@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-app: #F8FAFF;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F0F3FA;
+  --bg-hover: #D5DEEF;
+  --bg-input: #FFFFFF;
+  --border-default: #D5DEEF;
+  --border-hover: #B1C9EF;
+  --border-input: #B1C9EF;
+  --text-primary: #1B2A41;
+  --text-secondary: #5F6F89;
+  --text-muted: #8A97AB;
+  --text-inverse: #FFFFFF;
+  --accent-blue: #628ECB;
+  --accent-green: #5B9B7A;
+  --accent-purple: #8AAEE0;
+  --accent-amber: #C49A6B;
+  --accent-red: #C96B6B;
+  --shadow-card: none;
+  --shadow-elevated: none;
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.08);
+}
+
+/* Accent: Azul Chronos (default) */
+[data-accent="blue"], :root {
+  --accent-primary: #628ECB;
+  --accent-hover: #8AAEE0;
+  --accent-light: rgba(98, 142, 203, 0.08);
+  --accent-border: rgba(98, 142, 203, 0.3);
+  --accent-active-bg: #8AAEE0;
+  --accent-active-text: #FFFFFF;
+  --accent-ring: rgba(98, 142, 203, 0.3);
+  --sidebar-bg: #395886;
+  --sidebar-hover: #628ECB;
+  --sidebar-active: #8AAEE0;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #FFFFFF;
+}
+
+/* Accent: Verde Empresarial */
+[data-accent="green"] {
+  --accent-primary: #5B9B7A;
+  --accent-hover: #7BBF9A;
+  --accent-light: rgba(91, 155, 122, 0.08);
+  --accent-border: rgba(91, 155, 122, 0.3);
+  --accent-active-bg: #7BBF9A;
+  --accent-active-text: #FFFFFF;
+  --accent-ring: rgba(91, 155, 122, 0.3);
+  --sidebar-bg: #2D6A4F;
+  --sidebar-hover: #5B9B7A;
+  --sidebar-active: #7BBF9A;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #FFFFFF;
+}
+
+/* Accent: Roxo Executivo */
+[data-accent="purple"] {
+  --accent-primary: #5B3E96;
+  --accent-hover: #6F4FAF;
+  --accent-light: rgba(91, 62, 150, 0.08);
+  --accent-border: rgba(91, 62, 150, 0.3);
+  --accent-active-bg: #6F4FAF;
+  --accent-active-text: #FFFFFF;
+  --accent-ring: rgba(91, 62, 150, 0.3);
+  --sidebar-bg: #2D1B69;
+  --sidebar-hover: #4A2E8A;
+  --sidebar-active: #6F4FAF;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #FFFFFF;
+}
+
+/* Accent: Laranja Profissional */
+[data-accent="gold"] {
+  --accent-primary: #D48C4B;
+  --accent-hover: #E8A96A;
+  --accent-light: rgba(212, 140, 75, 0.08);
+  --accent-border: rgba(212, 140, 75, 0.3);
+  --accent-active-bg: #E8A96A;
+  --accent-active-text: #FFFFFF;
+  --accent-ring: rgba(212, 140, 75, 0.3);
+  --sidebar-bg: #8B5E20;
+  --sidebar-hover: #B8860B;
+  --sidebar-active: #E8A96A;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #FFFFFF;
+}
+
+/* Accent: Rosa */
+[data-accent="gray"] {
+  --accent-primary: #D96C8C;
+  --accent-hover: #E88DA8;
+  --accent-light: rgba(217, 108, 140, 0.08);
+  --accent-border: rgba(217, 108, 140, 0.3);
+  --accent-active-bg: #E88DA8;
+  --accent-active-text: #FFFFFF;
+  --accent-ring: rgba(217, 108, 140, 0.3);
+  --sidebar-bg: #8B2D4A;
+  --sidebar-hover: #B8546E;
+  --sidebar-active: #E88DA8;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #FFFFFF;
+}
+
+/* Accent: Vermelho Corporativo */
+[data-accent="red"] {
+  --accent-primary: #C96B6B;
+  --accent-hover: #D98C8C;
+  --accent-light: rgba(201, 107, 107, 0.08);
+  --accent-border: rgba(201, 107, 107, 0.3);
+  --accent-active-bg: #D98C8C;
+  --accent-active-text: #FFFFFF;
+  --accent-ring: rgba(201, 107, 107, 0.3);
+  --sidebar-bg: #8B3A3A;
+  --sidebar-hover: #B85454;
+  --sidebar-active: #D98C8C;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #FFFFFF;
+}
+
+/* Accent: Cinza Executivo */
+[data-accent="gray"] {
+  --accent-primary: #5F6F89;
+  --accent-hover: #8A97AB;
+  --accent-light: rgba(95, 111, 137, 0.08);
+  --accent-border: rgba(95, 111, 137, 0.3);
+  --accent-active-bg: #8A97AB;
+  --accent-active-text: #FFFFFF;
+  --accent-ring: rgba(95, 111, 137, 0.3);
+  --sidebar-bg: #334155;
+  --sidebar-hover: #5F6F89;
+  --sidebar-active: #8A97AB;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #FFFFFF;
+}
+
+/* Accent: Turquesa Moderno */
+[data-accent="teal"] {
+  --accent-primary: #2DD4BF;
+  --accent-hover: #5EEAD4;
+  --accent-light: rgba(45, 212, 191, 0.08);
+  --accent-border: rgba(45, 212, 191, 0.3);
+  --accent-active-bg: #5EEAD4;
+  --accent-active-text: #0F172A;
+  --accent-ring: rgba(45, 212, 191, 0.3);
+  --sidebar-bg: #0F766E;
+  --sidebar-hover: #14B8A6;
+  --sidebar-active: #5EEAD4;
+  --sidebar-text: #F0F3FA;
+  --sidebar-text-active: #0F172A;
+}
+
+.dark {
+  --bg-app: #081120;
+  --bg-surface: #0E1C36;
+  --bg-elevated: #101E3A;
+  --bg-hover: rgba(255,255,255,0.04);
+  --bg-input: rgba(255,255,255,0.04);
+  --border-default: rgba(255,255,255,0.05);
+  --border-hover: rgba(255,255,255,0.10);
+  --border-input: rgba(255,255,255,0.06);
+  --text-primary: #F0F3FA;
+  --text-secondary: #B1C9EF;
+  --text-muted: #8A97AB;
+  --text-inverse: #081120;
+  --accent-blue: #628ECB;
+  --accent-green: #5B9B7A;
+  --accent-purple: #8AAEE0;
+  --accent-amber: #C49A6B;
+  --accent-red: #C96B6B;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.dark[data-accent="blue"] {
+  --sidebar-bg: #0B1730;
+  --sidebar-hover: #1F3250;
+  --sidebar-active: #8AAEE0;
+}
+
+.dark[data-accent="green"] {
+  --sidebar-bg: #002B1A;
+  --sidebar-hover: #1B4D3A;
+  --sidebar-active: #7BBF9A;
+}
+
+.dark[data-accent="purple"] {
+  --sidebar-bg: #1A0533;
+  --sidebar-hover: #3B0764;
+  --sidebar-active: #A78BFA;
+}
+
+.dark[data-accent="gold"] {
+  --sidebar-bg: #1F0D02;
+  --sidebar-hover: #4A2815;
+  --sidebar-active: #E8A96A;
+}
+
+.dark[data-accent="red"] {
+  --sidebar-bg: #1F0505;
+  --sidebar-hover: #4A1515;
+  --sidebar-active: #D98C8C;
+}
+
+.dark[data-accent="gray"] {
+  --sidebar-bg: #1F0510;
+  --sidebar-hover: #4A1528;
+  --sidebar-active: #E88DA8;
+}
+
+.dark[data-accent="teal"] {
+  --sidebar-bg: #021A19;
+  --sidebar-hover: #0F3D3A;
+  --sidebar-active: #5EEAD4;
+}
+
+@layer components {
+  .bg-app { background-color: var(--bg-app); }
+  .bg-surface { background-color: var(--bg-surface); }
+  .bg-elevated { background-color: var(--bg-elevated); }
+  .bg-hover { background-color: var(--bg-hover); }
+  .bg-input { background-color: var(--bg-input); }
+  .border-default { border-color: var(--border-default); }
+  .border-hover { border-color: var(--border-hover); }
+  .border-input { border-color: var(--border-input); }
+  .text-primary { color: var(--text-primary); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-muted { color: var(--text-muted); }
+  .text-inverse { color: var(--text-inverse); }
+
+  .sidebar-bg { background-color: var(--sidebar-bg); }
+  .sidebar-text { color: var(--sidebar-text); }
+  .sidebar-text-active { color: var(--sidebar-text-active); }
+
+  .text-accent-blue { color: var(--accent-blue); }
+  .text-accent-green { color: var(--accent-green); }
+  .text-accent-purple { color: var(--accent-purple); }
+  .text-accent-amber { color: var(--accent-amber); }
+  .text-accent-red { color: var(--accent-red); }
+
+  .bg-accent-blue\/8 { background-color: color-mix(in srgb, var(--accent-blue) 8%, transparent); }
+  .bg-accent-green\/8 { background-color: color-mix(in srgb, var(--accent-green) 8%, transparent); }
+  .bg-accent-purple\/8 { background-color: color-mix(in srgb, var(--accent-purple) 8%, transparent); }
+  .bg-accent-amber\/8 { background-color: color-mix(in srgb, var(--accent-amber) 8%, transparent); }
+  .bg-accent-red\/8 { background-color: color-mix(in srgb, var(--accent-red) 8%, transparent); }
+
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-modal { box-shadow: var(--shadow-modal); }
+}
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+input, select, textarea, button, a {
+  transition-property: background-color, border-color, color, box-shadow, transform;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
