@@ -30,30 +30,35 @@ async function send(to: string, subject: string, html: string) {
 }
 
 function bannerTop() {
-  return `<img
-    src="https://xwitkwbymmucultysyox.supabase.co/storage/v1/object/public/branding/banner%20chronos.png"
-    alt="Chronos"
-    style="width:100%;display:block;"
-  />`
+  const imgUrl = 'https://xwitkwbymmucultysyox.supabase.co/storage/v1/object/public/branding/banner%20chronos.png'
+  return `
+    <!--[if !mso]><!-->
+    <img src="${imgUrl}" alt="Chronos" style="width:100%;display:block;max-width:700px;" onerror="this.style.display='none'">
+    <!--<![endif]-->
+    <div style="background:#071A3D;padding:20px;text-align:center;mso-hide:all;">
+      <h1 style="margin:0;color:#ffffff;font-size:24px;letter-spacing:2px;">CHRONOS</h1>
+      <p style="margin:4px 0 0;color:#94A3B8;font-size:13px;">Gestão de Pessoas</p>
+    </div>`
 }
 
 function bannerBottom() {
+  const imgUrl = 'https://xwitkwbymmucultysyox.supabase.co/storage/v1/object/public/branding/banner%20final%20do%20email.png'
   return `
     <hr style="margin:32px 0;border:none;border-top:1px solid #E2E8F0;">
     <div style="text-align:center;">
-      <img
-        src="https://xwitkwbymmucultysyox.supabase.co/storage/v1/object/public/branding/banner%20final%20do%20email.png"
-        alt="Chronos"
-        style="max-width:320px;width:100%;height:auto;display:block;margin:0 auto 20px auto;"
-      />
-      <p style="margin:0;color:#64748B;font-size:14px;line-height:1.7;">
-        <strong>Milena Alves</strong><br>
-        Desenvolvedora Responsável
-      </p>
-      <p style="margin-top:12px;color:#94A3B8;font-size:12px;">
-        © 2026 Chronos • Gestão de Pessoas<br>
-        Gestão inteligente de jornadas e produtividade.
-      </p>
+      <!--[if !mso]><!-->
+      <img src="${imgUrl}" alt="Chronos" style="max-width:320px;width:100%;height:auto;display:block;margin:0 auto 20px auto;" onerror="this.style.display='none'">
+      <!--<![endif]-->
+      <div style="mso-hide:all;">
+        <p style="margin:0;color:#64748B;font-size:14px;line-height:1.7;">
+          <strong>Milena Alves</strong><br>
+          Desenvolvedora Responsável
+        </p>
+        <p style="margin-top:12px;color:#94A3B8;font-size:12px;">
+          © 2026 Chronos • Gestão de Pessoas<br>
+          Gestão inteligente de jornadas e produtividade.
+        </p>
+      </div>
     </div>`
 }
 
