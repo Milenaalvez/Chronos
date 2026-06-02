@@ -43,7 +43,11 @@ app.use('/api/face-registration', faceRegistrationRouter)
 
 app.use(errorHandler)
 
-app.listen(env.port, () => {
-  console.log(`Chronos API running on http://localhost:${env.port}`)
-  startScheduler()
-})
+if (!process.env.VERCEL) {
+  app.listen(env.port, () => {
+    console.log(`Chronos API running on http://localhost:${env.port}`)
+    startScheduler()
+  })
+}
+
+export default app
