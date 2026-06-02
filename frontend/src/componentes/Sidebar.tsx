@@ -136,7 +136,6 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
         { label: "Férias", icon: Umbrella, page: "ferias" },
         { label: "Calendário", icon: Calendar, page: "calendario" },
         { label: "Relatórios", icon: BarChart3, page: "relatorios" },
-        { label: "Documentos", icon: FileText, page: "documentos" },
       ],
     },
     {
