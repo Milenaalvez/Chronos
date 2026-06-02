@@ -1,4 +1,4 @@
-const BASE_URL = '/api'
+const BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 let token: string | null = localStorage.getItem('chronos_token')
 let refreshToken: string | null = localStorage.getItem('chronos_refresh')
