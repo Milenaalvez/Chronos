@@ -6,13 +6,13 @@ import type { EventClickArg, EventContentArg } from "@fullcalendar/core"
 import {
   Umbrella, CalendarCheck, Users, Clock, CheckCircle,
   Search, MoreHorizontal, Eye, ThumbsUp, ThumbsDown, Edit3, X, Plus,
-  ChevronLeft, ChevronRight, Loader2, Calendar,
+  ChevronLeft, ChevronRight, Loader2, Calendar, ClipboardList,
 } from "lucide-react"
-import { team as apiTeam } from "../services/api"
+import { team as apiTeam, notifications as apiNotifs } from "../services/api"
 import { PageHeader } from "../componentes/PageHeader"
 
 interface TeamMember {
-  id: string; name: string; email: string; role: string; department: string | null; departmentId: string | null
+  id: string; name: string; email: string; role: string; department: string | null; departmentId: string | null; hireDate: string
 }
 
 interface FeriasRecord {
@@ -65,7 +65,7 @@ export function FeriasPage() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("")
   const [deptFilter, setDeptFilter] = useState("")
-  const [activeTab, setActiveTab] = useState<"lista" | "calendario">("lista")
+  const [activeTab, setActiveTab] = useState<"lista" | "calendario" | "analise">("lista")
   const [page, setPage] = useState(1)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
@@ -76,6 +76,8 @@ export function FeriasPage() {
   const [newNotes, setNewNotes] = useState("")
 
   const [viewRecord, setViewRecord] = useState<FeriasRecord | null>(null)
+  const [analyzeRecord, setAnalyzeRecord] = useState<FeriasRecord | null>(null)
+  const [confirmResult, setConfirmResult] = useState<{ record: FeriasRecord; action: "aprovado" | "rejeitado" } | null>(null)
 
   const closeMenu = () => setOpenMenuId(null)
 
@@ -147,13 +149,41 @@ export function FeriasPage() {
   }
 
   function handleApprove(id: string) {
+    const record = records.find(r => r.id === id)
+    if (!record) return
     setRecords(prev => prev.map(r => r.id === id ? { ...r, status: "aprovado" as const } : r))
     setOpenMenuId(null)
+    setAnalyzeRecord(null)
+    setConfirmResult({ record, action: "aprovado" })
+    const member = teamMembers.find(m => m.id === record.collaboratorId)
+    apiNotifs.create({
+      title: "Férias aprovadas",
+      message: `As férias de ${record.collaboratorName} foram aprovadas.`,
+      type: "APPROVAL",
+      collaboratorEmail: member?.email,
+      collaboratorName: record.collaboratorName,
+      period: `${fmtDate(record.startDate)} — ${fmtDate(record.endDate)}`,
+      sendEmail: !!member?.email,
+    }).catch(() => {})
   }
 
   function handleReject(id: string) {
+    const record = records.find(r => r.id === id)
+    if (!record) return
     setRecords(prev => prev.map(r => r.id === id ? { ...r, status: "rejeitado" as const } : r))
     setOpenMenuId(null)
+    setAnalyzeRecord(null)
+    setConfirmResult({ record, action: "rejeitado" })
+    const member = teamMembers.find(m => m.id === record.collaboratorId)
+    apiNotifs.create({
+      title: "Férias recusadas",
+      message: `As férias de ${record.collaboratorName} foram recusadas.`,
+      type: "WARNING",
+      collaboratorEmail: member?.email,
+      collaboratorName: record.collaboratorName,
+      period: `${fmtDate(record.startDate)} — ${fmtDate(record.endDate)}`,
+      sendEmail: !!member?.email,
+    }).catch(() => {})
   }
 
   const departments = useMemo(() => {
@@ -214,6 +244,14 @@ export function FeriasPage() {
         >
           <Calendar size={14} strokeWidth={1.5} />
           Calendário Anual
+        </button>
+        <button onClick={() => setActiveTab("analise")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold transition-all ${
+            activeTab === "analise" ? "bg-surface text-primary shadow-sm" : "text-muted hover:text-primary"
+          }`}
+        >
+          <ClipboardList size={14} strokeWidth={1.5} />
+          Pedidos para Análise
         </button>
       </div>
 
@@ -381,7 +419,7 @@ export function FeriasPage() {
             </div>
           )}
         </>
-      ) : (
+      ) : activeTab === "calendario" ? (
         /* Calendar View */
         <div className="flex flex-col gap-4">
           <div className="rounded-xl bg-surface border border-default/20 p-3 overflow-x-auto">
@@ -436,6 +474,58 @@ export function FeriasPage() {
               <div className="w-3 h-3 rounded bg-[#6366f1]" />
               <span className="text-[11px] text-muted">Em andamento</span>
             </div>
+          </div>
+        </div>
+      ) : (
+        /* Pedidos para Análise */
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted">{records.filter(r => r.status === "pendente").length} solicitação(ões) aguardando análise</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {records.filter(r => r.status === "pendente").map(r => (
+              <div key={r.id} className="rounded-xl bg-surface border border-default/20 hover:shadow-md transition-all duration-200 overflow-hidden">
+                <div className="p-4 flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--sidebar-bg)] flex items-center justify-center text-xs font-bold text-white shrink-0">
+                      {avatarFallback(r.collaboratorName)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-primary truncate">{r.collaboratorName}</p>
+                      <span className="text-[11px] text-amber-400 font-medium">{STATUS_CONFIG[r.status].label}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-[11px]">
+                    <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-elevated/20 col-span-2">
+                      <span className="text-muted uppercase tracking-wider font-semibold">Período</span>
+                      <span className="text-primary font-medium">{fmtDate(r.startDate)} — {fmtDate(r.endDate)}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-elevated/20">
+                      <span className="text-muted uppercase tracking-wider font-semibold">Dias</span>
+                      <span className="text-primary font-medium">{r.days}d</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-elevated/20 col-span-3">
+                      <span className="text-muted uppercase tracking-wider font-semibold">Solicitado em</span>
+                      <span className="text-primary font-medium">{fmtDate(r.requestedAt)}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-t border-default/20">
+                  <button onClick={() => setAnalyzeRecord(r)}
+                    className="flex-1 py-2.5 text-[11px] font-semibold text-primary hover:bg-elevated/30 transition-all duration-150 text-center"
+                  >
+                    Analisar
+                  </button>
+                </div>
+              </div>
+            ))}
+            {records.filter(r => r.status === "pendente").length === 0 && (
+              <div className="col-span-full flex flex-col items-center gap-2 py-16">
+                <ClipboardList size={24} className="text-muted/50" strokeWidth={1.5} />
+                <p className="text-sm text-muted">Nenhum pedido pendente.</p>
+                <p className="text-[11px] text-muted/70">Todas as solicitações já foram analisadas.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -570,6 +660,112 @@ export function FeriasPage() {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Analisar Modal */}
+      {analyzeRecord && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setAnalyzeRecord(null)}>
+          <div className="w-full max-w-lg mx-4 rounded-2xl bg-surface border border-default/30 shadow-modal"
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-default/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-400/10 flex items-center justify-center">
+                  <ClipboardList size={16} className="text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-primary">Analisar Solicitação</h3>
+                  <p className="text-xs text-secondary">{analyzeRecord.collaboratorName}</p>
+                </div>
+              </div>
+              <button onClick={() => setAnalyzeRecord(null)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all duration-200">
+                <X size={16} strokeWidth={2} />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                {(() => {
+                  const member = teamMembers.find(m => m.id === analyzeRecord.collaboratorId)
+                  return [
+                    { label: "Colaborador", value: analyzeRecord.collaboratorName },
+                    { label: "Admissão", value: member?.hireDate ? fmtDate(member.hireDate) : "---" },
+                    { label: "Período", value: `${fmtDate(analyzeRecord.startDate)} — ${fmtDate(analyzeRecord.endDate)}` },
+                    { label: "Dias", value: `${analyzeRecord.days} dias` },
+                    { label: "Solicitado em", value: fmtDate(analyzeRecord.requestedAt) },
+                  ]
+                })().map(item => (
+                  <div key={item.label} className="flex flex-col gap-1 p-3 rounded-lg bg-elevated/20">
+                    <span className="text-[9px] font-semibold uppercase tracking-wider text-muted">{item.label}</span>
+                    <span className="text-xs font-medium text-primary">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+              {analyzeRecord.notes && (
+                <div className="flex flex-col gap-1 p-3 rounded-lg bg-elevated/20">
+                  <span className="text-[9px] font-semibold uppercase tracking-wider text-muted">Observações</span>
+                  <p className="text-xs text-primary">{analyzeRecord.notes}</p>
+                </div>
+              )}
+              <div className="flex items-center gap-3 pt-3 border-t border-default/10">
+                <button onClick={() => { handleReject(analyzeRecord.id); setAnalyzeRecord(null) }}
+                  className="flex-1 h-11 rounded-lg border border-accent-red/30 text-xs font-semibold text-accent-red hover:bg-accent-red/8 transition-all flex items-center justify-center gap-2"
+                >
+                  <ThumbsDown size={14} strokeWidth={2} /> Recusar
+                </button>
+                <button onClick={() => { handleApprove(analyzeRecord.id); setAnalyzeRecord(null) }}
+                  className="flex-1 h-11 rounded-lg bg-accent-green text-xs font-semibold text-white hover:bg-accent-green/80 transition-all flex items-center justify-center gap-2"
+                >
+                  <ThumbsUp size={14} strokeWidth={2} /> Aprovar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmação Modal */}
+      {confirmResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setConfirmResult(null)}>
+          <div className="w-full max-w-md mx-4 rounded-2xl bg-surface border border-default/30 shadow-modal"
+            onClick={e => e.stopPropagation()}>
+            <div className="flex flex-col items-center gap-4 py-10 px-8 text-center">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                confirmResult.action === "aprovado" ? "bg-accent-green/10" : "bg-accent-red/10"
+              }`}>
+                {confirmResult.action === "aprovado" ? (
+                  <ThumbsUp size={28} className="text-accent-green" strokeWidth={1.5} />
+                ) : (
+                  <ThumbsDown size={28} className="text-accent-red" strokeWidth={1.5} />
+                )}
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-primary">
+                  {confirmResult.action === "aprovado" ? "Férias aprovadas" : "Férias recusadas"}
+                </h3>
+                <p className="text-xs text-secondary mt-1">
+                  Solicitação de <strong>{confirmResult.record.collaboratorName}</strong> foi {confirmResult.action === "aprovado" ? "aprovada" : "recusada"} com sucesso.
+                </p>
+              </div>
+              <div className="w-full flex flex-col gap-1.5 p-3 rounded-lg bg-elevated/20 text-[11px]">
+                <div className="flex justify-between">
+                  <span className="text-muted">Período</span>
+                  <span className="text-primary font-medium">{fmtDate(confirmResult.record.startDate)} — {fmtDate(confirmResult.record.endDate)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted">Dias</span>
+                  <span className="text-primary font-medium">{confirmResult.record.days}d</span>
+                </div>
+              </div>
+              <button onClick={() => setConfirmResult(null)}
+                className="w-full h-10 rounded-lg bg-[var(--accent-primary)] text-xs font-semibold text-white hover:bg-[var(--accent-hover)] transition-all"
+              >
+                OK
+              </button>
             </div>
           </div>
         </div>

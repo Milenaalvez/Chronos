@@ -37,6 +37,19 @@ export async function remove(req: AuthRequest, res: Response, next: NextFunction
   } catch (err) { next(err) }
 }
 
+export async function create(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const { title, message, type, link, metadata, sendEmail, collaboratorEmail, collaboratorName, period } = req.body
+    const notif = await service.createNotification(req.user!.userId, { title, message, type, link, metadata })
+    if (sendEmail && collaboratorEmail) {
+      const { sendVacationStatusEmail } = await import('../../services/email.js')
+      const reviewerName = req.user!.name || 'RH'
+      sendVacationStatusEmail(collaboratorEmail, collaboratorName || 'Colaborador', type === 'APPROVAL' ? 'aprovado' : 'rejeitado', period || '', reviewerName).catch(() => {})
+    }
+    res.json(notif)
+  } catch (err) { next(err) }
+}
+
 export async function refreshNotifications(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     await service.generateAllSmartNotifications(req.user!.userId)

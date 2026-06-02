@@ -143,6 +143,37 @@ export async function sendPasswordResetEmail(to: string, name: string, link: str
   `)
 }
 
+export async function sendVacationStatusEmail(to: string, collaboratorName: string, status: 'aprovado' | 'rejeitado', period: string, reviewerName: string) {
+  const subject = status === 'aprovado'
+    ? 'Férias aprovadas - Chronos'
+    : 'Férias recusadas - Chronos'
+  const heading = status === 'aprovado'
+    ? 'Suas férias foram aprovadas!'
+    : 'Suas férias foram recusadas'
+  const color = status === 'aprovado' ? '#10b981' : '#ef4444'
+  await send(to, subject, `
+    <div style="font-family:Arial,Helvetica,sans-serif;background:#f8fafc;padding:20px;">
+      <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;">
+        ${bannerTop()}
+        <div style="padding:32px;">
+          <h2 style="color:#071A3D;">${heading}</h2>
+          <p>Olá <strong>${collaboratorName}</strong>,</p>
+          <p>O status da sua solicitação de férias foi atualizado por <strong>${reviewerName}</strong>.</p>
+          <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:20px 0;">
+            <p style="margin:4px 0;"><strong>Período:</strong> ${period}</p>
+            <p style="margin:4px 0;">
+              <strong>Status:</strong>
+              <span style="color:${color};font-weight:600;">${status === 'aprovado' ? 'Aprovado' : 'Recusado'}</span>
+            </p>
+          </div>
+          <p style="color:#64748b;">Acesse o Chronos para mais detalhes.</p>
+          ${bannerBottom()}
+        </div>
+      </div>
+    </div>
+  `)
+}
+
 export async function sendSecurityNotification(to: string, name: string) {
   await send(to, 'Senha alterada - Chronos', `
     <div style="font-family:Arial,Helvetica,sans-serif;background:#f8fafc;padding:20px;">

@@ -342,7 +342,12 @@ export async function getMetrics(companyId: string, actorId?: string) {
   const canAll = await canViewAll(actorId)
   const whereCompany = canAll ? {} : { companyId }
 
-  const [total, active, inactive, verified, justifications, todayRecords] = await Promise.all([
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)
+  const prevMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+  const prevMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999)
+
+  const [total, active, inactive, verified, justifications, todayRecords, hiresThisMonth, deactivationsThisMonth, hiresPrevMonth, deactivationsPrevMonth] = await Promise.all([
     prisma.user.count({ where: whereCompany }),
     prisma.user.count({ where: { ...whereCompany, isActive: true } }),
     prisma.user.count({ where: { ...whereCompany, isActive: false } }),
@@ -354,11 +359,29 @@ export async function getMetrics(companyId: string, actorId?: string) {
       where: { date: new Date(todayStr), user: canAll ? {} : { companyId } },
       select: { userId: true, status: true, clockIn: true, clockOut: true, totalMinutes: true },
     }),
+    prisma.user.count({
+      where: { ...whereCompany, hireDate: { gte: monthStart, lte: monthEnd } },
+    }),
+    prisma.user.count({
+      where: { ...whereCompany, isActive: false, updatedAt: { gte: monthStart, lte: monthEnd } },
+    }),
+    prisma.user.count({
+      where: { ...whereCompany, hireDate: { gte: prevMonthStart, lte: prevMonthEnd } },
+    }),
+    prisma.user.count({
+      where: { ...whereCompany, isActive: false, updatedAt: { gte: prevMonthStart, lte: prevMonthEnd } },
+    }),
   ])
 
   const presentToday = todayRecords.filter(r => r.clockIn).length
   const lateToday = todayRecords.filter(r => r.clockIn && r.status === 'ABSENCE').length
   const absentToday = active - presentToday
+
+  function trend(current: number, prev: number): 'up' | 'down' | 'stable' {
+    if (current > prev) return 'up'
+    if (current < prev) return 'down'
+    return 'stable'
+  }
 
   return {
     total,
@@ -369,6 +392,10 @@ export async function getMetrics(companyId: string, actorId?: string) {
     lateToday,
     absentToday: Math.max(absentToday, 0),
     pendingJustifications: justifications,
+    hiresThisMonth,
+    deactivationsThisMonth,
+    hiresTrend: trend(hiresThisMonth, hiresPrevMonth),
+    deactivationsTrend: trend(deactivationsThisMonth, deactivationsPrevMonth),
   }
 }
 

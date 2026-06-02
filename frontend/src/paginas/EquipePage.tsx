@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Wifi, Lock,
   ThumbsUp, ThumbsDown,
+  UserRoundPlus, UserRoundX, Umbrella, TrendingUp, TrendingDown,
 } from "lucide-react"
 import { team as apiTeam, justifications as apiJust, timeRecords as apiRecords, reference as apiRef } from "../services/api"
 import { PageHeader } from "../componentes/PageHeader"
@@ -34,6 +35,9 @@ interface MetricsData {
   total: number; active: number; inactive: number; verified: number
   presentToday: number; lateToday: number
   absentToday: number; pendingJustifications: number
+  hiresThisMonth: number; deactivationsThisMonth: number
+  hiresTrend: 'up' | 'down' | 'stable'
+  deactivationsTrend: 'up' | 'down' | 'stable'
 }
 
 interface JustItem {
@@ -176,6 +180,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("todas")
   const [statusFilter, setStatusFilter] = useState("todos")
+  const [sortOrder, setSortOrder] = useState<"az" | "za">("az")
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -299,8 +304,9 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
     }
     if (roleFilter !== "todas") list = list.filter(m => m.role === roleFilter)
     if (statusFilter !== "todos") list = list.filter(m => statusOf(m) === statusFilter)
+    list.sort((a, b) => sortOrder === "az" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
     return list
-  }, [membersWithLocalStats, search, roleFilter, statusFilter])
+  }, [membersWithLocalStats, search, roleFilter, statusFilter, sortOrder])
 
   const pendingJusts = useMemo(() => justifications.filter(j => j.status === "PENDING"), [justifications])
   const roles = useMemo(() => ["todas", ...new Set(membersWithLocalStats.map(m => m.role))], [membersWithLocalStats])
@@ -499,7 +505,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
         title="Equipe"
         subtitle={
           metrics
-            ? `${metrics.active} ativos · ${metrics.presentToday} presentes hoje`
+            ? `${metrics.total} colaboradores · ${metrics.presentToday} presentes hoje`
             : "Carregando..."
         }
         loading={loading}
@@ -535,27 +541,38 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
       {/* Metric cards */}
       {metrics && (
         <div className="flex items-stretch">
-          {[
-            { key: "total" as const, label: "Total", icon: Users, color: "text-accent-purple/80" },
-            { key: "active" as const, label: "Ativos", icon: UserCheck, color: "text-accent-green/80" },
-            { key: "presentToday" as const, label: "Presentes hoje", icon: Clock, color: "text-accent-green/80" },
-            { key: "absentToday" as const, label: "Ausentes hoje", icon: UserX, color: "text-accent-red/80" },
-            { key: "lateToday" as const, label: "Em atraso", icon: AlertTriangle, color: "text-accent-amber/80" },
-            { key: "pendingJustifications" as const, label: "Justif. pendentes", icon: FileText, color: "text-accent-amber/80" },
-            { key: "inactive" as const, label: "Inativos", icon: UserX, color: "text-muted/60" },
-          ].map(c => {
-            const Icon = c.icon
-            const val = metrics[c.key]
-            return (
-              <div key={c.key} className="flex-1 flex flex-col gap-1.5 p-5 border-r border-default last:border-r-0">
-                <div className="flex items-center gap-2">
-                  <Icon size={13} className={c.color} />
-                  <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">{c.label}</span>
+          {(() => {
+            const cards = [
+              { key: "total" as const, label: "Total de Colaboradores", icon: Users, value: metrics.total, color: "text-accent-purple/80", bg: "bg-accent-purple/5", trend: null as null | { dir: 'up' | 'down'; val: number } },
+              { key: "hires" as const, label: "Admissões (mês)", icon: UserRoundPlus, value: metrics.hiresThisMonth, color: "text-accent-green/80", bg: "bg-accent-green/5", trend: { dir: metrics.hiresTrend, val: metrics.hiresThisMonth } },
+              { key: "deactivations" as const, label: "Desligamentos (mês)", icon: UserRoundX, value: metrics.deactivationsThisMonth, color: "text-accent-red/80", bg: "bg-accent-red/5", trend: { dir: metrics.deactivationsTrend, val: metrics.deactivationsThisMonth } },
+              { key: "presentToday" as const, label: "Presentes hoje", icon: Clock, value: metrics.presentToday, color: "text-accent-green/80", bg: "bg-accent-green/5", trend: null },
+            ]
+            return cards.map(c => {
+              const Icon = c.icon
+              return (
+                <div key={c.key} className={`flex-1 flex flex-col gap-2 p-5 border-r border-default last:border-r-0 ${c.bg}`}>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center`}>
+                      <Icon size={14} className={c.color} />
+                    </div>
+                    <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">{c.label}</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl font-bold text-primary">{c.value}</span>
+                    {c.trend && (
+                      <span className={`flex items-center gap-0.5 text-[11px] font-semibold ${
+                        c.trend.dir === 'up' ? 'text-accent-green' : c.trend.dir === 'down' ? 'text-accent-red' : 'text-muted'
+                      }`}>
+                        {c.trend.dir === 'up' ? <TrendingUp size={12} strokeWidth={2} /> : c.trend.dir === 'down' ? <TrendingDown size={12} strokeWidth={2} /> : null}
+                        {c.trend.dir === 'stable' ? '—' : c.trend.dir === 'up' ? 'alta' : 'baixa'}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <span className="text-xl font-bold text-primary">{val}</span>
-              </div>
-            )
-          })}
+              )
+            })
+          })()}
         </div>
       )}
 
@@ -600,6 +617,12 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
               {(["online","late","absent","offline","pending","inactive"] as StatusKey[]).map(k => (
                 <option key={k} value={k} className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">{STATUS_CFG[k].label}</option>
               ))}
+            </select>
+            <select value={sortOrder} onChange={e => setSortOrder(e.target.value as "az" | "za")}
+              className="h-9 px-2.5 rounded-lg border border-default/20 bg-input text-[11px] text-primary focus:outline-none focus:border-[var(--accent-ring)]"
+            >
+              <option value="az" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">A → Z</option>
+              <option value="za" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Z → A</option>
             </select>
             <span className="text-[11px] text-muted whitespace-nowrap">{filtered.length} de {members.length}</span>
           </div>

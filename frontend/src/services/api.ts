@@ -286,6 +286,21 @@ export const justifications = {
 }
 
 export const notifications = {
+  create: (data: {
+    title: string
+    message: string
+    type: 'APPROVAL' | 'WARNING' | 'INFO' | 'SYSTEM'
+    link?: string
+    metadata?: Record<string, unknown>
+    sendEmail?: boolean
+    collaboratorEmail?: string
+    collaboratorName?: string
+    period?: string
+  }) => request<any>('/notifications', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+
   list: () => request<any[]>('/notifications'),
 
   unreadCount: () => request<{ count: number }>('/notifications/unread-count'),
