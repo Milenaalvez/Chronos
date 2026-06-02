@@ -179,7 +179,7 @@ export function JustificativasPage() {
                 Histórico ({justifications.filter(j => j.status !== "PENDING").length})
               </summary>
               <div className="flex flex-col">
-                {justifications.filter(j => j.status !== "PENDING").map((j, ji) => (
+                {justifications.filter(j => j.status !== "PENDING").map((j) => (
                   <div key={j.id} className="flex items-center gap-3 py-3 border-b border-default/5 last:border-b-0">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${j.status === "APPROVED" ? "bg-[var(--accent-green)]/8" : "bg-[var(--accent-red)]/8"}`}>
                       {j.status === "APPROVED"

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { ShieldCheck, Clock, AlertTriangle, CheckCircle, XCircle, Loader2, ExternalLink, Eye } from "lucide-react"
+import { Clock, CheckCircle, ExternalLink, Eye } from "lucide-react"
 import { PageHeader } from "../componentes/PageHeader"
 import { timeRecords as apiRecords } from "../services/api"
 import { ReviewModal } from "../componentes/ReviewModal"

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Activity, CheckCircle, XCircle, AlertTriangle, Clock, User, Loader2, ShieldCheck } from "lucide-react"
+import { Activity, CheckCircle, XCircle } from "lucide-react"
 import { PageHeader } from "../componentes/PageHeader"
 import { team as apiTeam } from "../services/api"
 

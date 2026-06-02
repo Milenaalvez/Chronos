@@ -174,7 +174,7 @@ export default function App() {
 
   const [showTerms, setShowTerms] = useState(false)
   const [showFaceReg, setShowFaceReg] = useState(false)
-  const [onboardingChecked, setOnboardingChecked] = useState(false)
+  const onboardingRef = useRef(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const prevUserIdRef = useRef<string | null>(null)
@@ -291,11 +291,6 @@ export default function App() {
   const handleDelete = useCallback((dataISO: string) => {
     setRecords((prev) => prev.filter((r) => r.dataISO !== dataISO))
     setDeletedDates((prev) => new Set(prev).add(dataISO))
-  }, [])
-
-  const handleOpenNew = useCallback(() => {
-    setEditDate(undefined)
-    setModalOpen(true)
   }, [])
 
   const handleJustificar = useCallback((data: Justificacao) => {
@@ -461,13 +456,13 @@ export default function App() {
       apiTermAcceptance.status().catch(() => ({ accepted: false })),
       apiFaceRegistration.status().catch(() => ({ registered: false })),
     ]).then(([terms, face]) => {
-      setOnboardingChecked(true)
+      onboardingRef.current = true
       if (!terms.accepted) {
         setShowTerms(true)
       } else if (!face.registered) {
         setShowFaceReg(true)
       }
-    }).catch(() => setOnboardingChecked(true))
+    }).catch(() => { onboardingRef.current = true })
   }, [authenticated])
 
   useEffect(() => {

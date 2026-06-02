@@ -105,11 +105,6 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
       : b.dataISO.localeCompare(a.dataISO))
   }, [allRecords, periodo, status, tipo, search, justificacoes, ordemCrescente])
 
-  function handleOpenNew() {
-    setEditDate(undefined)
-    setModalOpen(true)
-  }
-
   function handleEditClick(dataISO: string) {
     setEditDate(dataISO)
     setModalOpen(true)

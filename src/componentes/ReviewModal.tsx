@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { CheckCircle2, XCircle, AlertTriangle, Clock, MapPin, Smartphone, Camera, KeyRound, User, Hash, Briefcase, Building, Loader2, X, ExternalLink, Wifi, Globe, Monitor, ShieldCheck } from "lucide-react"
+import { CheckCircle2, XCircle, AlertTriangle, Clock, MapPin, Smartphone, Camera, User, Hash, Loader2, X, Wifi, ShieldCheck, Briefcase, Building } from "lucide-react"
 import { timeRecords as apiRecords, pointRecords as apiPointRecords } from "../services/api"
 import type { PointEvent } from "../types"
 

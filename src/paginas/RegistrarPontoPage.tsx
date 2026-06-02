@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react"
-import { MapPin, Smartphone, ShieldCheck, Clock, LogIn, LogOut, Coffee, Undo2, CheckCircle2, XCircle, AlertTriangle, Loader2, User, Hash, Briefcase, Building, Camera, Wifi, Monitor, Globe, ArrowUpRight, ArrowDownLeft, ScanLine, Maximize2, X } from "lucide-react"
+import { MapPin, Smartphone, ShieldCheck, Clock, LogIn, LogOut, Coffee, Undo2, CheckCircle2, XCircle, AlertTriangle, Loader2, User, Hash, Wifi, ArrowUpRight, ArrowDownLeft, ScanLine, Maximize2, X, Monitor, Globe } from "lucide-react"
 import { PageHeader } from "../componentes/PageHeader"
 import { PointVerificationModal } from "../componentes/PointVerificationModal"
 import { LocationMap } from "../componentes/LocationMap"
@@ -16,9 +16,9 @@ const POINT_CONFIG: Record<PointType, { label: string; desc: string; icon: any }
 
 const POINT_ORDER: PointType[] = ["ENTRY", "BREAK_START", "BREAK_END", "EXIT"]
 
-function nowTime(): string {
+function nowTime(): number {
   const d = new Date()
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
+  return d.getHours() * 60 + d.getMinutes()
 }
 
 function todayISO(): string {
@@ -52,11 +52,6 @@ function getDeviceInfo(): DeviceInfo {
     screenWidth: window.screen.width,
     screenHeight: window.screen.height,
   }
-}
-
-function formatHour(d: string): string {
-  const date = new Date(d)
-  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`
 }
 
 function maskCPF(cpf?: string | null): string {
@@ -121,7 +116,7 @@ interface RegistrarPontoPageProps {
 
 export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageProps) {
   const [todayEvents, setTodayEvents] = useState<PointEvent[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [location, setLocation] = useState<LocationData | null>(null)
@@ -132,7 +127,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
   const [modalOpen, setModalOpen] = useState(false)
   const [locationModalOpen, setLocationModalOpen] = useState(false)
   const [selectedType, setSelectedType] = useState<PointType | null>(null)
-  const [recording, setRecording] = useState(false)
+  const [, setRecording] = useState(false)
 
   // Face verification state
   const [faceRegistered, setFaceRegistered] = useState<boolean | null>(null)
@@ -283,7 +278,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
 
       await apiPointRecords.create({
         pointType: selectedType,
-        timeValue: timeVal,
+        timeValue: String(timeVal),
         latitude: locData.latitude,
         longitude: locData.longitude,
         locationAccuracy: locData.accuracy,
