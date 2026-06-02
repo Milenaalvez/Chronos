@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "npx tsx server/src/index.ts",
+    "start": "npx tsx src/index.ts",
     "build": "npx prisma generate",
-    "dev": "npx tsx watch server/src/index.ts"
+    "dev": "npx tsx watch src/index.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
