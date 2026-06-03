@@ -7,15 +7,15 @@ interface ClockIconProps {
 export function ClockIcon({ size = 48, accent, className }: ClockIconProps) {
   return (
     <svg viewBox="0 0 48 48" width={size} height={size} className={className} fill="none">
-      <circle cx="24" cy="24" r="21" stroke={accent || "currentColor"} strokeWidth="2" strokeDasharray="125 7" strokeDashoffset="3" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="18.5" stroke={accent || "currentColor"} strokeWidth="0.5" opacity="0.25" />
-      <line x1="24" y1="6" x2="24" y2="9.5" stroke={accent || "currentColor"} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="42" y1="24" x2="38.5" y2="24" stroke={accent || "currentColor"} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="24" y1="42" x2="24" y2="38.5" stroke={accent || "currentColor"} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="6" y1="24" x2="9.5" y2="24" stroke={accent || "currentColor"} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="24" y2="15" stroke={accent || "currentColor"} strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="31" y2="24" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" opacity="0.85" />
-      <circle cx="24" cy="24" r="2.5" fill={accent || "currentColor"} />
+      <circle cx="24" cy="24" r="21" stroke={accent || "currentColor"} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="24" cy="24" r="18.5" stroke={accent || "currentColor"} strokeWidth="0.75" opacity="0.4" />
+      <line x1="24" y1="6" x2="24" y2="10" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
+      <line x1="42" y1="24" x2="38" y2="24" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
+      <line x1="24" y1="42" x2="24" y2="38" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
+      <line x1="6" y1="24" x2="10" y2="24" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="24" y2="15" stroke={accent || "currentColor"} strokeWidth="3" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="31" y2="24" stroke={accent || "currentColor"} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="24" cy="24" r="3" fill={accent || "currentColor"} />
     </svg>
   )
 }
@@ -76,15 +76,15 @@ export function ChronosBrand({ size = "md", variant = "horizontal", dark = true,
 export function FaviconSvg({ size = 32 }: { size?: number }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <circle cx="24" cy="24" r="21" stroke="#3B82F6" strokeWidth="2" strokeDasharray="125 7" strokeDashoffset="3" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="18.5" stroke="#3B82F6" strokeWidth="0.5" opacity="0.3" />
-      <line x1="24" y1="6" x2="24" y2="9.5" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="42" y1="24" x2="38.5" y2="24" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="24" y1="42" x2="24" y2="38.5" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="6" y1="24" x2="9.5" y2="24" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="24" y2="15" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="31" y2="24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" opacity="0.85" />
-      <circle cx="24" cy="24" r="2.5" fill="#3B82F6" />
+      <circle cx="24" cy="24" r="21" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="24" cy="24" r="18.5" stroke="#3B82F6" strokeWidth="0.75" opacity="0.4" />
+      <line x1="24" y1="6" x2="24" y2="10" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+      <line x1="42" y1="24" x2="38" y2="24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+      <line x1="24" y1="42" x2="24" y2="38" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+      <line x1="6" y1="24" x2="10" y2="24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="24" y2="15" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="31" y2="24" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="24" cy="24" r="3" fill="#3B82F6" />
     </svg>
   )
 }
