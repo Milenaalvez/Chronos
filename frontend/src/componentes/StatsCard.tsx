@@ -11,7 +11,7 @@ interface StatsCardProps {
 
 export function StatsCard({ icon: Icon, title, value, subtitle, trend, trendValue }: StatsCardProps) {
   return (
-    <div className="flex flex-col gap-1 p-5">
+    <div className="flex flex-col gap-1 p-5 border-r border-default/10 last:border-r-0">
       <div className="flex items-center gap-2">
         <Icon size={13} strokeWidth={2} className="text-accent-blue shrink-0" />
         <span className="text-[11px] font-medium text-muted uppercase tracking-wider">{title}</span>

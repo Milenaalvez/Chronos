@@ -6,6 +6,7 @@ import { supabase } from "../services/supabase"
 
 import { ForgotPasswordModal } from "../componentes/ForgotPasswordModal"
 import { toast } from "../componentes/Toast"
+import { ChronosBrand } from "../componentes/ChronosBrand"
 import { maskCPF, maskPhone, validateEmail, validateCPF } from "../utils/masks"
 import loginImg from "../../../fotos/login.png"
 import criarContaImg from "../../../fotos/criar-conta.png"
@@ -248,19 +249,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           isDark ? "bg-[#060816]" : "bg-[#F8FAFC]"
         }`}
       >
-        <div className="w-full max-w-md flex items-center gap-5 relative z-10">
-          <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 48 48" className="w-full h-full">
-              <circle cx="24" cy="24" r="21" fill="none" stroke={isDark ? "#B1C9EF" : "#628ECB"} strokeWidth="2.5" strokeDasharray="118 14" strokeDashoffset="16" strokeLinecap="round" />
-              <line x1="24" y1="24" x2="24" y2="14" stroke={isDark ? "#B1C9EF" : "#628ECB"} strokeWidth="3" strokeLinecap="round" />
-              <line x1="24" y1="24" x2="33" y2="24" stroke={isDark ? "#B1C9EF" : "#628ECB"} strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
-              <circle cx="24" cy="24" r="3" fill={isDark ? "#B1C9EF" : "#628ECB"} />
-            </svg>
-          </div>
-          <div className="flex flex-col">
-            <h1 className={`text-5xl font-bold leading-none tracking-tight ${isDark ? "text-[#F8FAFC]" : "text-[#0F172A]"}`}>Chronos</h1>
-            <span className={`text-xs font-semibold uppercase tracking-[0.2em] mt-1 ${isDark ? "text-[#B1C9EF]/60" : "text-[#628ECB]/60"}`}>Gestão de Pessoas</span>
-          </div>
+        <div className="w-full max-w-md relative z-10">
+          <ChronosBrand size="xl" dark={isDark} showSubtitle />
         </div>
 
         <div className="relative z-10 w-full flex-1 mx-auto flex items-center justify-center min-h-0">
@@ -298,19 +288,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         isDark ? "bg-[#0B1120]" : "bg-[#FFFFFF]"
       }`}>
         <div className="w-full max-w-[480px] py-12">
-          <div className="flex lg:hidden items-start gap-3 mb-10">
-            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-              <svg viewBox="0 0 48 48" className="w-full h-full">
-                <circle cx="24" cy="24" r="21" fill="none" stroke={isDark ? "#B1C9EF" : "#628ECB"} strokeWidth="2.5" strokeDasharray="118 14" strokeDashoffset="16" strokeLinecap="round" />
-                <line x1="24" y1="24" x2="24" y2="14" stroke={isDark ? "#B1C9EF" : "#628ECB"} strokeWidth="3" strokeLinecap="round" />
-                <line x1="24" y1="24" x2="33" y2="24" stroke={isDark ? "#B1C9EF" : "#628ECB"} strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
-                <circle cx="24" cy="24" r="3" fill={isDark ? "#B1C9EF" : "#628ECB"} />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className={`text-xl font-bold leading-none tracking-tight ${isDark ? "text-[#F8FAFC]" : "text-[#1B2A41]"}`}>Chronos</span>
-              <span className={`text-[10px] font-semibold uppercase tracking-[0.2em] mt-0.5 ${isDark ? "text-[#B1C9EF]/60" : "text-[#628ECB]/60"}`}>Gestão de Pessoas</span>
-            </div>
+          <div className="flex lg:hidden mb-10">
+            <ChronosBrand size="sm" dark={isDark} showSubtitle />
           </div>
 
           {authView === "login" && (

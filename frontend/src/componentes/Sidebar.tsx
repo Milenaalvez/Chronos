@@ -17,6 +17,7 @@ import {
   Moon,
   LogOut,
 } from "lucide-react"
+import { ChronosBrand } from "./ChronosBrand"
 import { useTheme } from "../contexts/ThemeContext"
 import { auth as apiAuth } from "../services/api"
 import { canAccess, getEffectiveRole, filterMenuGroups, ROLE_SHORT_LABELS } from "../utils/permissions"
@@ -227,20 +228,7 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
             </div>
           ) : (
             <>
-              <div className="relative w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ boxShadow: '0 0 20px color-mix(in srgb, var(--accent-primary) 35%, transparent)' }}>
-                <svg viewBox="0 0 48 48" className="w-full h-full">
-                  <circle cx="24" cy="24" r="21" fill="none" stroke="#B1C9EF" strokeWidth="2.5" strokeDasharray="118 14" strokeDashoffset="16" strokeLinecap="round" />
-                  <line x1="24" y1="24" x2="24" y2="14" stroke="#F0F3FA" strokeWidth="3" strokeLinecap="round" />
-                  <line x1="24" y1="24" x2="33" y2="24" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
-                  <circle cx="24" cy="24" r="3" fill="#F0F3FA" />
-                </svg>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold text-[#FFFFFF] leading-none tracking-tight">Chronos</h1>
-                </div>
-                <span className="text-[9px] text-[#F0F3FA] leading-tight font-semibold uppercase tracking-[0.18em]">Gestão de Pessoas</span>
-              </div>
+              <ChronosBrand size="md" dark showSubtitle />
             </>
           )}
         </div>
