@@ -12,11 +12,10 @@ export function ClockIcon({ size = 48, accent: _accent, className }: ClockIconPr
           <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#3B82F6" floodOpacity="0.35" />
         </filter>
       </defs>
-      <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#F0F3FA" strokeWidth="2" filter="url(#clock-glow)" />
-      <circle cx="24" cy="24" r="19" stroke="#F0F3FA" strokeWidth="0.5" opacity="0.15" />
-      <line x1="24" y1="24" x2="24" y2="12" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="18" y2="18" stroke="#F0F3FA" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="2.5" fill="#F0F3FA" />
+      <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#F0F3FA" strokeWidth="1.5" filter="url(#clock-glow)" />
+      <line x1="24" y1="24" x2="24" y2="13" stroke="#F0F3FA" strokeWidth="2" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="20" y2="18" stroke="#F0F3FA" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="24" cy="24" r="2" fill="#F0F3FA" />
     </svg>
   )
 }
