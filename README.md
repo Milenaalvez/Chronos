@@ -21,13 +21,6 @@
 >
 > **API (Backend):** [https://chronos-1-wzqq.onrender.com](https://chronos-1-wzqq.onrender.com)
 
----
-
-## Screenshots
-
-| Login | Cadastro | Dashboard |
-|-------|----------|-----------|
-| ![Login](fotos/login.png) | ![Cadastro](fotos/criar-conta.png) | ![Dashboard](fotos/Belmont%20Cameli.png) |
 
 ---
 
