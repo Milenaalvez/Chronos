@@ -1,31 +1,16 @@
-<div align="center">
-  <br/>
-  <h1>Chronos — Gestão de Pessoas</h1>
-  <p>
-    <strong>Sistema completo de ponto eletrônico com verificação facial, geolocalização e notificações inteligentes</strong>
-  </p>
-  <p>
-    <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React 19"/>
-    <img src="https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white" alt="TypeScript 6"/>
-    <img src="https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white" alt="Vite 8"/>
-    <img src="https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white" alt="Express 5"/>
-    <img src="https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white" alt="Prisma 7"/>
-    <img src="https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL"/>
-    <img src="https://img.shields.io/badge/Vercel-Frontend-000000?logo=vercel&logoColor=white" alt="Vercel"/>
-    <img src="https://img.shields.io/badge/Render-Backend-46E3B7?logo=render&logoColor=white" alt="Render"/>
-  </p>
-  <br/>
-</div>
+# Chronos — Gestão de Pessoas
 
-> **URL de Produção:** [https://chronos-blond-gamma.vercel.app](https://chronos-blond-gamma.vercel.app)
->
-> **API (Backend):** [https://chronos-1-wzqq.onrender.com](https://chronos-1-wzqq.onrender.com)
+Sistema de controle de ponto eletrônico com verificação facial, geolocalização e notificações automatizadas.
+
+**Frontend:** [https://chronos-blond-gamma.vercel.app](https://chronos-blond-gamma.vercel.app)
+**API:** [https://chronos-1-wzqq.onrender.com](https://chronos-1-wzqq.onrender.com)
 
 
 ---
 
 ## Funcionalidades
 
+<<<<<<< Updated upstream
 ###  Registro de Ponto
 - Marcação de entrada, almoço (início/fim) e saída
 - Verificação facial opcional com **face-api.js**
@@ -41,11 +26,29 @@
 - Histórico de atividades por colaborador
 
 ###  Relatórios
-- Relatório consolidado mensal com filtros (departamento, cargo, colaborador, status)
-- Fechamento mensal (abrir/fechar períodos)
-- Exportação para **PDF** (jsPDF) e **Excel** (SheetJS)
-- Log de auditoria
+=======
+### Registro de Ponto
+- Marcação de entrada, intervalo (início/fim) e saída
+- Verificação facial via face-api.js (descritores de 512 floats, threshold Euclidiano 0.6)
+- Captura de foto por webcam
+- Geolocalização (coordenadas, endereço reverso) obtida via API do navegador
+- Identificação de dispositivo (IP público via ip-api.com, user-agent, timezone)
 
+### Gestao de Equipe
+- CRUD de colaboradores com vínculo a departamentos e cargos
+- Controle de regimes contratuais (CLT, PJ, EstAGIO)
+- Permissões granulares por usuário (11 permissoes)
+- Métricas em tempo real (total, ativos, presentes no dia, atrasados, ausentes, justificativas pendentes)
+- Histórico de atividades por colaborador
+
+### Relatorios
+>>>>>>> Stashed changes
+- Relatório consolidado mensal com filtros (departamento, cargo, colaborador, status)
+- Fechamento mensal com controle de abertura/reabertura
+- Exportação para PDF (jsPDF com auto-table) e Excel (SheetJS)
+- Log de auditoria de ações sobre relatorios
+
+<<<<<<< Updated upstream
 ###  Calendário
 - Visualização mensal dos registros em calendário (FullCalendar)
 - Código de cores por status (Normal, Extra, Falta, Pendente)
@@ -67,15 +70,47 @@
 
 ###  Configurações
 - Perfil do usuário (nome, email, telefone, CPF, endereço, data de nascimento)
-- Upload de avatar
-- Tema (claro/escuro/sistema) e cor de destaque
+=======
+### Calendario
+- Visualização mensal FullCalendar (dayGrid, timeGrid, list)
+- Codificação por cores conforme status (Normal, Extra, Ausencia, Pendente, Negativo)
+- Edição rápida e associação de justificativas
 
+### Notificacoes Inteligentes
+- Scheduler com verificação a cada 1 hora
+- Categorias: PENDING_FACE_REGISTRATION, PENDING_BREAK, OVERTIME_DONE, LATE_ENTRY, MISSING_ENTRY, MISSING_EXIT, NO_LUNCH_TODAY, BELOW_MIN_HOURS_WEEK
+- Resolução automatica quando a condição deixa de existir
+- Deduplicação por metadados (date, shift)
+
+### Autenticacao e Seguranca
+- Login por email/senha e Google OAuth (Supabase Auth)
+- Autenticação stateless via JWT (validade de 7 dias) + Refresh Token (30 ou 365 dias)
+- Verificação de email obrigatoria com codigo via crypto.randomBytes
+- Recuperação de senha com token expirável (1 hora)
+- Impersonação de usuarios (permissao switch_accounts, apenas DEVELOPER)
+- Hashing de senha com bcrypt (10 rounds)
+
+### Configuracoes
+- Edição de perfil (nome, email, telefone, CPF, endereço, data de nascimento)
+>>>>>>> Stashed changes
+- Upload de avatar
+- Personalização de tema (claro, escuro, sistema) e cor de destaque (6 opcoes)
+
+<<<<<<< Updated upstream
 ### Outros
 -  Gestão de documentos por colaborador
 -  Controle de férias
 -  Justificativas de ausência com fluxo de aprovação
 -  Mapa interativo com Leaflet
 -  Detecção de diagnóstico (dev only)
+=======
+### Recursos Adicionais
+- Gestão de documentos por colaborador com upload para Supabase Storage
+- Controle de ferias
+- Justificativas de ausencia com fluxo de aprovacao (RH/Admin)
+- Mapa interativo com Leaflet para visualização de coordenadas de registro
+- Pagina de diagnostico para desenvolvimento (acessivel via Ctrl+Shift+D)
+>>>>>>> Stashed changes
 
 ---
 
@@ -83,19 +118,19 @@
 
 | Camada | Tecnologia |
 |--------|-----------|
-| **Frontend** | React 19, Vite 8, TypeScript 6, Tailwind CSS 3 |
-| **Backend** | Express 5, TypeScript |
-| **ORM** | Prisma 7 + @prisma/adapter-pg |
-| **Banco** | PostgreSQL (Supabase) |
-| **Auth** | JWT + Refresh Token + Supabase Auth (Google OAuth) |
-| **Storage** | Supabase Storage (documentos, avatares) |
-| **Email** | Nodemailer + SMTP Gmail |
-| **Face API** | face-api.js (descritores faciais no navegador) |
-| **Mapas** | Leaflet + react-leaflet |
-| **PDF** | jsPDF + jspdf-autotable |
-| **Planilhas** | xlsx (SheetJS) |
-| **Calendário** | FullCalendar 6 |
-| **Ícones** | Lucide React |
+| Frontend | React 19, Vite 8, TypeScript 6, Tailwind CSS 3 |
+| Backend | Express 5, TypeScript |
+| ORM | Prisma 7 + @prisma/adapter-pg |
+| Banco | PostgreSQL (Supabase) |
+| Autenticacao | JWT + Refresh Token + Supabase Auth (Google OAuth) |
+| Storage | Supabase Storage (documentos, avatares, banners) |
+| Email | Nodemailer + SMTP Gmail |
+| Face API | face-api.js (inferencia no navegador) |
+| Mapas | Leaflet + react-leaflet |
+| PDF | jsPDF + jspdf-autotable |
+| Planilhas | xlsx (SheetJS) |
+| Calendario | FullCalendar 6 (core, daygrid, timegrid, list, interaction) |
+| Icones | Lucide React |
 
 ---
 
@@ -106,7 +141,7 @@
 │                  FRONTEND (Vercel)                   │
 │  React 19 + Vite 8 + TypeScript + Tailwind          │
 │  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │
-│  │   Páginas    │  │ Componentes  │  │ Serviços  │ │
+│  │   Paginas    │  │ Componentes  │  │ Servicos  │ │
 │  │  (15 pages)  │  │   (26 cmp)   │  │  api.ts   │ │
 │  └──────┬───────┘  └──────┬───────┘  └─────┬─────┘ │
 │         │                  │                 │       │
@@ -119,16 +154,25 @@
 │               BACKEND (Render)                       │
 │  Express 5 + Prisma + TypeScript                     │
 │  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │
-│  │  Routes  │→│ Services │→│     Database      │  │
-│  │(11 mód.) │  │          │  │ PostgreSQL/Prisma │  │
+│  │  Routes  │  │ Services │  │     Database      │  │
+│  │(11 mod.) │  │          │  │ PostgreSQL/Prisma │  │
 │  └──────────┘  └──────────┘  └──────────────────┘  │
 │                        │                             │
 │  ┌──────────────────────────────────────────────┐   │
 │  │          Supabase (Auth + Storage)           │   │
-│  │  Google OAuth │ Armazenamento │ Emails SMTP  │   │
+│  │  Google OAuth  Storage  Emails SMTP          │   │
 │  └──────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────┘
 ```
+
+### Fluxo de Dados
+
+1. Cliente React faz requisicao HTTP para `/api/*`
+2. Express roteia para o modulo correspondente
+3. Middleware de autenticacao valida JWT
+4. Controller processa a requisicao e chama servicos
+5. Servicos acessam banco via Prisma ORM
+6. Resposta JSON retorna ao cliente
 
 ---
 
@@ -137,163 +181,135 @@
 ```
 chronos/
 ├── backend/
-│   ├── prisma/                  # Schema, migrations, seeds
-│   │   └── schema.prisma        # 15 modelos (User, TimeRecord, PointEvent...)
-│   ├── prisma.config.ts         # Configuração do Prisma
+│   ├── prisma/                  # Schema ORM, migrations, seeds
+│   │   └── schema.prisma        # 15 modelos de dados
+│   ├── prisma.config.ts         # Configuracao do Prisma
 │   └── server/
 │       └── src/
-│           ├── index.ts         # Entry point (Express)
-│           ├── config/          # env.ts (variáveis de ambiente)
-│           ├── database/        # prisma.ts (conexão)
-│           ├── generated/       # Prisma Client gerado
-│           ├── middleware/      # auth, error, permissions
-│           ├── modules/         # 11 módulos funcionais
-│           │   ├── auth/        # Registro, login, OAuth, perfil, avatar
-│           │   ├── timeRecord/  # Registros de jornada
-│           │   ├── pointRecord/ # Eventos de ponto (GPS/foto/face)
-│           │   ├── justification/ # Justificativas
-│           │   ├── notification/ # Notificações
-│           │   ├── team/        # Equipe (CRUD, métricas, permissões)
-│           │   ├── reports/     # Relatórios consolidados, fechamento
-│           │   ├── document/    # Documentos
-│           │   ├── faceRegistration/ # Registro facial
-│           │   ├── termAcceptance/   # Termos de uso
-│           │   └── reference/   # Departamentos e cargos
+│           ├── index.ts         # Entry point Express
+│           ├── config/          # Variaveis de ambiente
+│           ├── database/        # Conexao Prisma
+│           ├── generated/       # Prisma Client (gerado)
+│           ├── middleware/      # Autenticacao, error handler, permissoes
+│           ├── modules/         # 11 modulos funcionais
 │           ├── services/        # Email (Nodemailer)
-│           └── utils/           # Scheduler, CPF, senha, permissões
+│           └── utils/           # Scheduler, validadores
 ├── frontend/
 │   └── src/
-│       ├── App.tsx             # Componente raiz com roteamento
-│       ├── main.tsx            # Entry point React
-│       ├── types.ts            # Interfaces compartilhadas
-│       ├── context/            # ThemeContext
-│       ├── paginas/            # 15 páginas
-│       ├── componentes/        # 26 componentes reutilizáveis
-│       ├── services/           # api.ts, supabase, validação, horas
-│       └── utils/              # Face API, permissões
+│       ├── App.tsx             # Componente raiz com estado de roteamento
+│       ├── main.tsx            # Inicializacao React
+│       ├── types.ts            # Interfaces TypeScript
+│       ├── context/            # ThemeProvider (modo claro/escuro)
+│       ├── paginas/            # 15 paginas do sistema
+│       ├── componentes/        # 26 componentes reutilizaveis
+│       ├── services/           # Cliente HTTP, Supabase, validacao, calculo de horas
+│       └── utils/              # Face API, permissoes, mascaras
 ├── docs/
-│   └── pipeline.md             # Documentação técnica detalhada
-├── fotos/                      # Screenshots do sistema
-├── Dockerfile                  # Build Docker para backend
-├── vercel.json                 # Config de deploy Vercel
+│   └── pipeline.md             # Documentacao tecnica de processos e fluxos
+├── fotos/                      # Screenshots
+├── Dockerfile                  # Build Docker para deploy
+├── vercel.json                 # Configuracao Vercel
 ├── vite.config.ts
 ├── tailwind.config.js
-├── tsconfig.json
-└── package.json                # Raiz do monorepo
+├── tsconfig.json               # Configuracao TypeScript (monorepo)
+└── package.json                # Dependencias e scripts
 ```
 
 ---
 
-## Começando (Desenvolvimento Local)
+## Setup Local
 
-### Pré-requisitos
+### Requisitos
 - Node.js 22+
 - PostgreSQL (ou Supabase)
 
-### Passo a passo
+### Instalacao
 
 ```bash
-# 1. Clone o repositório
 git clone https://github.com/Milenaalvez/Chronos.git
 cd Chronos
-
-# 2. Instale as dependências
 npm install
-
-# 3. Configure as variáveis de ambiente
 cp .env.example .env
-# Edite .env com suas credenciais (DATABASE_URL, JWT_SECRET, etc.)
-
-# 4. Gere o Prisma Client
+# Configurar DATABASE_URL, JWT_SECRET no .env
 npm run db:generate
-
-# 5. Execute as migrations
 npm run db:push
-
-# 6. Inicie o desenvolvimento (frontend + backend)
 npm run dev:all
 ```
 
-O frontend será aberto em `http://localhost:5173` e a API em `http://localhost:3001`.
+Frontend em `http://localhost:5173`, API em `http://localhost:3001`.
 
-### Scripts Disponíveis
+### Scripts
 
-| Script | Descrição |
+| Script | Descricao |
 |--------|-----------|
 | `npm run dev` | Frontend (Vite dev server) |
 | `npm run dev:server` | Backend (tsx watch) |
-| `npm run dev:all` | Frontend + Backend simultâneos |
-| `npm run build` | Build de produção (tsc + Vite) |
-| `npm start` | Iniciar servidor (produção) |
+| `npm run dev:all` | Frontend + Backend |
+| `npm run build` | Build producao (tsc + Vite) |
+| `npm start` | Iniciar servidor em producao |
 | `npm run db:generate` | Gerar Prisma Client |
-| `npm run db:push` | Sincronizar schema com banco |
-| `npm run db:studio` | Abrir Prisma Studio |
-| `npm run db:seed` | Popular banco com dados iniciais |
+| `npm run db:push` | Sincronizar schema |
+| `npm run db:studio` | Prisma Studio |
+| `npm run db:seed` | Seed de dados |
 | `npm run db:migrate` | Criar migration |
 
 ---
 
-## Variáveis de Ambiente
+## Variaveis de Ambiente
 
-| Variável | Obrigatória | Descrição |
+| Variavel | Obrigatoria | Descricao |
 |----------|-------------|-----------|
-| `DATABASE_URL` | ✅ | URL de conexão PostgreSQL |
-| `JWT_SECRET` | ✅ | Chave secreta para assinar tokens JWT |
-| `PORT` | | Porta do servidor (default: 3001) |
-| `SUPABASE_URL` | | URL do projeto Supabase |
-| `SUPABASE_ANON_KEY` | | Chave anônima do Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | | Chave de serviço do Supabase |
-| `SMTP_HOST` | | Host SMTP (ex: smtp.gmail.com) |
-| `SMTP_PORT` | | Porta SMTP (default: 587) |
-| `SMTP_USER` | | Usuário SMTP |
-| `SMTP_PASS` | | Senha SMTP (App Password) |
-| `SMTP_FROM` | | Remetente dos emails |
-| `APP_URL` | | URL pública do frontend (links em emails) |
-| `CORS_ORIGIN` | | Origens permitidas no CORS (separadas por vírgula) |
-| `VITE_SUPABASE_URL` | ✅ | URL Supabase para o frontend |
-| `VITE_SUPABASE_ANON_KEY` | ✅ | Anon key para o frontend |
-| `VITE_API_URL` | | URL da API (default: `/api`) |
+| `DATABASE_URL` | Sim | URL de conexao PostgreSQL |
+| `JWT_SECRET` | Sim | Chave para assinatura de tokens JWT |
+| `PORT` | Nao | Porta do servidor (default: 3001) |
+| `SUPABASE_URL` | Nao | URL do projeto Supabase |
+| `SUPABASE_ANON_KEY` | Nao | Chave anonima Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Nao | Chave de servico Supabase |
+| `SMTP_HOST` | Nao | Host SMTP (smtp.gmail.com) |
+| `SMTP_PORT` | Nao | Porta SMTP (default: 587) |
+| `SMTP_USER` | Nao | Usuario SMTP |
+| `SMTP_PASS` | Nao | Senha SMTP (App Password) |
+| `SMTP_FROM` | Nao | Remetente de emails |
+| `APP_URL` | Nao | URL publica do frontend |
+| `CORS_ORIGIN` | Nao | Origens CORS permitidas (separadas por virgula) |
+| `VITE_SUPABASE_URL` | Sim | URL Supabase para o frontend |
+| `VITE_SUPABASE_ANON_KEY` | Sim | Anon key para o frontend |
+| `VITE_API_URL` | Nao | URL da API (default: `/api`) |
 
 ---
 
 ## Deploy
 
-### Frontend → Vercel
+### Frontend (Vercel)
 
-O frontend é implantado automaticamente no **Vercel** via integração com GitHub.
+Build: `npm run build` (tsc -b && vite build)
+Output: `frontend/dist/`
+URL: `https://chronos-blond-gamma.vercel.app`
 
-```bash
-# Manual (caso necessário)
-npx vercel --prod --yes
-```
+### Backend (Render)
 
-- Build: `npm run build` (tsc -b && vite build)
-- Output: `frontend/dist/`
-- Domínio: `https://chronos-blond-gamma.vercel.app`
-
-### Backend → Render
-
-O backend é implantado no **Render** como Web Service Node.js.
-
-- Build: `npm install && npm run build`
-- Start: `npm start` (`npx tsx backend/server/src/index.ts`)
-- Health check: `/api/health`
-- Domínio: `https://chronos-1-wzqq.onrender.com`
+Runtime: Node.js
+Build: `npm install && npm run build`
+Start: `npm start` (npx tsx backend/server/src/index.ts)
+Health check: `GET /api/health`
+URL: `https://chronos-1-wzqq.onrender.com`
 
 ---
 
 ## Controle de Acesso (RBAC)
 
-| Role | Nível | Acesso |
-|------|-------|--------|
-| **DEVELOPER** | 1 (maior) | Tudo — debug, monitoramento, impersonação, feature flags |
-| **ADMIN** | 2 | Gestão completa — equipe, relatórios, cargos, permissões, auditoria |
-| **RH** | 3 | Equipe, relatórios, férias, justificativas, aprovações |
-| **EMPLOYEE** | 4 | Dashboard, registrar ponto, meus registros, banco de horas, calendário, notificações, configurações |
+### Roles
 
-### Permissões Específicas
+| Role | Nivel | Permissoes Padrao |
+|------|-------|-------------------|
+| DEVELOPER | 1 (maior) | Acesso total ao sistema |
+| ADMIN | 2 | Gestao completa (equipe, relatorios, permissoes, auditoria) |
+| RH | 3 | Equipe, relatorios, ferias, justificativas, aprovacoes |
+| EMPLOYEE | 4 | Registro de ponto, dashboard, calendario, notificacoes, configuracoes |
 
-| Permissão | Descrição |
+### Permissoes
+
+| Permissao | Descricao |
 |-----------|-----------|
 | `access_team` | Visualizar equipe |
 | `manage_members` | Gerenciar membros (CRUD) |
@@ -302,41 +318,54 @@ O backend é implantado no **Render** como Web Service Node.js.
 | `approve_time_records` | Aprovar jornadas |
 | `reset_passwords` | Redefinir senhas |
 | `view_logs` | Visualizar logs |
-| `export_reports` | Exportar relatórios |
-| `switch_accounts` | Trocar entre contas |
-| `manage_permissions` | Gerenciar permissões |
+| `export_reports` | Exportar relatorios |
+| `switch_accounts` | Trocar contas (impersonacao) |
+| `manage_permissions` | Gerenciar permissoes |
 | `manage_company` | Gerenciar empresa |
 
-Usuários do departamento **TI** recebem automaticamente todas as permissões.
+Usuarios alocados ao departamento **TI** recebem automaticamente todas as permissoes.
 
 ---
 
 ## Modelo de Dados
 
-O banco possui **15 modelos** gerenciados pelo Prisma:
+15 modelos gerenciados pelo Prisma ORM:
 
-- `User` — Colaboradores com autenticação, perfil e preferências
+- `User` — Colaboradores (autenticacao, perfil, preferencias)
 - `Company` — Empresas (multi-tenant)
-- `Department` / `Position` — Departamentos e cargos
-- `TimeRecord` — Registros de jornada (entrada, almoço, saída)
-- `PointEvent` — Eventos individuais de ponto (com GPS, foto, face)
-- `Justification` — Justificativas de ausência
-- `Notification` — Notificações do sistema
-- `FaceRegistration` — Descritores faciais para verificação
+- `Department` — Departamentos
+- `Position` — Cargos
+- `TimeRecord` — Registros de jornada (entrada, saida, intervalos)
+- `PointEvent` — Eventos de ponto individuais (GPS, foto, face)
+- `Justification` — Justificativas de ausencia
+- `Notification` — Notificacoes do sistema
+- `FaceRegistration` — Descritores faciais
 - `Document` — Documentos dos colaboradores
-- `Integration` — Integrações (Google Calendar, Slack, etc.)
-- `TermAcceptance` — Aceitação dos termos de uso
-- `ActivityLog` — Log de auditoria
+- `Integration` — Integracoes (Google Calendar, Slack, Teams, Outlook)
+- `TermAcceptance` — Aceitacao dos termos de uso
+- `ActivityLog` — Auditoria
 - `MonthClosing` — Fechamento mensal
+- `ContractType` — Tipo de contrato (enum: CLT, PJ, ESTAGIO)
 
 ---
 
-## Licença
+## Documentacao Detalhada
 
-Este projeto é privado e de uso interno.
+Consulte `docs/pipeline.md` para documentacao tecnica completa de processos e fluxos:
+
+- Fluxo de autenticacao (registro, login, OAuth, refresh token, recuperacao de senha)
+- Fluxo de registro de ponto (ciclo ENTRY -> BREAK_START -> BREAK_END -> EXIT)
+- Fluxo de verificacao facial (registro e matching)
+- Fluxo de justificativas (criacao e aprovacao)
+- Fluxo de notificacoes inteligentes (scheduler e tipos)
+- Fluxo de emails (SMTP e templates)
+- Fluxo de times e membros
+- Fluxo de documentos (upload/download)
+- Pipeline de deploy (Vercel + Render)
+- Modelo de dados completo (Prisma schema)
 
 ---
 
-<div align="center">
-  <sub>Built with ❤️ by Milena Alvez</sub>
-</div>
+## Licenca
+
+Uso interno. Projeto privado.
