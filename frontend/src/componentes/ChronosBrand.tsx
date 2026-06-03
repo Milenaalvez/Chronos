@@ -82,9 +82,9 @@ export function FaviconSvg({ size = 32 }: { size?: number }) {
       <line x1="42" y1="24" x2="38.5" y2="24" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
       <line x1="24" y1="42" x2="24" y2="38.5" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
       <line x1="6" y1="24" x2="9.5" y2="24" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="24" y2="15" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="31" y2="24" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" opacity="0.85" />
-      <circle cx="24" cy="24" r="2.5" fill="#FFFFFF" />
+      <line x1="24" y1="24" x2="24" y2="15" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="31" y2="24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" opacity="0.85" />
+      <circle cx="24" cy="24" r="2.5" fill="#3B82F6" />
     </svg>
   )
 }
