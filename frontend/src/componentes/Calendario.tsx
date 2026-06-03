@@ -325,15 +325,15 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
           }
         />
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
           {insightCards.map((card) => {
             const Icon = card.icon
             return (
-              <div key={card.label} className={`${card.bg} rounded-xl p-4 flex flex-col gap-1.5`}>
-                <span className="text-[9px] font-semibold text-muted uppercase tracking-wider">{card.label}</span>
-                <div className="flex items-center gap-2">
-                  <Icon size={14} className={card.color} />
-                  <span className={`text-sm font-bold font-mono ${card.color}`}>{card.value}</span>
+              <div key={card.label} className={`${card.bg} rounded-xl p-2.5 flex flex-col gap-1`}>
+                <span className="text-[8px] font-semibold text-muted uppercase tracking-wider truncate">{card.label}</span>
+                <div className="flex items-center gap-1.5">
+                  <Icon size={12} className={card.color} />
+                  <span className={`text-xs font-bold font-mono ${card.color}`}>{card.value}</span>
                 </div>
               </div>
             )
@@ -350,9 +350,6 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
               <ChevronRight size={14} />
             </button>
           </div>
-          <span className="text-[11px] text-muted font-medium">
-            {monthRecords.length} registro{monthRecords.length !== 1 ? "s" : ""} · {formatMinutes(monthStats.totalMins)} acumuladas
-          </span>
         </div>
 
         <style>{`
