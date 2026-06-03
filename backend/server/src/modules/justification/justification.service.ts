@@ -1,7 +1,9 @@
 import { prisma } from '../../database/prisma.js'
 
-export async function listJustifications(userId: string, role: string) {
-  const where = role === 'ADMIN' || role === 'RH' || role === 'DEVELOPER' ? {} : { userId }
+export async function listJustifications(userId: string, role: string, companyId: string) {
+  const where = role === 'ADMIN' || role === 'RH' || role === 'DEVELOPER'
+    ? { user: { companyId } }
+    : { userId, user: { companyId } }
   return prisma.justification.findMany({
     where,
     orderBy: { createdAt: 'desc' },

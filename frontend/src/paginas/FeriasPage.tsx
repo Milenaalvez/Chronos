@@ -12,7 +12,7 @@ import { team as apiTeam, notifications as apiNotifs } from "../services/api"
 import { PageHeader } from "../componentes/PageHeader"
 
 interface TeamMember {
-  id: string; name: string; email: string; role: string; department: string | null; departmentId: string | null; hireDate: string
+  id: string; name: string; email: string; role: string; department: string | null; departmentId: string | null; hireDate: string; isActive?: boolean
 }
 
 interface FeriasRecord {
@@ -27,16 +27,7 @@ interface FeriasRecord {
   notes?: string
 }
 
-const SAMPLE_FERIAS: FeriasRecord[] = [
-  { id: "f1", collaboratorId: "1", collaboratorName: "Ana Silva", startDate: "2026-07-01", endDate: "2026-07-20", days: 20, requestedAt: "2026-05-15", status: "aprovado" },
-  { id: "f2", collaboratorId: "2", collaboratorName: "Carlos Oliveira", startDate: "2026-08-10", endDate: "2026-08-24", days: 15, requestedAt: "2026-06-01", status: "pendente" },
-  { id: "f3", collaboratorId: "3", collaboratorName: "Marina Costa", startDate: "2026-06-05", endDate: "2026-06-09", days: 5, requestedAt: "2026-04-20", status: "rejeitado" },
-  { id: "f4", collaboratorId: "4", collaboratorName: "Rafael Santos", startDate: "2026-09-01", endDate: "2026-09-30", days: 30, requestedAt: "2026-05-30", status: "aprovado" },
-  { id: "f5", collaboratorId: "5", collaboratorName: "Juliana Lima", startDate: "2026-07-15", endDate: "2026-07-19", days: 5, requestedAt: "2026-06-10", status: "pendente" },
-  { id: "f6", collaboratorId: "1", collaboratorName: "Ana Silva", startDate: "2026-11-01", endDate: "2026-11-10", days: 10, requestedAt: "2026-05-20", status: "em_andamento" },
-  { id: "f7", collaboratorId: "6", collaboratorName: "Pedro Alves", startDate: "2026-07-05", endDate: "2026-07-12", days: 8, requestedAt: "2026-06-05", status: "em_andamento" },
-  { id: "f8", collaboratorId: "7", collaboratorName: "Lucia Mendes", startDate: "2026-10-01", endDate: "2026-10-20", days: 20, requestedAt: "2026-06-15", status: "pendente" },
-]
+
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string }> = {
   aprovado: { label: "Aprovado", bg: "bg-accent-green/10", color: "text-accent-green" },
@@ -59,7 +50,7 @@ function avatarFallback(name: string): string {
 }
 
 export function FeriasPage() {
-  const [records, setRecords] = useState<FeriasRecord[]>(SAMPLE_FERIAS)
+  const [records, setRecords] = useState<FeriasRecord[]>([])
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -100,6 +91,8 @@ export function FeriasPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  const activeTeamMembers = useMemo(() => teamMembers.filter(m => m.isActive !== false), [teamMembers])
+
   const programmed = records.filter(r => r.status === "aprovado" || r.status === "em_andamento").length
   const active = records.filter(r => r.status === "em_andamento").length
   const pending = records.filter(r => r.status === "pendente").length
@@ -113,11 +106,11 @@ export function FeriasPage() {
     }
     if (statusFilter) list = list.filter(r => r.status === statusFilter)
     if (deptFilter) {
-      const memberIds = teamMembers.filter(m => m.departmentId === deptFilter).map(m => m.id)
+      const memberIds = activeTeamMembers.filter(m => m.departmentId === deptFilter).map(m => m.id)
       list = list.filter(r => memberIds.includes(r.collaboratorId))
     }
     return list
-  }, [records, search, statusFilter, deptFilter, teamMembers])
+  }, [records, search, statusFilter, deptFilter, activeTeamMembers])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
@@ -125,7 +118,7 @@ export function FeriasPage() {
   useEffect(() => { setPage(1) }, [search, statusFilter, deptFilter])
 
   function handleNewRequest() {
-    const member = teamMembers.find(m => m.id === newCollaboratorId)
+    const member = activeTeamMembers.find(m => m.id === newCollaboratorId)
     const start = new Date(newStart + "T12:00:00")
     const end = new Date(newEnd + "T12:00:00")
     const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1)
@@ -142,7 +135,7 @@ export function FeriasPage() {
     }
     setRecords(prev => [record, ...prev])
     setShowNewModal(false)
-    setNewCollaboratorId(teamMembers[0]?.id || "")
+    setNewCollaboratorId(activeTeamMembers[0]?.id || "")
     setNewStart("")
     setNewEnd("")
     setNewNotes("")
@@ -188,11 +181,11 @@ export function FeriasPage() {
 
   const departments = useMemo(() => {
     const map = new Map<string, string>()
-    teamMembers.forEach(m => {
+    activeTeamMembers.forEach(m => {
       if (m.departmentId && m.department) map.set(m.departmentId, m.department)
     })
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
-  }, [teamMembers])
+  }, [activeTeamMembers])
 
   const fcEvents = useMemo(() => {
     const active = records.filter(r => r.status === "aprovado" || r.status === "em_andamento")
@@ -557,7 +550,7 @@ export function FeriasPage() {
                 <select required value={newCollaboratorId} onChange={e => setNewCollaboratorId(e.target.value)}
                   className="h-9 px-2.5 rounded-lg bg-input border border-default/30 text-[11px] text-primary focus:outline-none focus:border-[var(--accent-ring)]"
                 >
-                  {teamMembers.map(m => (
+                  {activeTeamMembers.map(m => (
                     <option key={m.id} value={m.id} className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">{m.name}</option>
                   ))}
                 </select>

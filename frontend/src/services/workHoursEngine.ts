@@ -182,13 +182,21 @@ export function computeAbsences(
   justificacoes: Record<string, Justificacao>,
 ): AbsenceInfo {
   const faltaISOs = weekdayISOs.filter((iso) => {
+    const j = justificacoes[iso]
+    if (j && j.status === "aprovado") return false
     const rec = allRecords.find((r) => r.dataISO === iso && r.tipo !== "Pendente")
     return !rec
   })
   return {
     faltaISOs,
     faltasCount: faltaISOs.length,
-    justificadasCount: faltaISOs.filter((iso) => justificacoes[iso]).length,
-    naoJustificadasCount: faltaISOs.length - faltaISOs.filter((iso) => justificacoes[iso]).length,
+    justificadasCount: faltaISOs.filter((iso) => {
+      const j = justificacoes[iso]
+      return j && (j.status === "aprovado" || j.status === "em_analise")
+    }).length,
+    naoJustificadasCount: faltaISOs.filter((iso) => {
+      const j = justificacoes[iso]
+      return !j || j.status === "recusado"
+    }).length,
   }
 }

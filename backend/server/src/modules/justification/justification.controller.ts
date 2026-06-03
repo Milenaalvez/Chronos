@@ -4,7 +4,7 @@ import * as service from './justification.service.js'
 
 export async function list(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const items = await service.listJustifications(req.user!.userId, req.user!.role)
+    const items = await service.listJustifications(req.user!.userId, req.user!.role, req.user!.companyId)
     res.json(items)
   } catch (err) { next(err) }
 }

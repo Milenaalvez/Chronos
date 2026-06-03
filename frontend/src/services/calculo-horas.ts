@@ -90,6 +90,14 @@ export function computeSaldo(records: TimeRecord[], justificacoes: Record<string
 
   for (const r of records) {
     if (r.tipo === "Pendente") {
+      if (r.entrada !== "---") {
+        const j = justificacoes[r.dataISO]
+        if (j && j.status === "aprovado") {
+          totalAbsences++
+          justifiedAbsences++
+        }
+        continue
+      }
       const j = justificacoes[r.dataISO]
       if (j) {
         if (j.status === "aprovado") {

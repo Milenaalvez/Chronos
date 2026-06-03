@@ -47,6 +47,7 @@ import { EmAnalisePage } from "./paginas/EmAnalisePage"
 import { AuditoriaPage } from "./paginas/AuditoriaPage"
 import { MeusRegistrosPage } from "./paginas/MeusRegistrosPage"
 import { FeriasPage } from "./paginas/FeriasPage"
+import { AbonosPage } from "./paginas/AbonosPage"
 import type { TimeRecord, FormData, Justificacao, WorkflowNotification, PageAction } from "./types"
 import { toMinutes, formatMinutes, formatDataBR } from "./types"
 import { timeRecords as apiRecords, justifications as apiJust, auth as apiAuth, getToken, setToken, getRefreshToken, setRefreshToken, setOnAuthExpired, notifications as apiNotifs, termAcceptance as apiTermAcceptance, faceRegistration as apiFaceRegistration } from "./services/api"
@@ -64,12 +65,42 @@ function genNotifId() {
   return `wf_${notifId++}`
 }
 
+function parseTimeValue(t: string): number | null {
+  if (!t || t === '---') return null
+  if (/^\d+$/.test(t)) return parseInt(t, 10)
+  const [h, m] = t.split(':').map(Number)
+  if (isNaN(h) || isNaN(m)) return null
+  return h * 60 + m
+}
+
 function apiRecordToTimeRecord(r: any): TimeRecord {
   const dateISO = r.date ? String(r.date).substring(0, 10) : ''
   const [y, m, d] = dateISO.split('-')
   const data = d && m && y ? `${d}/${m}/${y}` : ''
   const hasClockOut = !!r.clockOut
-  const totalMins = r.totalMinutes || 0
+
+  let totalMins = r.totalMinutes || 0
+  if (!hasClockOut && r.clockIn) {
+    const today = new Date().toISOString().split('T')[0]
+    if (dateISO === today) {
+      const ci = parseTimeValue(r.clockIn)
+      const bs = parseTimeValue(r.breakStart)
+      const be = parseTimeValue(r.breakEnd)
+      const now = new Date()
+      const currentMins = now.getHours() * 60 + now.getMinutes()
+      if (ci !== null) {
+        const norm = (t: number) => t > currentMins ? t - 1440 : t
+        const nci = norm(ci)
+        const nbs = bs !== null ? norm(bs) : null
+        const nbe = be !== null ? norm(be) : null
+        let worked = currentMins - nci
+        if (nbs !== null && nbe !== null) worked -= (nbe - nbs)
+        else if (nbs !== null && nbe === null) worked = nbs - nci
+        totalMins = Math.max(Math.round(worked), 0)
+      }
+    }
+  }
+
   const totalH = totalMins / 60
   let tipo: TimeRecord['tipo'] = 'Normal'
   if (!hasClockOut) tipo = 'Pendente'
@@ -634,6 +665,8 @@ export default function App() {
         return <EquipePage user={user} onViewProfile={(id) => setProfileMemberId(id)} allRecords={allRecords} justificacoes={justificacoes} />
       case "ferias":
         return <FeriasPage />
+      case "abonos":
+        return <AbonosPage />
       case "diagnostico":
         return (
           <DiagnosticoPage

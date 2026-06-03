@@ -70,13 +70,13 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
   const monthRecords = useMemo(() => filterMonthRecords(allRecords, monthBounds), [allRecords, monthBounds])
 
-  const monthStats = useMemo(() => computeMonthStats(monthRecordsStrict), [monthRecordsStrict])
+  const monthStats = useMemo(() => computeMonthStats(monthRecords), [monthRecords])
 
   const saldoData = useMemo(() => computeSaldo(monthRecords, justificacoes), [monthRecords, justificacoes])
 
   const saldoDisplay = formatSaldoDisplay(saldoData.netSaldo)
 
-  const filteredTotals = useMemo(() => computeFilteredTotals(monthRecordsStrict), [monthRecordsStrict])
+  const filteredTotals = useMemo(() => computeFilteredTotals(monthRecords), [monthRecords])
 
   const { totalMins, extraMins, workedDays } = filteredTotals
   const normalHours = (totalMins - extraMins) / 60

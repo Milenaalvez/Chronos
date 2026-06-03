@@ -643,22 +643,8 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                     {location.address && `${location.address}${location.city ? ", " : ""}`}
                     {location.city && `${location.city}/${location.state}`}
                     {location.postcode && ` — CEP ${location.postcode}`}
-                    {!location.address && !location.city && `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
+                    {!location.address && !location.city && "Localização obtida"}
                   </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-elevated/50 rounded-lg p-2">
-                      <span className="text-[8px] text-muted uppercase tracking-wider">Latitude</span>
-                      <p className="text-[10px] font-mono text-primary mt-px">{location.latitude.toFixed(6)}</p>
-                    </div>
-                    <div className="bg-elevated/50 rounded-lg p-2">
-                      <span className="text-[8px] text-muted uppercase tracking-wider">Longitude</span>
-                      <p className="text-[10px] font-mono text-primary mt-px">{location.longitude.toFixed(6)}</p>
-                    </div>
-                    <div className="bg-elevated/50 rounded-lg p-2">
-                      <span className="text-[8px] text-muted uppercase tracking-wider">Precisão</span>
-                      <p className="text-[10px] font-mono text-primary mt-px">{location.accuracy}m</p>
-                    </div>
-                  </div>
                   <div className="flex items-center gap-1.5">
                     <Clock size={10} className="text-muted" />
                     <span className="text-[10px] text-muted">Horário GPS:</span>
@@ -786,11 +772,6 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                         <p className={`text-[10px] mt-px ${event ? "text-secondary" : "text-muted/30"}`}>
                           {event ? eventStatusLabel(type) : eventStatusLabel(type)}
                         </p>
-                        {event && event.latitude && (
-                          <p className="text-[8px] font-mono text-muted/50 mt-0.5">
-                            {event.latitude.toFixed(2)}, {event.longitude?.toFixed(2)}
-                          </p>
-                        )}
                       </div>
                     </div>
                   )
@@ -991,21 +972,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
               />
             </div>
             <div className="px-6 py-4 border-t border-default flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-muted">Lat:</span>
-                  <span className="text-[11px] font-mono font-semibold text-primary">{liveCoords.latitude.toFixed(6)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-muted">Lon:</span>
-                  <span className="text-[11px] font-mono font-semibold text-primary">{liveCoords.longitude.toFixed(6)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-muted">Precisão:</span>
-                  <span className="text-[11px] font-mono font-semibold text-primary">{liveCoords.accuracy}m</span>
-                </div>
-              </div>
-              <p className="text-[10px] text-secondary truncate max-w-[40%] text-right">
+              <p className="text-[10px] text-secondary truncate max-w-full">
                 {location?.address && `${location.address}${location.city ? ", " : ""}`}
                 {location?.city && `${location.city}/${location.state}`}
               </p>
