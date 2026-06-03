@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useState } from "react"
-import { TrendingUp, Clock3, Timer, CalendarDays, X, Settings2, LayoutGrid, ChevronDown } from "lucide-react"
+import { TrendingUp, Clock3, Timer, CalendarDays, X, Settings2, LayoutGrid } from "lucide-react"
 import { StatsCard } from "../componentes/StatsCard"
 import { ChartCard } from "../componentes/ChartCard"
 import { RecentRecords } from "../componentes/RecentRecords"
@@ -23,14 +23,20 @@ import {
   computeFilteredTotals,
 } from "../services/workHoursEngine"
 import {
-  getCardsForRole,
-  getTemplatesForRole,
+  getWidgetsForRole,
+  getWidgetsForSlot,
   loadConfig,
   saveConfig,
   findBestTemplateForSlots,
+  TEMPLATES,
+  CATEGORY_ORDER,
+  CATEGORY_LABELS,
+  SLOTS,
   type DashboardConfig,
-  type DashboardCardDef,
   type DashboardTemplate,
+  type WidgetDef,
+  type SlotType,
+  type SlotConfig,
 } from "../services/dashboardCards"
 
 interface DashboardPageProps {
@@ -65,16 +71,16 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
   const [config, setConfig] = useState<DashboardConfig>(() => loadConfig(userId))
   const [modalOpen, setModalOpen] = useState(false)
 
-  const availableCards = useMemo(() => getCardsForRole(userRole), [userRole])
-  const templates = useMemo(() => getTemplatesForRole(userRole), [userRole])
+  const availableWidgets = useMemo(() => getWidgetsForRole(userRole), [userRole])
+  const templates = useMemo(() => TEMPLATES.filter(t => t.roles.includes(userRole as any)), [userRole])
 
-  const cardMap = useMemo(() => {
-    const m = new Map<string, DashboardCardDef>()
-    for (const c of availableCards) m.set(c.id, c)
+  const widgetMap = useMemo(() => {
+    const m = new Map<string, WidgetDef>()
+    for (const w of availableWidgets) m.set(w.id, w)
     return m
-  }, [availableCards])
+  }, [availableWidgets])
 
-  function applySlots(slots: [string, string, string, string]) {
+  function applySlots(slots: SlotConfig) {
     const templateId = findBestTemplateForSlots(slots, userRole)
     const c: DashboardConfig = { slots, templateId }
     setConfig(c)
@@ -88,7 +94,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
   }
 
   function setSlot(index: number, cardId: string) {
-    const slots = [...config.slots] as [string, string, string, string]
+    const slots = [...config.slots] as SlotConfig
     slots[index] = cardId
     applySlots(slots)
   }
@@ -127,16 +133,26 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
   const workedDaysLabel = monthStats.workedDays === 1 ? "dia trabalhado" : "dias trabalhados"
 
-  function renderSlotCard(cardId: string, idx: number) {
-    const def = cardMap.get(cardId)
-    if (!def) return null
-    return renderCardById(cardId, idx)
+  function PlaceholderWidget({ label }: { label: string }) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-[120px] rounded-lg border border-dashed border-default/10 bg-elevated/5 p-6">
+        <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">Em breve</span>
+        <span className="text-xs text-secondary mt-1">{label}</span>
+      </div>
+    )
   }
 
-  function renderCardById(cardId: string, _idx: number) {
+  function renderCardById(cardId: string) {
+    const def = widgetMap.get(cardId)
+    if (!def) return null
+
     const recordToday = allRecords.find(r => r.dataISO === todayISO())
     const todayMins = recordToday ? Math.round(recordToday.totalHours * 60) : 0
     const hasClockIn = recordToday && recordToday.entrada !== "---"
+
+    if (!def.hasData) {
+      return <PlaceholderWidget label={def.label} />
+    }
 
     switch (cardId) {
       case "bancoHoras":
@@ -183,20 +199,6 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
             trendValue={saldoData.netSaldo >= 0 ? "positivo" : "negativo"}
           />
         )
-      case "ultimosRegistros":
-        return (
-          <div key="ultimosRegistros" className="lg:col-span-2 flex flex-col gap-5 min-w-0">
-            <RecentRecords records={allRecords} onEdit={onEdit} onNavigate={onNavigate} />
-          </div>
-        )
-      case "calendarioResumido":
-        return (
-          <div key="calendarioResumido" className="flex flex-col gap-5 min-w-0">
-            <ChartCard title="Evolução do Banco de Horas" subtitle="Saldo acumulado por semana" insight={evolutionInsight}>
-              <LineChart data={weekEvolution} />
-            </ChartCard>
-          </div>
-        )
       case "pendencias":
         return (
           <StatsCard key="pendencias"
@@ -221,17 +223,58 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
             subtitle={workedDaysLabel}
           />
         )
+      case "ultimosRegistros":
+        return (
+          <div key="ultimosRegistros" className="flex flex-col min-w-0">
+            <RecentRecords records={allRecords} onEdit={onEdit} onNavigate={onNavigate} />
+          </div>
+        )
+      case "evolucaoBanco":
+        return (
+          <div key="evolucaoBanco" className="flex flex-col min-w-0">
+            <ChartCard title="Evolução do Banco de Horas" subtitle="Saldo acumulado por semana" insight={evolutionInsight}>
+              <LineChart data={weekEvolution} />
+            </ChartCard>
+          </div>
+        )
+      case "distribuicaoHoras":
+        return (
+          <div key="distribuicaoHoras" className="flex flex-col min-w-0">
+            <ChartCard title="Distribuição de Horas" subtitle="Total do período atual">
+              <DonutChart
+                segments={[
+                  { label: "Horário Normal", value: normalHours, color: "#8AAEE0" },
+                  { label: "Horas Extras", value: extraHours, color: "#628ECB" },
+                  { label: "Banco Negativo", value: negativoHours, color: "#C96B6C" },
+                ]}
+                totalValue={normalHours + extraHours + negativoHours}
+              />
+            </ChartCard>
+          </div>
+        )
+      case "metaSemanal":
+        return (
+          <div key="metaSemanal" className="flex flex-col min-w-0">
+            <MetaSemanal weekDays={weekDays} monthTotalMins={monthStats.totalMins} monthRecords={monthRecordsStrict} />
+          </div>
+        )
       default:
-        return null
+        return <PlaceholderWidget label={def.label} />
     }
   }
 
-  const slot1 = renderSlotCard(config.slots[0], 0)
-  const slot2 = renderSlotCard(config.slots[1], 1)
-  const slot3 = renderSlotCard(config.slots[2], 2)
-  const slot4 = renderSlotCard(config.slots[3], 3)
-
-  const isWideSlot = (cardId: string) => cardId === "ultimosRegistros" || cardId === "calendarioResumido"
+  function renderSlot(slotIndex: number) {
+    const cardId = config.slots[slotIndex]
+    const def = widgetMap.get(cardId)
+    if (!def) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full min-h-[80px] rounded-lg border border-dashed border-default/10 bg-elevated/5 p-4">
+          <span className="text-[10px] text-muted">Selecione um widget</span>
+        </div>
+      )
+    }
+    return renderCardById(cardId)
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -271,54 +314,44 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
         </div>
       )}
 
-      <div className={`grid ${isWideSlot(config.slots[0]) || isWideSlot(config.slots[1]) ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0"}`}>
-        {slot1}
-        {!isWideSlot(config.slots[0]) && slot2}
-        {!isWideSlot(config.slots[0]) && slot3}
-        {!isWideSlot(config.slots[0]) && slot4}
+      {/* Row 1: 4 stat slots */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {renderSlot(0)}
+        {renderSlot(1)}
+        {renderSlot(2)}
+        {renderSlot(3)}
       </div>
 
-      {isWideSlot(config.slots[0]) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-          {slot2 && <div className="flex flex-col gap-5 min-w-0">{slot2}</div>}
-          {slot3 && <div className="flex flex-col gap-5 min-w-0">{slot3}</div>}
-        </div>
-      )}
-
-      <div className="bg-elevated/50 h-px" />
-
+      {/* Row 2: 2 medium slots */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        <div className="flex flex-col gap-5 min-w-0">
-          <ChartCard title="Evolução do Banco de Horas" subtitle="Saldo acumulado por semana" insight={evolutionInsight}>
-            <LineChart data={weekEvolution} />
-          </ChartCard>
+        <div className="flex flex-col min-w-0">
+          {renderSlot(4)}
         </div>
-        <div className="flex flex-col gap-5 min-w-0">
-          <ChartCard title="Distribuição de Horas" subtitle="Total do período atual">
-            <DonutChart
-              segments={[
-                { label: "Horário Normal", value: normalHours, color: "#8AAEE0" },
-                { label: "Horas Extras", value: extraHours, color: "#628ECB" },
-                { label: "Banco Negativo", value: negativoHours, color: "#C96B6C" },
-              ]}
-              totalValue={normalHours + extraHours + negativoHours}
-            />
-          </ChartCard>
+        <div className="flex flex-col min-w-0">
+          {renderSlot(5)}
         </div>
       </div>
 
-      <div className="bg-elevated/50 h-px" />
-
+      {/* Row 3: 2 medium slots */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        <RecentRecords records={allRecords} onEdit={onEdit} onNavigate={onNavigate} />
-        <MetaSemanal weekDays={weekDays} monthTotalMins={monthStats.totalMins} monthRecords={monthRecordsStrict} />
+        <div className="flex flex-col min-w-0">
+          {renderSlot(6)}
+        </div>
+        <div className="flex flex-col min-w-0">
+          {renderSlot(7)}
+        </div>
+      </div>
+
+      {/* Row 4: 1 wide slot */}
+      <div className="grid grid-cols-1">
+        {renderSlot(8)}
       </div>
 
       {/* Personalization Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
-          <div className="relative w-full max-w-2xl mx-4 bg-surface border border-default/40 rounded-xl p-6 animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+          <div className="relative w-full max-w-3xl mx-4 bg-surface border border-default/40 rounded-xl p-6 animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setModalOpen(false)}
               className="absolute top-5 right-5 w-10 h-10 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-white/[0.07] transition-all duration-200"
@@ -328,12 +361,12 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
             <div className="flex flex-col gap-1 mb-8">
               <h2 className="text-xl font-bold text-primary tracking-tight">Personalizar Dashboard</h2>
-              <p className="text-sm text-secondary">Escolha qual card exibir em cada posição do dashboard.</p>
+              <p className="text-sm text-secondary">Escolha os widgets para cada posição do seu dashboard.</p>
             </div>
 
             {/* Templates */}
             {templates.length > 0 && (
-              <div className="mb-6">
+              <div className="mb-8">
                 <div className="flex items-center gap-2 mb-3">
                   <LayoutGrid size={14} className="text-muted" />
                   <span className="text-xs font-semibold text-secondary uppercase tracking-wider">Modelos Prontos</span>
@@ -358,29 +391,51 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
             {/* Slots */}
             <div className="flex flex-col gap-4">
-              {config.slots.map((cardId, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-elevated/20 border border-default/10">
-                  <div className="w-8 h-8 rounded-lg bg-[var(--accent-primary)]/10 flex items-center justify-center shrink-0">
-                    <span className="text-[11px] font-bold text-[var(--accent-primary)]">{i + 1}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-1">Posição {i + 1}</p>
-                    <div className="relative">
-                      <select
-                        value={cardId}
-                        onChange={e => setSlot(i, e.target.value)}
-                        className="w-full appearance-none h-9 px-3 rounded-lg bg-input border border-default/20 text-xs text-primary font-medium outline-none focus:border-[var(--accent-ring)] cursor-pointer"
-                      >
-                        {availableCards.map(c => (
-                          <option key={c.id} value={c.id}>{c.label}</option>
-                        ))}
-                      </select>
-                      <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+              {config.slots.map((cardId, i) => {
+                const slotDef = SLOTS[i]
+                const compatibleWidgets = getWidgetsForSlot(slotDef.slotType as SlotType, userRole)
+                return (
+                  <div key={i} className="flex items-start gap-4 p-4 rounded-lg bg-elevated/20 border border-default/10">
+                    <div className="w-9 h-9 rounded-lg bg-[var(--accent-primary)]/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-xs font-bold text-[var(--accent-primary)]">{i + 1}</span>
                     </div>
-                    <p className="text-[10px] text-muted mt-1">{cardMap.get(cardId)?.description || ""}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <p className="text-[10px] font-semibold text-muted uppercase tracking-wider">
+                          {slotDef.label}
+                        </p>
+                        <span className="text-[9px] font-medium text-muted bg-elevated/30 px-1.5 py-0.5 rounded">
+                          {slotDef.slotType === "stat" ? "Indicador" : slotDef.slotType === "medium" ? "Widget" : "Painel"}
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <select
+                          value={cardId}
+                          onChange={e => setSlot(i, e.target.value)}
+                          className="w-full appearance-none h-9 px-3 rounded-lg bg-input border border-default/20 text-xs text-primary font-medium outline-none focus:border-[var(--accent-ring)] cursor-pointer"
+                        >
+                          {CATEGORY_ORDER.map(cat => {
+                            const catWidgets = compatibleWidgets.filter(w => w.category === cat)
+                            if (catWidgets.length === 0) return null
+                            return (
+                              <optgroup key={cat} label={CATEGORY_LABELS[cat]}>
+                                {catWidgets.map(w => (
+                                  <option key={w.id} value={w.id}>
+                                    {w.label}{w.hasData ? "" : ""}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )
+                          })}
+                        </select>
+                      </div>
+                      <p className="text-[10px] text-muted mt-1.5">
+                        {widgetMap.get(cardId)?.description || "Selecione um widget"}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             <div className="flex items-center gap-3 pt-6">
@@ -388,10 +443,10 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
                 onClick={() => setModalOpen(false)}
                 className="flex-1 h-10 rounded-lg bg-surface border border-default/50 text-xs font-medium text-secondary hover:text-primary hover:bg-elevated transition-all"
               >
-                Fechar
+                Cancelar
               </button>
               <button
-                onClick={() => { setModalOpen(false) }}
+                onClick={() => setModalOpen(false)}
                 className="flex-1 h-10 rounded-lg bg-[var(--accent-primary)] text-xs font-bold text-white hover:brightness-110 transition-all"
               >
                 Confirmar
