@@ -47,24 +47,24 @@ export function RecentRecords({ records, onEdit, onNavigate }: RecentRecordsProp
           <span className="w-7" />
         </div>
         {sorted.map((r) => {
-          const isMissing = r.tipo === "Pendente"
-          const displayTipo = isMissing ? "Pendente" : r.totalHours < 8 ? "Negativo" : r.tipo
+          const semBatida = r.tipo === "Pendente" && r.entrada === "---"
+          const displayTipo = semBatida ? "Pendente" : r.totalHours < 8 ? "Negativo" : r.tipo
           return (
             <div
               key={r.id}
               className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-3 px-0 py-2.5 items-center transition-all duration-200 hover:bg-elevated/20 rounded -mx-0.5 px-0.5"
             >
-              <span className={`text-sm font-medium ${isMissing ? "text-[#C49A6B]" : "text-primary"}`}>
+              <span className={`text-sm font-medium ${semBatida ? "text-[#C49A6B]" : "text-primary"}`}>
                 {r.data}
               </span>
               <span className="w-14 text-center text-sm text-secondary font-mono tracking-wide">
-                {isMissing ? "---" : r.entrada}
+                {semBatida ? "---" : r.entrada}
               </span>
               <span className="w-14 text-center text-sm text-secondary font-mono tracking-wide">
-                {isMissing ? "---" : r.saida}
+                {semBatida ? "---" : r.saida}
               </span>
               <span className="w-14 text-center text-sm text-secondary font-mono tracking-wide">
-                {isMissing ? "---" : r.total}
+                {semBatida ? "---" : r.total}
               </span>
               <span className="w-16 flex justify-center">
                 <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${tipoStyle[displayTipo]}`}>
@@ -72,7 +72,7 @@ export function RecentRecords({ records, onEdit, onNavigate }: RecentRecordsProp
                 </span>
               </span>
               <span className="w-7 flex justify-center">
-                {isMissing ? (
+                {semBatida ? (
                   <button
                     onClick={() => onEdit(r.dataISO)}
                     className="w-6 h-6 rounded flex items-center justify-center text-muted hover:text-[#C49A6B] hover:bg-[#C49A6B]/8 transition-all duration-200"
