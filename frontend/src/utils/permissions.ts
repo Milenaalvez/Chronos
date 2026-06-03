@@ -36,7 +36,6 @@ const PAGE_ACCESS: Record<string, Role[]> = {
 
   colaboradores: ["RH", "ADMIN", "DEVELOPER"],
   ferias: ["RH", "ADMIN", "DEVELOPER"],
-  abonos: ["RH", "ADMIN", "DEVELOPER"],
   afastamentos: ["RH", "ADMIN", "DEVELOPER"],
   documentos: ["RH", "ADMIN", "DEVELOPER"],
   aprovacoes: ["RH", "ADMIN", "DEVELOPER"],

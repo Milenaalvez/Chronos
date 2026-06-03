@@ -47,7 +47,6 @@ import { EmAnalisePage } from "./paginas/EmAnalisePage"
 import { AuditoriaPage } from "./paginas/AuditoriaPage"
 import { MeusRegistrosPage } from "./paginas/MeusRegistrosPage"
 import { FeriasPage } from "./paginas/FeriasPage"
-import { AbonosPage } from "./paginas/AbonosPage"
 import type { TimeRecord, FormData, Justificacao, WorkflowNotification, PageAction } from "./types"
 import { toMinutes, formatMinutes, formatDataBR } from "./types"
 import { timeRecords as apiRecords, justifications as apiJust, auth as apiAuth, getToken, setToken, getRefreshToken, setRefreshToken, setOnAuthExpired, notifications as apiNotifs, termAcceptance as apiTermAcceptance, faceRegistration as apiFaceRegistration } from "./services/api"
@@ -683,8 +682,6 @@ export default function App() {
         return <EquipePage user={user} onViewProfile={(id) => setProfileMemberId(id)} allRecords={allRecords} justificacoes={justificacoes} />
       case "ferias":
         return <FeriasPage />
-      case "abonos":
-        return <AbonosPage />
       case "diagnostico":
         return (
           <DiagnosticoPage

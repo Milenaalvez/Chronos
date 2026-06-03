@@ -8,7 +8,6 @@ import {
   Calendar,
   BarChart3,
   Umbrella,
-  Hand,
   Bell,
   Settings,
   ChevronDown,
@@ -131,7 +130,6 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
       items: [
         { label: "Equipe", icon: Users, page: "equipe" },
         { label: "Férias", icon: Umbrella, page: "ferias" },
-        { label: "Abonos", icon: Hand, page: "abonos" },
         { label: "Calendário", icon: Calendar, page: "calendario" },
         { label: "Relatórios", icon: BarChart3, page: "relatorios" },
       ],
