@@ -24,7 +24,17 @@ import { startScheduler } from './utils/scheduler.js'
 
 const app = express()
 
-app.use(cors({ origin: env.corsOrigin, credentials: true }))
+const allowedOrigins = env.corsOrigin.split(',').map(s => s.trim())
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true,
+}))
 app.use(express.json({ limit: '10mb' }))
 
 app.get('/api/health', (_req, res) => {
