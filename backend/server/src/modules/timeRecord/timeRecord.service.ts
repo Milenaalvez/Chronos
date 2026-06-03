@@ -10,10 +10,41 @@ export async function listRecords(userId: string, startDate?: string, endDate?: 
     if (startDate) where.date.gte = new Date(startDate)
     if (endDate) where.date.lte = new Date(endDate)
   }
-  return prisma.timeRecord.findMany({
+  const records = await prisma.timeRecord.findMany({
     where,
     orderBy: { date: 'desc' },
   })
+  const today = new Date()
+  const todayStr = today.toISOString().split('T')[0]
+  for (const r of records) {
+    if (!r.clockOut && r.clockIn) {
+      const recordDate = r.date instanceof Date ? r.date.toISOString().split('T')[0] : String(r.date).substring(0, 10)
+      if (recordDate === todayStr) {
+        const ci = parseTimePart(r.clockIn)
+        const bs = r.breakStart ? parseTimePart(r.breakStart) : null
+        const be = r.breakEnd ? parseTimePart(r.breakEnd) : null
+        const now = today.getHours() * 60 + today.getMinutes()
+        if (ci !== null) {
+          const norm = (t: number) => t > now ? t - 1440 : t
+          const nci = norm(ci)
+          const nbs = bs !== null ? norm(bs) : null
+          const nbe = be !== null ? norm(be) : null
+          let worked = now - nci
+          if (nbs !== null && nbe !== null) worked -= (nbe - nbs)
+          else if (nbs !== null && nbe === null) worked = nbs - nci
+          Object.assign(r, { totalMinutes: Math.max(Math.round(worked), 0) })
+        }
+      }
+    }
+  }
+  return records
+}
+
+function parseTimePart(t: string): number | null {
+  if (!t) return null
+  const [h, m] = t.split(':').map(Number)
+  if (isNaN(h) || isNaN(m)) return null
+  return h * 60 + m
 }
 
 export async function getRecord(id: string, userId: string) {

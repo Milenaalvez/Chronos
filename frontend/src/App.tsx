@@ -238,6 +238,11 @@ export default function App() {
     if (user.themeAccent) setThemeAccent(user.themeAccent as any)
   }, [user, setThemeMode, setThemeAccent])
 
+  const refreshRecords = useCallback(() => {
+    if (!user) return
+    apiRecords.list().then((data) => setRecords(data.map(apiRecordToTimeRecord))).catch(() => {})
+  }, [user])
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.ctrlKey && e.shiftKey && e.key === "D") {
@@ -248,6 +253,19 @@ export default function App() {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    const h = setInterval(refreshRecords, 60000)
+    return () => clearInterval(h)
+  }, [user, refreshRecords])
+
+  useEffect(() => {
+    if (!user) return
+    function handleFocus() { refreshRecords() }
+    window.addEventListener("focus", handleFocus)
+    return () => window.removeEventListener("focus", handleFocus)
+  }, [user, refreshRecords])
 
   const [saveFeedback, setSaveFeedback] = useState<{
     open: boolean
@@ -470,7 +488,7 @@ export default function App() {
   useEffect(() => {
     if (!authenticated || !getToken()) return
     if (!user) apiAuth.me().then((u) => setUser(u)).catch(() => {})
-    apiRecords.list().then((data) => setRecords(data.map(apiRecordToTimeRecord))).catch((err) => console.warn('[App] Erro ao carregar registros:', err))
+    refreshRecords()
     apiJust.list().then((data) => {
       const justMap: Record<string, Justificacao> = {}
       if (Array.isArray(data)) {
@@ -643,7 +661,7 @@ export default function App() {
         return <ConfiguracoesPage userId={user?.id} user={user ?? undefined} onAvatarUpdate={(url) => setUser((prev) => prev ? { ...prev, avatar: url } : prev)} />
       case "registrar-ponto":
       case "ponto-registrar":
-        return <RegistrarPontoPage user={user ?? undefined} onPointCreated={() => apiRecords.list().then((data) => setRecords(data.map(apiRecordToTimeRecord))).catch((err) => console.warn('[App] onPointCreated: erro ao atualizar registros:', err))} />
+        return <RegistrarPontoPage user={user ?? undefined} onPointCreated={refreshRecords} />
       case "ponto-meus-registros":
         return (
           <MeusRegistrosPage
