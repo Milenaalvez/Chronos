@@ -23,7 +23,7 @@ export async function create(req: AuthRequest, res: Response, next: NextFunction
 
 export async function approve(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const just = await service.approveJustification(req.params['id'], req.user!.userId, req.user!.name || 'Administrador')
+    const just = await service.approveJustification(req.params['id'] as string, req.user!.userId, req.user!.name || 'Administrador', req.user!.companyId)
     res.json(just)
   } catch (err) { next(err) }
 }
@@ -31,7 +31,7 @@ export async function approve(req: AuthRequest, res: Response, next: NextFunctio
 export async function reject(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const { rhResponse } = req.body
-    const just = await service.rejectJustification(req.params['id'], req.user!.userId, req.user!.name || 'Administrador', rhResponse)
+    const just = await service.rejectJustification(req.params['id'] as string, req.user!.userId, req.user!.name || 'Administrador', req.user!.companyId, rhResponse)
     res.json(just)
   } catch (err) { next(err) }
 }

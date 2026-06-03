@@ -1,7 +1,7 @@
 import { prisma } from '../../database/prisma.js'
 
 export async function listJustifications(userId: string, role: string, companyId: string) {
-  const where = role === 'ADMIN' || role === 'RH' || role === 'DEVELOPER'
+  const where: any = role === 'ADMIN' || role === 'RH' || role === 'DEVELOPER' || role === 'SUPER_ADMIN'
     ? { user: { companyId } }
     : { userId, user: { companyId } }
   return prisma.justification.findMany({
@@ -30,8 +30,17 @@ export async function createJustification(userId: string, data: {
   })
 }
 
-export async function approveJustification(id: string, respondedBy: string, actorName: string) {
-  const just = await prisma.justification.update({
+export async function approveJustification(id: string, respondedBy: string, actorName: string, actorCompanyId: string) {
+  const just = await prisma.justification.findUnique({
+    where: { id },
+    include: { user: { select: { companyId: true } } },
+  })
+  if (!just) throw Object.assign(new Error('Justificativa não encontrada'), { statusCode: 404 })
+  if (just.user.companyId !== actorCompanyId) {
+    throw Object.assign(new Error('Sem permissão para esta justificativa'), { statusCode: 403 })
+  }
+
+  await prisma.justification.update({
     where: { id },
     data: { status: 'APPROVED' as any, respondedBy, rhResponse: 'Justificativa aprovada pelo RH.' },
   })
@@ -58,8 +67,17 @@ export async function approveJustification(id: string, respondedBy: string, acto
   return just
 }
 
-export async function rejectJustification(id: string, respondedBy: string, actorName: string, rhResponse?: string) {
-  const just = await prisma.justification.update({
+export async function rejectJustification(id: string, respondedBy: string, actorName: string, actorCompanyId: string, rhResponse?: string) {
+  const just = await prisma.justification.findUnique({
+    where: { id },
+    include: { user: { select: { companyId: true } } },
+  })
+  if (!just) throw Object.assign(new Error('Justificativa não encontrada'), { statusCode: 404 })
+  if (just.user.companyId !== actorCompanyId) {
+    throw Object.assign(new Error('Sem permissão para esta justificativa'), { statusCode: 403 })
+  }
+
+  await prisma.justification.update({
     where: { id },
     data: { status: 'REJECTED' as any, respondedBy, rhResponse: rhResponse || 'Justificativa recusada.' },
   })

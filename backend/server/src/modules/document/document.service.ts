@@ -16,11 +16,18 @@ async function ensureBucket() {
 export async function uploadDocument(
   userId: string,
   uploadedBy: string,
+  companyId: string,
   fileBuffer: Buffer,
   mimeType: string,
   fileName: string,
   data: { name: string; type: string; category: string; notes?: string },
 ) {
+  const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { companyId: true } })
+  if (!targetUser) throw Object.assign(new Error('Usuário não encontrado'), { statusCode: 404 })
+  if (targetUser.companyId !== companyId) {
+    throw Object.assign(new Error('Sem permissão'), { statusCode: 403 })
+  }
+
   await ensureBucket()
 
   const ext = fileName.split('.').pop() || 'pdf'
@@ -86,11 +93,15 @@ export async function listDocuments(userId: string, companyId: string, actorId?:
   })
 }
 
-export async function deleteDocument(id: string, userId: string, actorId: string, actorRole: string) {
+export async function deleteDocument(id: string, userId: string, actorId: string, actorRole: string, actorCompanyId: string) {
   const doc = await prisma.document.findUnique({ where: { id } })
   if (!doc) return false
-  if (doc.userId !== userId && actorRole !== 'ADMIN' && actorRole !== 'RH' && actorRole !== 'DEVELOPER') return false
-  if (doc.uploadedBy !== actorId && actorRole !== 'ADMIN' && actorRole !== 'RH' && actorRole !== 'DEVELOPER') return false
+
+  const targetUser = await prisma.user.findUnique({ where: { id: doc.userId }, select: { companyId: true } })
+  if (!targetUser || targetUser.companyId !== actorCompanyId) return false
+
+  if (doc.userId !== userId && actorRole !== 'ADMIN' && actorRole !== 'RH' && actorRole !== 'DEVELOPER' && actorRole !== 'SUPER_ADMIN') return false
+  if (doc.uploadedBy !== actorId && actorRole !== 'ADMIN' && actorRole !== 'RH' && actorRole !== 'DEVELOPER' && actorRole !== 'SUPER_ADMIN') return false
 
   await prisma.document.delete({ where: { id } }).catch(() => {})
 

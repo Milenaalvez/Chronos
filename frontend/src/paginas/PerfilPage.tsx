@@ -120,13 +120,14 @@ interface PerfilPageProps {
   memberId: string
   user: any
   onBack: () => void
+  onNavigate?: (page: string) => void
   embedded?: boolean
   onAvatarUpdate?: (url: string) => void
   allRecords?: TimeRecord[]
   justificacoes?: Record<string, Justificacao>
 }
 
-export function PerfilPage({ memberId, user, onBack, embedded, onAvatarUpdate, allRecords = [], justificacoes = {} }: PerfilPageProps) {
+export function PerfilPage({ memberId, user, onBack, onNavigate, embedded, onAvatarUpdate, allRecords = [], justificacoes = {} }: PerfilPageProps) {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -495,7 +496,7 @@ export function PerfilPage({ memberId, user, onBack, embedded, onAvatarUpdate, a
   const roleLabel = ROLE_STYLES[p.role]?.label || "Membro"
 
   return (
-    <div className={`${embedded ? "w-full" : "max-w-6xl mx-auto"} pb-16 animate-in fade-in duration-300`}>
+    <div className={`${embedded ? "w-full" : "w-full px-4 sm:px-6 lg:px-8"} pb-16 animate-in fade-in duration-300`}>
 
       {/* ═══════════════ TOPO ═══════════════ */}
       {!embedded && (
@@ -506,7 +507,7 @@ export function PerfilPage({ memberId, user, onBack, embedded, onAvatarUpdate, a
               Voltar
             </button>
             <span className="text-[11px] text-muted">/</span>
-            <span className="text-[11px] text-muted">Colaboradores</span>
+            <button onClick={() => { onNavigate?.("equipe"); onBack() }} className="text-[11px] text-muted hover:text-primary transition-colors">Colaboradores</button>
             <span className="text-[11px] text-muted">/</span>
             <span className="text-[11px] text-primary font-medium">{p.name}</span>
           </div>

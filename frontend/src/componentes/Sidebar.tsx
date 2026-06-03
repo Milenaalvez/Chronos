@@ -10,6 +10,8 @@ import {
   Umbrella,
   Bell,
   Settings,
+  Building2,
+  ShieldCheck,
   ChevronDown,
   PanelRightClose,
   PanelRightOpen,
@@ -140,6 +142,13 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
       items: [
         { label: "Notificações", icon: Bell, page: "notificacoes", badge: notificationCount },
         { label: "Configurações", icon: Settings, page: "configuracoes" },
+      ],
+    },
+    {
+      label: "Administrador",
+      items: [
+        { label: "Empresa", icon: Building2, page: "admin-empresa" },
+        { label: "Super Admin", icon: ShieldCheck, page: "super-admin" },
       ],
     },
   ], [notificationCount])

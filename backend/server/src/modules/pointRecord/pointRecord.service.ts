@@ -8,7 +8,13 @@ function parseTimeValue(t: string): number {
   return h * 60 + (m || 0)
 }
 
-export async function listPointRecords(userId: string, date?: string, includePhoto?: boolean) {
+export async function listPointRecords(userId: string, companyId: string, date?: string, includePhoto?: boolean) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { companyId: true },
+  })
+  if (!user || user.companyId !== companyId) return []
+
   const where: any = { userId }
   if (date) {
     where.date = new Date(date)

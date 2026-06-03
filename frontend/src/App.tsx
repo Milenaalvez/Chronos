@@ -47,6 +47,8 @@ import { EmAnalisePage } from "./paginas/EmAnalisePage"
 import { AuditoriaPage } from "./paginas/AuditoriaPage"
 import { MeusRegistrosPage } from "./paginas/MeusRegistrosPage"
 import { FeriasPage } from "./paginas/FeriasPage"
+import { AdminEmpresaPage } from "./paginas/AdminEmpresaPage"
+import { SuperAdminPage } from "./paginas/SuperAdminPage"
 import type { TimeRecord, FormData, Justificacao, WorkflowNotification, PageAction } from "./types"
 import { toMinutes, formatMinutes, formatDataBR } from "./types"
 import { timeRecords as apiRecords, justifications as apiJust, auth as apiAuth, getToken, setToken, getRefreshToken, setRefreshToken, setOnAuthExpired, notifications as apiNotifs, termAcceptance as apiTermAcceptance, faceRegistration as apiFaceRegistration } from "./services/api"
@@ -568,7 +570,7 @@ export default function App() {
 
   if (action === 'verify-email' && urlParams.get('token')) {
     return <><ToastContainer /><VerifyEmailPage onVerified={(userData) => {
-      if (userData) setUser(userData)
+      if (userData) { setUser(userData); setAuthenticated(true) }
       window.history.replaceState({}, '', window.location.pathname)
     }} /></>
   }
@@ -602,6 +604,7 @@ export default function App() {
           memberId={profileMemberId}
           user={user}
           onBack={() => setProfileMemberId(null)}
+          onNavigate={setPage}
           allRecords={allRecords}
           justificacoes={justificacoes}
         />
@@ -690,6 +693,10 @@ export default function App() {
             justificacoes={justificacoes}
           />
         )
+      case "admin-empresa":
+        return <AdminEmpresaPage user={user} />
+      case "super-admin":
+        return <SuperAdminPage />
       default:
         return (
           <DashboardPage
@@ -708,7 +715,7 @@ export default function App() {
     <ErrorBoundary>
     <div className="h-screen bg-app text-primary">
       <ToastContainer />
-      <Sidebar activePage={page} onNavigate={(p) => { setPage(p); setSidebarOpen(false) }} onLogout={handleLogout} onSwitchAccount={(token, userData, refreshTok) => { setToken(token); if (refreshTok) setRefreshToken(refreshTok); setUser(userData); setPage("dashboard"); }} user={user} notificationCount={notificationCount} sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((p) => !p)} collapsed={sidebarCollapsed} onCollapseChange={handleCollapseChange} impersonatingRole={impersonatingRole} onExitImpersonation={() => setImpersonatingRole(null)} onImpersonateRole={(role) => setImpersonatingRole(role)} />
+      <Sidebar activePage={page} onNavigate={(p) => { setPage(p); setProfileMemberId(null); setSidebarOpen(false) }} onLogout={handleLogout} onSwitchAccount={(token, userData, refreshTok) => { setToken(token); if (refreshTok) setRefreshToken(refreshTok); setUser(userData); setPage("dashboard"); }} user={user} notificationCount={notificationCount} sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((p) => !p)} collapsed={sidebarCollapsed} onCollapseChange={handleCollapseChange} impersonatingRole={impersonatingRole} onExitImpersonation={() => setImpersonatingRole(null)} onImpersonateRole={(role) => setImpersonatingRole(role)} />
 
       {impersonatingRole && (
         <div className="fixed top-0 left-0 right-0 z-50 h-8 bg-amber-600/80 backdrop-blur-sm flex items-center justify-center gap-2 text-[11px] font-medium text-white">

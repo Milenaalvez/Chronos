@@ -1,8 +1,8 @@
 import { prisma } from '../../database/prisma.js'
 
-export async function listDepartments() {
+export async function listDepartments(companyId: string) {
   return prisma.department.findMany({
-    where: { active: true },
+    where: { active: true, companyId },
     orderBy: { order: 'asc' },
     include: {
       positions: {
@@ -13,8 +13,8 @@ export async function listDepartments() {
   })
 }
 
-export async function listPositions(departmentId?: string) {
-  const where: any = { active: true }
+export async function listPositions(companyId: string, departmentId?: string) {
+  const where: any = { active: true, companyId }
   if (departmentId) where.departmentId = departmentId
   return prisma.position.findMany({
     where,

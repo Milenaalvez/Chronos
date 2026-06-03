@@ -1,6 +1,7 @@
-export type Role = "DEVELOPER" | "ADMIN" | "RH" | "EMPLOYEE"
+export type Role = "SUPER_ADMIN" | "DEVELOPER" | "ADMIN" | "RH" | "EMPLOYEE"
 
 export const ROLE_HIERARCHY: Record<Role, number> = {
+  SUPER_ADMIN: 5,
   DEVELOPER: 4,
   ADMIN: 3,
   RH: 2,
@@ -8,6 +9,7 @@ export const ROLE_HIERARCHY: Record<Role, number> = {
 }
 
 export const ROLE_LABELS: Record<Role, string> = {
+  SUPER_ADMIN: "Super Administrador",
   DEVELOPER: "Super Administrador",
   ADMIN: "Administrador",
   RH: "RH",
@@ -15,6 +17,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 }
 
 export const ROLE_SHORT_LABELS: Record<Role, string> = {
+  SUPER_ADMIN: "Master",
   DEVELOPER: "Super Admin",
   ADMIN: "Admin",
   RH: "RH",
@@ -22,29 +25,33 @@ export const ROLE_SHORT_LABELS: Record<Role, string> = {
 }
 
 const PAGE_ACCESS: Record<string, Role[]> = {
-  dashboard: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
-  "ponto-registrar": ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
-  "registrar-ponto": ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
-  "ponto-meus-registros": ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
-  banco: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
-  calendario: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
-  notificacoes: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
-  configuracoes: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER"],
+  dashboard: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  "ponto-registrar": ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  "registrar-ponto": ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  "ponto-meus-registros": ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  banco: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  calendario: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  notificacoes: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  configuracoes: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
 
-  equipe: ["RH", "ADMIN", "DEVELOPER"],
-  relatorios: ["RH", "ADMIN", "DEVELOPER"],
+  equipe: ["RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  relatorios: ["RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
 
-  colaboradores: ["RH", "ADMIN", "DEVELOPER"],
-  ferias: ["RH", "ADMIN", "DEVELOPER"],
-  afastamentos: ["RH", "ADMIN", "DEVELOPER"],
-  documentos: ["RH", "ADMIN", "DEVELOPER"],
-  aprovacoes: ["RH", "ADMIN", "DEVELOPER"],
+  colaboradores: ["RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  ferias: ["RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  afastamentos: ["RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  documentos: ["RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  aprovacoes: ["RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
 
-  usuarios: ["ADMIN", "DEVELOPER"],
-  cargos: ["ADMIN", "DEVELOPER"],
-  departamentos: ["ADMIN", "DEVELOPER"],
-  permissoes: ["ADMIN", "DEVELOPER"],
-  auditoria: ["ADMIN", "DEVELOPER"],
+  usuarios: ["ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  cargos: ["ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  departamentos: ["ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  permissoes: ["ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  auditoria: ["ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+
+  admin: ["ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  "admin-empresa": ["ADMIN", "DEVELOPER", "SUPER_ADMIN"],
+  "super-admin": ["SUPER_ADMIN"],
 
   logs: ["DEVELOPER"],
   monitoramento: ["DEVELOPER"],
@@ -109,6 +116,7 @@ export const ALL_PERMISSIONS = [
 ] as const
 
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
+  SUPER_ADMIN: ALL_PERMISSIONS.map((p) => p.key),
   ADMIN: ALL_PERMISSIONS.map((p) => p.key),
   RH: [
     "access_team", "manage_members", "approve_justifications",

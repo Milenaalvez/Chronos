@@ -17,6 +17,7 @@ export async function upload(req: AuthRequest, res: Response, next: NextFunction
     const result = await documentService.uploadDocument(
       userId,
       req.user!.userId,
+      req.user!.companyId,
       file.buffer,
       file.mimetype,
       file.originalname,
@@ -34,7 +35,7 @@ export async function upload(req: AuthRequest, res: Response, next: NextFunction
 
 export async function list(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { userId } = req.params
+    const userId = req.params['userId'] as string
     if (!userId) {
       res.status(400).json({ error: 'userId é obrigatório' })
       return
@@ -48,9 +49,9 @@ export async function list(req: AuthRequest, res: Response, next: NextFunction) 
 
 export async function remove(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params
+    const { id } = req.params as { id: string }
     const { userId } = req.body
-    const ok = await documentService.deleteDocument(id, userId || req.user!.userId, req.user!.userId, req.user!.role)
+    const ok = await documentService.deleteDocument(id, userId || req.user!.userId, req.user!.userId, req.user!.role, req.user!.companyId)
     if (!ok) {
       res.status(404).json({ error: 'Documento não encontrado' })
       return

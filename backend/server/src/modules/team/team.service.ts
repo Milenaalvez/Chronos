@@ -165,7 +165,7 @@ export async function createTeamMember(companyId: string, data: {
     data.position || data.role || 'Membro',
     company?.name || 'Empresa',
     `${env.appUrl}/?action=verify-email&token=${verificationCode}`
-  ).catch(() => {})
+  ).catch((err: any) => console.error('[Team] Erro ao enviar welcome email:', err?.message))
 
   createNotification(user.id, {
     title: 'Bem-vindo ao Chronos',

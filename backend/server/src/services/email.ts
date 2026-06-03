@@ -3,27 +3,41 @@ import { env } from '../config/env.js'
 
 const hasSmtp = !!(env.smtpHost && env.smtpUser && env.smtpPass)
 
+console.log(`[Email] SMTP configurado: ${hasSmtp} (host=${env.smtpHost}, user=${env.smtpUser})`)
+
 const transporter = hasSmtp
   ? nodemailer.createTransport({
       host: env.smtpHost,
       port: env.smtpPort,
       secure: env.smtpPort === 465,
       auth: { user: env.smtpUser, pass: env.smtpPass },
+      logger: true,
+      debug: true,
     })
   : null
 
+if (transporter) {
+  transporter.verify().then(() => {
+    console.log('[Email] Conexão SMTP verificada com sucesso')
+  }).catch((err) => {
+    console.error('[Email] ERRO na verificação SMTP:', err.message)
+  })
+}
+
 function logFallback(to: string, subject: string, html: string) {
-  console.log(`[Email] TO: ${to} | SUBJECT: ${subject}`)
-  console.log(`[Email] HTML:\n${html.replace(/<[^>]+>/g, '').slice(0, 500)}...`)
+  console.warn(`[Email] FALLBACK (console) -> TO: ${to} | SUBJECT: ${subject}`)
+  console.warn(`[Email] HTML:\n${html.replace(/<[^>]+>/g, '').slice(0, 500)}...`)
 }
 
 async function send(to: string, subject: string, html: string) {
   if (transporter) {
     try {
-      await transporter.sendMail({ from: env.smtpFrom, to, subject, html })
+      const info = await transporter.sendMail({ from: env.smtpFrom, to, subject, html })
+      console.log(`[Email] Enviado para ${to}: ${info.messageId}`)
       return
     } catch (err: any) {
-      console.warn('[Email] SMTP error, falling back to console:', err?.message)
+      console.error(`[Email] ERRO ao enviar para ${to}:`, err.message)
+      throw err
     }
   }
   logFallback(to, subject, html)
@@ -63,6 +77,7 @@ function bannerBottom() {
 }
 
 export async function sendWelcomeEmail(to: string, name: string, registrationNumber: string, role: string, company: string, verificationLink: string) {
+  const code = verificationLink.split('token=')[1] || ''
   await send(to, 'Bem-vindo ao Chronos!', `
     <div style="font-family:Arial,Helvetica,sans-serif;background:#f8fafc;padding:20px;">
       <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;">
@@ -86,6 +101,10 @@ export async function sendWelcomeEmail(to: string, name: string, registrationNum
               Ativar minha conta
             </a>
           </p>
+          <p style="color:#64748b;">Ou copie o código abaixo para ativar manualmente:</p>
+          <p style="font-size:13px;text-align:center;padding:12px;background:#f1f5f9;border-radius:6px;font-family:monospace;letter-spacing:1px;color:#071A3D;word-break:break-all;">
+            ${code}
+          </p>
           <p>Após a ativação você poderá registrar jornadas, acompanhar seu banco de horas e acessar os recursos da plataforma.</p>
           <p style="color:#64748b;">Se você não esperava este convite, ignore este e-mail.</p>
           ${bannerBottom()}
@@ -96,6 +115,7 @@ export async function sendWelcomeEmail(to: string, name: string, registrationNum
 }
 
 export async function sendVerificationEmail(to: string, name: string, link: string) {
+  const code = link.split('token=')[1] || ''
   await send(to, 'Confirme seu e-mail - Chronos', `
     <div style="font-family:Arial,Helvetica,sans-serif;background:#f8fafc;padding:20px;">
       <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;">
@@ -110,6 +130,10 @@ export async function sendVerificationEmail(to: string, name: string, link: stri
                style="background:#3B82F6;color:#ffffff;padding:14px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">
               Confirmar meu e-mail
             </a>
+          </p>
+          <p style="color:#64748b;">Ou copie o código abaixo para ativar manualmente:</p>
+          <p style="font-size:13px;text-align:center;padding:12px;background:#f1f5f9;border-radius:6px;font-family:monospace;letter-spacing:1px;color:#071A3D;word-break:break-all;">
+            ${code}
           </p>
           <p style="color:#64748b;">Se você não solicitou este cadastro, ignore esta mensagem.</p>
           ${bannerBottom()}

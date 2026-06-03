@@ -129,7 +129,7 @@ export async function registerUser(data: {
     data.position || role,
     company.name,
     `${env.appUrl}/?action=verify-email&token=${verificationCode}`
-  ).catch(() => {})
+  ).catch((err: any) => console.error('[Auth] Erro ao enviar welcome email:', err?.message))
 
   createNotification(user.id, {
     title: 'Bem-vindo ao Chronos',
@@ -181,7 +181,7 @@ export async function sendVerificationCode(email: string) {
     user.email,
     user.name,
     `${env.appUrl}/?action=verify-email&token=${verificationCode}`
-  ).catch(() => {})
+  ).catch((err: any) => console.error('[Auth] Erro ao enviar verification email:', err?.message))
 
   logActivity(user.id, 'VERIFICATION_RESENT', `Novo link de verificação enviado para ${user.email}`, 'User', user.id, user.id)
 
@@ -331,7 +331,7 @@ export async function forgotPassword(email: string) {
     user.email,
     user.name,
     `${env.appUrl}/?action=reset-password&token=${resetToken}`
-  ).catch(() => {})
+  ).catch((err: any) => console.error('[Auth] Erro ao enviar reset password email:', err?.message))
 
   logActivity(user.id, 'PASSWORD_RESET_REQUESTED', `Recuperação de senha solicitada para ${user.email}`, 'User', user.id, user.id)
 

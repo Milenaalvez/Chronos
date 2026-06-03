@@ -507,3 +507,108 @@ export const documents = {
       body: JSON.stringify({ userId }),
     }),
 }
+
+export interface CompanyData {
+  id: string
+  name: string
+  slug: string
+  document?: string
+  phone?: string
+  address?: string
+  logo?: string
+  plan: string
+  userLimit: number
+  status: string
+  isActive: boolean
+  createdAt: string
+  config?: {
+    logo?: string
+    primaryColor: string
+    requireGeo: boolean
+    requireFace: boolean
+    defaultWeeklyHours: number
+    lunchDuration: number
+  }
+  _count?: {
+    users: number
+    branches: number
+  }
+}
+
+export interface BranchData {
+  id: string
+  name: string
+  code?: string
+  cnpj?: string
+  address?: string
+  city?: string
+  state?: string
+  phone?: string
+  responsible?: string
+  isActive: boolean
+  companyId: string
+  _count?: {
+    users: number
+  }
+}
+
+export const companies = {
+  list: () =>
+    request<CompanyData[]>('/companies'),
+
+  getById: (id: string) =>
+    request<CompanyData>(`/companies/${id}`),
+
+  create: (data: { name: string; slug: string; document?: string; phone?: string; address?: string; plan?: string; userLimit?: number }) =>
+    request<CompanyData>('/companies', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  update: (id: string, data: Partial<CompanyData>) =>
+    request<CompanyData>(`/companies/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/companies/${id}`, {
+      method: 'DELETE',
+    }),
+}
+
+export const branches = {
+  list: (companyId?: string) =>
+    request<BranchData[]>(`/branches${companyId ? `?companyId=${companyId}` : ''}`),
+
+  getById: (id: string) =>
+    request<BranchData>(`/branches/${id}`),
+
+  create: (data: { name: string; code?: string; cnpj?: string; address?: string; city?: string; state?: string; phone?: string; responsible?: string; companyId?: string }) =>
+    request<BranchData>('/branches', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  update: (id: string, data: Partial<BranchData>) =>
+    request<BranchData>(`/branches/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/branches/${id}`, {
+      method: 'DELETE',
+    }),
+}
+
+export const companyConfig = {
+  get: (companyId?: string) =>
+    request<any>(`/company-config${companyId ? `/${companyId}` : ''}`),
+
+  update: (companyId: string | undefined, data: any) =>
+    request<any>(`/company-config${companyId ? `/${companyId}` : ''}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+}

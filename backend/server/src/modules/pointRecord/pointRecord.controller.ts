@@ -10,7 +10,7 @@ export async function list(req: AuthRequest, res: Response, next: NextFunction) 
     const targetUserId = (userId && (req.user!.role === 'RH' || req.user!.role === 'ADMIN'))
       ? userId
       : req.user!.userId
-    const events = await listPointRecords(targetUserId, req.query.date as string | undefined, includePhoto)
+    const events = await listPointRecords(targetUserId, req.user!.companyId, req.query.date as string | undefined, includePhoto)
     res.json(events)
   } catch (err) { next(err) }
 }
