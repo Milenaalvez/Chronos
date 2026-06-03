@@ -421,48 +421,6 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
         subtitle="Registre sua jornada de trabalho com segurança e localização"
       />
 
-      {/* ─── PREMIUM COLLABORATOR CARD ─── */}
-      <div className="bg-app border border-default rounded-xl p-5">
-        <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 ring-2 ring-[var(--accent-primary)]/20">
-            {user?.avatar ? (
-              <img src={user.avatar} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--sidebar-bg)] flex items-center justify-center">
-                <User size={24} className="text-white" />
-              </div>
-            )}
-          </div>
-          <div className="flex-1 min-w-0 flex flex-col justify-center">
-            <div className="flex items-center gap-3">
-              <h2 className="text-lg font-bold text-primary">{user?.name || "Carregando..."}</h2>
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--accent-green)]/8">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-green)]" />
-                <span className="text-[10px] font-semibold text-[var(--accent-green)]">Ativo</span>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-x-8 gap-y-1.5 justify-center">
-              <div className="text-center">
-                <span className="text-[9px] text-muted uppercase tracking-wider">Matrícula</span>
-                <p className="text-xs text-primary font-mono mt-px">CHR{user?.registrationNumber || "---"}</p>
-              </div>
-              <div className="text-center">
-                <span className="text-[9px] text-muted uppercase tracking-wider">CPF</span>
-                <p className="text-xs text-primary font-mono mt-px">{maskCPF(user?.cpf)}</p>
-              </div>
-              <div className="text-center">
-                <span className="text-[9px] text-muted uppercase tracking-wider">Cargo</span>
-                <p className="text-xs text-primary mt-px">{user?.position || user?.role || "---"}</p>
-              </div>
-              <div className="text-center">
-                <span className="text-[9px] text-muted uppercase tracking-wider">Departamento</span>
-                <p className="text-xs text-primary mt-px">{user?.department || "---"}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ═══ TWO COLUMN LAYOUT ═══ */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-8 items-stretch">
 
