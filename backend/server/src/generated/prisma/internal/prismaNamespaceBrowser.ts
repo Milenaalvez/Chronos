@@ -63,7 +63,8 @@ export const ModelName = {
   Document: 'Document',
   Integration: 'Integration',
   TermAcceptance: 'TermAcceptance',
-  FaceRegistration: 'FaceRegistration'
+  FaceRegistration: 'FaceRegistration',
+  MonthClosing: 'MonthClosing'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -320,6 +321,21 @@ export const FaceRegistrationScalarFieldEnum = {
 } as const
 
 export type FaceRegistrationScalarFieldEnum = (typeof FaceRegistrationScalarFieldEnum)[keyof typeof FaceRegistrationScalarFieldEnum]
+
+
+export const MonthClosingScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  year: 'year',
+  month: 'month',
+  status: 'status',
+  closedAt: 'closedAt',
+  closedBy: 'closedBy',
+  reopenedAt: 'reopenedAt',
+  reopenedBy: 'reopenedBy'
+} as const
+
+export type MonthClosingScalarFieldEnum = (typeof MonthClosingScalarFieldEnum)[keyof typeof MonthClosingScalarFieldEnum]
 
 
 export const SortOrder = {

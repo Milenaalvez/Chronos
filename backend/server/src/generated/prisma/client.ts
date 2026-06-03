@@ -106,3 +106,8 @@ export type TermAcceptance = Prisma.TermAcceptanceModel
  * 
  */
 export type FaceRegistration = Prisma.FaceRegistrationModel
+/**
+ * Model MonthClosing
+ * 
+ */
+export type MonthClosing = Prisma.MonthClosingModel

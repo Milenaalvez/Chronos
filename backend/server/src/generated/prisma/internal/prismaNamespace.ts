@@ -396,7 +396,8 @@ export const ModelName = {
   Document: 'Document',
   Integration: 'Integration',
   TermAcceptance: 'TermAcceptance',
-  FaceRegistration: 'FaceRegistration'
+  FaceRegistration: 'FaceRegistration',
+  MonthClosing: 'MonthClosing'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "company" | "department" | "position" | "user" | "timeRecord" | "pointEvent" | "justification" | "notification" | "activityLog" | "document" | "integration" | "termAcceptance" | "faceRegistration"
+    modelProps: "company" | "department" | "position" | "user" | "timeRecord" | "pointEvent" | "justification" | "notification" | "activityLog" | "document" | "integration" | "termAcceptance" | "faceRegistration" | "monthClosing"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1378,6 +1379,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MonthClosing: {
+      payload: Prisma.$MonthClosingPayload<ExtArgs>
+      fields: Prisma.MonthClosingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthClosingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthClosingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>
+        }
+        findFirst: {
+          args: Prisma.MonthClosingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthClosingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>
+        }
+        findMany: {
+          args: Prisma.MonthClosingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>[]
+        }
+        create: {
+          args: Prisma.MonthClosingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>
+        }
+        createMany: {
+          args: Prisma.MonthClosingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthClosingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>[]
+        }
+        delete: {
+          args: Prisma.MonthClosingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>
+        }
+        update: {
+          args: Prisma.MonthClosingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthClosingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthClosingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthClosingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthClosingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthClosingPayload>
+        }
+        aggregate: {
+          args: Prisma.MonthClosingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthClosing>
+        }
+        groupBy: {
+          args: Prisma.MonthClosingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthClosingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthClosingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthClosingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1655,6 +1730,21 @@ export const FaceRegistrationScalarFieldEnum = {
 } as const
 
 export type FaceRegistrationScalarFieldEnum = (typeof FaceRegistrationScalarFieldEnum)[keyof typeof FaceRegistrationScalarFieldEnum]
+
+
+export const MonthClosingScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  year: 'year',
+  month: 'month',
+  status: 'status',
+  closedAt: 'closedAt',
+  closedBy: 'closedBy',
+  reopenedAt: 'reopenedAt',
+  reopenedBy: 'reopenedBy'
+} as const
+
+export type MonthClosingScalarFieldEnum = (typeof MonthClosingScalarFieldEnum)[keyof typeof MonthClosingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2015,6 +2105,7 @@ export type GlobalOmitConfig = {
   integration?: Prisma.IntegrationOmit
   termAcceptance?: Prisma.TermAcceptanceOmit
   faceRegistration?: Prisma.FaceRegistrationOmit
+  monthClosing?: Prisma.MonthClosingOmit
 }
 
 /* Types for Logging */
