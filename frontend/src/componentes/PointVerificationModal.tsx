@@ -265,6 +265,11 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
       const ctx = canvas.getContext("2d")
       if (!ctx) { capturingRef.current = false; setStep("face"); return }
       ctx.drawImage(vid, 0, 0)
+
+      // Extract descriptor DIRECTLY from canvas (no JPEG roundtrip)
+      const descriptor = await extractDescriptor(canvas)
+
+      // Save photo for display after extraction
       const imgData = canvas.toDataURL("image/jpeg", 0.8)
       setCapturedPhoto(imgData)
 
@@ -274,12 +279,6 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
         streamRef.current = null
       }
 
-      // Extract descriptor and compare
-      const img = new Image()
-      img.src = imgData
-      await img.decode()
-      const descriptor = await extractDescriptor(img)
-
       if (!descriptor) {
         setFaceMatch(false)
         setError("Nenhum rosto detectado na imagem. Tente novamente.")
@@ -288,7 +287,13 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
         return
       }
 
-      if (!faceDescriptors) return
+      if (!faceDescriptors) {
+        setFaceMatch(false)
+        setError("Nenhum cadastro facial encontrado.")
+        setStep("result")
+        capturingRef.current = false
+        return
+      }
       const matches = faceDescriptors.some((ref) => compareDescriptors(ref, descriptor))
       setFaceMatch(matches)
 
