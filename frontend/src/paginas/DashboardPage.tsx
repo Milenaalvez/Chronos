@@ -1,4 +1,4 @@
-﻿import { useMemo, useEffect, useState } from "react"
+import { useMemo, useEffect, useState } from "react"
 import { TrendingUp, Clock3, Timer, CalendarDays, X } from "lucide-react"
 import { StatsCard } from "../componentes/StatsCard"
 import { ChartCard } from "../componentes/ChartCard"
@@ -48,7 +48,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
   const monthBounds = useMemo(() => getMonthBounds(), [])
   const periodLabel = monthLabel(currentMonthISO())
 
-  const monthLabelClean = "No m├¬s atual"
+  const monthLabelClean = "No mês atual"
 
   const weekDays = useMemo(() => computeWeekDays(allRecords), [allRecords])
 
@@ -59,7 +59,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
     const first = weekEvolution[0].value
     const last = weekEvolution[weekEvolution.length - 1].value
     const diff = last - first
-    if (Math.abs(diff) < 0.1) return "Seu banco de horas se manteve est├ível esta semana."
+    if (Math.abs(diff) < 0.1) return "Seu banco de horas se manteve estável esta semana."
     const pct = first !== 0 ? ((diff / Math.abs(first)) * 100).toFixed(0) : diff.toFixed(1)
     return diff > 0
       ? `Seu banco de horas aumentou +${diff.toFixed(1)}h (${pct}%) esta semana.`
@@ -90,10 +90,10 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title={`Ol├í, ${user?.name || "Usu├írio"}`}
+        title={`Olá, ${user?.name || "Usuário"}`}
         subtitle={
           user?.position
-            ? `${user.position} ÔÇö ${periodLabel}`
+            ? `${user.position} — ${periodLabel}`
             : periodLabel
         }
       />
@@ -110,7 +110,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
             <h2 className="text-lg font-bold text-primary">Bem-vindo(a) ao Chronos!</h2>
             <p className="text-sm text-secondary leading-relaxed">
               Sua jornada foi iniciada hoje.
-              Seu banco de horas est├í zerado e seus registros come├ºar├úo a ser contabilizados a partir da sua data de admiss├úo.
+              Seu banco de horas está zerado e seus registros começarão a ser contabilizados a partir da sua data de admissão.
             </p>
           </div>
         </div>
@@ -151,15 +151,15 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         <div className="flex flex-col gap-5 min-w-0">
-          <ChartCard title="Evolu├º├úo do Banco de Horas" subtitle="Saldo acumulado por semana" insight={evolutionInsight}>
+          <ChartCard title="Evolução do Banco de Horas" subtitle="Saldo acumulado por semana" insight={evolutionInsight}>
             <LineChart data={weekEvolution} />
           </ChartCard>
         </div>
         <div className="flex flex-col gap-5 min-w-0">
-          <ChartCard title="Distribui├º├úo de Horas" subtitle="Total do per├¡odo atual">
+          <ChartCard title="Distribuição de Horas" subtitle="Total do período atual">
             <DonutChart
               segments={[
-                { label: "Hor├írio Normal", value: normalHours, color: "#8AAEE0" },
+                { label: "Horário Normal", value: normalHours, color: "#8AAEE0" },
                 { label: "Horas Extras", value: extraHours, color: "#628ECB" },
                 { label: "Banco Negativo", value: negativoHours, color: "#C96B6C" },
               ]}
