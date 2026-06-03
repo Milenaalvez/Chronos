@@ -12,7 +12,7 @@ import {
   LogIn, LogOut, Coffee, Undo2, X,
 } from "lucide-react"
 import type { TimeRecord, Justificacao, PageAction } from "../types"
-import { formatMinutes, formatDataBR } from "../types"
+import { formatMinutes } from "../types"
 import { PageHeader } from "./PageHeader"
 import { RegisterModal } from "./RegisterModal"
 import { JustificacaoModal } from "./JustificacaoModal"

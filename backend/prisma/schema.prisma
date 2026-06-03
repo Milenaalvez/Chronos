@@ -379,3 +379,20 @@ model FaceRegistration {
   @@unique([userId])
   @@map("face_registrations")
 }
+
+model MonthClosing {
+  id        String   @id @default(cuid())
+  companyId String
+  year      Int
+  month     Int
+  status    String   @default("open") // "open" | "closed"
+  closedAt  DateTime?
+  closedBy  String?
+  reopenedAt DateTime?
+  reopenedBy String?
+
+  @@unique([companyId, year, month])
+  @@index([companyId])
+  @@index([status])
+  @@map("month_closings")
+}

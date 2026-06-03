@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import {
-  Users, UserCheck, UserX, Clock, AlertTriangle, ShieldCheck,
+  Users, UserCheck, Clock, AlertTriangle, ShieldCheck,
   Search, Loader2, RefreshCw, ChevronDown, MoreHorizontal,
   CheckCircle, XCircle, Ban, Trash2, Key,
   Mail, Activity, FileText,
@@ -8,7 +8,7 @@ import {
   ExternalLink,
   Wifi, Lock,
   ThumbsUp, ThumbsDown,
-  UserRoundPlus, UserRoundX, Umbrella, TrendingUp, TrendingDown,
+  UserRoundPlus, UserRoundX, TrendingUp, TrendingDown,
 } from "lucide-react"
 import { team as apiTeam, justifications as apiJust, timeRecords as apiRecords, reference as apiRef } from "../services/api"
 import { PageHeader } from "../componentes/PageHeader"

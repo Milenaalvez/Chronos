@@ -10,7 +10,7 @@ interface PointVerificationModalProps {
   userName: string
   userAvatar?: string | null
   faceRegistered: boolean
-  faceDescriptors: number[][]
+  faceDescriptors: number[][] | null
   onConfirm: (password: string, capturedPhoto: string | null) => Promise<void>
   onCancel: () => void
 }
@@ -117,7 +117,7 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
     }, 600)
   }, [captchaVerified])
 
-  // Go to face step
+  // Go to face step (or skip if no face registered)
   const handleGoToFace = useCallback(async () => {
     if (!password) {
       setPasswordError("Digite sua senha para continuar.")
@@ -129,9 +129,14 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
     }
     setError(null)
     setPasswordError(null)
+    if (!faceDescriptors || faceDescriptors.length === 0) {
+      setFaceMatch(true)
+      setStep("result")
+      return
+    }
     setStep("face")
     await startCamera()
-  }, [password, captchaVerified, startCamera])
+  }, [password, captchaVerified, startCamera, faceDescriptors])
 
   // Detection loop for face centering
   useEffect(() => {
@@ -283,6 +288,7 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
         return
       }
 
+      if (!faceDescriptors) return
       const matches = faceDescriptors.some((ref) => compareDescriptors(ref, descriptor))
       setFaceMatch(matches)
 

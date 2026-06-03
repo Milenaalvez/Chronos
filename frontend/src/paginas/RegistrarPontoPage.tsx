@@ -141,7 +141,7 @@ async function getLocation(): Promise<LocationData | null> {
         state = geo.address.state || ""
         postcode = geo.address.postcode || ""
       }
-    } catch {}
+    } catch { /* ignore */ }
     return { latitude, longitude, accuracy, address, city, state, postcode }
   } catch {
     return null
@@ -306,7 +306,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
     const onBreak = nbs !== null && nbe === null
     const jornadaEmAndamento = nco === null && !onBreak
 
-    let worked = 0
+    let worked: number
     if (nco !== null) {
       // Jornada completa: (Saída Intervalo - Entrada) + (Saída Final - Retorno Intervalo)
       const morning = nbs !== null ? nbs - nci : nco - nci
@@ -324,7 +324,6 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
       worked = Math.max(total, 0)
     }
 
-    worked = Math.max(worked, 0)
     const expected = Math.max((user?.weeklyHours || 40) * 60 / 5, 1)
     const saldo = co !== null ? worked - expected : null
     const extra = saldo !== null ? Math.max(saldo, 0) : null
@@ -381,8 +380,6 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
       setModalOpen(false)
       await fetchEvents()
       onPointCreated?.()
-    } catch (err: any) {
-      throw err // re-throw so modal can handle error display
     } finally {
       setRecording(false)
     }
@@ -420,7 +417,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
       />
 
       {/* ─── PREMIUM COLLABORATOR CARD ─── */}
-      <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 rounded-xl p-5">
+      <div className="bg-app border border-default rounded-xl p-5">
         <div className="flex items-center gap-5">
           <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 ring-2 ring-[var(--accent-primary)]/20">
             {user?.avatar ? (
@@ -431,7 +428,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
               </div>
             )}
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
             <div className="flex items-center gap-3">
               <h2 className="text-lg font-bold text-primary">{user?.name || "Carregando..."}</h2>
               <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--accent-green)]/8">
@@ -439,20 +436,20 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                 <span className="text-[10px] font-semibold text-[var(--accent-green)]">Ativo</span>
               </div>
             </div>
-            <div className="flex flex-wrap gap-x-6 gap-y-1 mt-2">
-              <div>
+            <div className="flex flex-wrap gap-x-8 gap-y-1.5 justify-center">
+              <div className="text-center">
                 <span className="text-[9px] text-muted uppercase tracking-wider">Matrícula</span>
                 <p className="text-xs text-primary font-mono mt-px">CHR{user?.registrationNumber || "---"}</p>
               </div>
-              <div>
+              <div className="text-center">
                 <span className="text-[9px] text-muted uppercase tracking-wider">CPF</span>
                 <p className="text-xs text-primary font-mono mt-px">{maskCPF(user?.cpf)}</p>
               </div>
-              <div>
+              <div className="text-center">
                 <span className="text-[9px] text-muted uppercase tracking-wider">Cargo</span>
                 <p className="text-xs text-primary mt-px">{user?.position || user?.role || "---"}</p>
               </div>
-              <div>
+              <div className="text-center">
                 <span className="text-[9px] text-muted uppercase tracking-wider">Departamento</span>
                 <p className="text-xs text-primary mt-px">{user?.department || "---"}</p>
               </div>
@@ -493,12 +490,12 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                       done
                         ? "bg-[var(--accent-green)]/5 border border-[var(--accent-green)]/10 cursor-default"
                         : isNext
-                          ? "bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 hover:border-[var(--accent-primary)]/20 hover:bg-[var(--bg-hover)] hover:shadow-[0_0_15px_-8px_var(--accent-primary)] cursor-pointer active:scale-[0.98]"
-                          : "bg-white/[0.02] dark:bg-white/[0.02] backdrop-blur-sm border-gray-200/60 dark:border-white/5 opacity-40 cursor-not-allowed"
+                          ? "bg-surface border border-default hover:border-[var(--accent-primary)]/20 hover:bg-[var(--bg-hover)] hover:shadow-[0_0_15px_-8px_var(--accent-primary)] cursor-pointer active:scale-[0.98]"
+                          : "bg-surface/30 border border-default/5 opacity-40 cursor-not-allowed"
                     }`}
                   >
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                      done ? "bg-[var(--accent-green)]/10" : isNext ? "bg-[var(--accent-primary)]/5 group-hover:bg-[var(--accent-primary)]/8" : "bg-white/[0.04] dark:bg-white/[0.04]"
+                      done ? "bg-[var(--accent-green)]/10" : isNext ? "bg-[var(--accent-primary)]/5 group-hover:bg-[var(--accent-primary)]/8" : "bg-elevated/50"
                     }`}>
                       <Icon size={24} className={
                         done ? "text-[var(--accent-green)]" : isNext ? "text-[var(--accent-primary)]/60" : "text-muted/40"
@@ -536,7 +533,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 
             {/* ─── IDENTITY + VALIDATIONS ─── */}
-            <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 rounded-xl p-5 flex flex-col h-full">
+            <div className="bg-app border border-default rounded-xl p-5 flex flex-col h-full">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-default">
                 <User size={13} className="text-muted" />
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Identidade</h3>
@@ -601,7 +598,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
             </div>
 
             {/* ─── GEOLOCATION ─── */}
-            <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 rounded-xl p-5 flex flex-col h-full">
+            <div className="bg-app border border-default rounded-xl p-5 flex flex-col h-full">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-default">
                 <MapPin size={13} className="text-muted" />
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Localização</h3>
@@ -644,15 +641,15 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                     {!location.address && !location.city && `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-gray-50 dark:bg-white/[0.04] rounded-lg p-2">
+                    <div className="bg-elevated/50 rounded-lg p-2">
                       <span className="text-[8px] text-muted uppercase tracking-wider">Latitude</span>
                       <p className="text-[10px] font-mono text-primary mt-px">{location.latitude.toFixed(6)}</p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-white/[0.04] rounded-lg p-2">
+                    <div className="bg-elevated/50 rounded-lg p-2">
                       <span className="text-[8px] text-muted uppercase tracking-wider">Longitude</span>
                       <p className="text-[10px] font-mono text-primary mt-px">{location.longitude.toFixed(6)}</p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-white/[0.04] rounded-lg p-2">
+                    <div className="bg-elevated/50 rounded-lg p-2">
                       <span className="text-[8px] text-muted uppercase tracking-wider">Precisão</span>
                       <p className="text-[10px] font-mono text-primary mt-px">{location.accuracy}m</p>
                     </div>
@@ -678,7 +675,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
 
 
           {/* ─── DEVICE INFO ─── */}
-          <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 rounded-xl p-5">
+          <div className="bg-app border border-default rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-default">
               <Smartphone size={13} className="text-muted" />
               <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Informações do dispositivo</h3>
@@ -692,7 +689,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
               ].map((d) => {
                 const DIcon = d.icon
                 return (
-                  <div key={d.label} className="bg-gray-50 dark:bg-white/[0.04] rounded-lg p-3">
+                  <div key={d.label} className="bg-elevated/50 rounded-lg p-3">
                     <DIcon size={10} className="text-muted mb-1.5" />
                     <span className="text-[8px] text-muted uppercase tracking-wider block">{d.label}</span>
                     <span className="text-[10px] text-primary font-mono block truncate mt-0.5">{d.value}</span>
@@ -739,7 +736,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
         <div className="flex flex-col gap-5 h-full">
 
           {/* ─── DAY TIMELINE ─── */}
-          <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 rounded-xl p-5">
+          <div className="bg-app border border-default rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-default">
               <Clock size={13} className="text-muted" />
               <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Histórico do Dia</h3>
@@ -761,7 +758,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                   return (
                     <div key={type} className={`relative flex items-start gap-3.5 ${isLast ? "" : "pb-4"}`}>
                       <div className={`relative z-10 w-[30px] h-[30px] rounded-lg flex items-center justify-center shrink-0 ${
-                        event ? "bg-[var(--accent-green)]/10" : type === nextToRecord ? "bg-[var(--accent-amber)]/10" : "bg-white/[0.04] dark:bg-white/[0.04]"
+                        event ? "bg-[var(--accent-green)]/10" : type === nextToRecord ? "bg-[var(--accent-amber)]/10" : "bg-elevated/50"
                       }`}>
                         <Icon size={13} className={
                           event ? "text-[var(--accent-green)]" : type === nextToRecord ? "text-[var(--accent-amber)]" : "text-muted/40"
@@ -801,7 +798,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
           </div>
 
           {/* ─── DAY SUMMARY ─── */}
-          <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 rounded-xl p-5">
+          <div className="bg-app border border-default rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-default">
               <ArrowUpRight size={13} className="text-muted" />
               <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Resumo da Jornada</h3>
@@ -868,7 +865,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                               ? "bg-[var(--accent-green)] border-[var(--accent-green)]"
                               : isNext
                                 ? "bg-[var(--accent-amber)]/10 border-[var(--accent-amber)]"
-                                : "bg-gray-50 dark:bg-white/[0.04] border-gray-200/60 dark:border-white/5"
+                                : "bg-elevated/50 border border-default"
                           }`}>
                             {active ? (
                               <CheckCircle2 size={11} className="text-white" />
@@ -905,7 +902,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
           </div>
 
           {/* ─── TRUST LEVEL ─── */}
-          <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-sm border-gray-200/60 dark:border-white/5 rounded-xl p-5">
+          <div className="bg-app border border-default rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-default">
               <ShieldCheck size={13} className="text-muted" />
               <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Nível de Confiabilidade</h3>
@@ -943,7 +940,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
       </div>
 
       {/* ─── POINT VERIFICATION MODAL ─── */}
-      {modalOpen && selectedType && faceDescriptors && (
+      {modalOpen && selectedType && (
         <PointVerificationModal
           pointLabel={POINT_CONFIG[selectedType].label}
           pointDesc={POINT_CONFIG[selectedType].desc}
@@ -969,7 +966,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
                 <span className="text-[9px] text-muted font-mono">AO VIVO</span>
               </div>
               <button
-                className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/[0.1] flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-lg bg-elevated hover:bg-elevated/80 flex items-center justify-center transition-colors"
                 onClick={() => setLocationModalOpen(false)}
               >
                 <X size={14} className="text-secondary" />

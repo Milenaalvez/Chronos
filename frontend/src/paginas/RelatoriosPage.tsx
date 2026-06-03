@@ -1,29 +1,82 @@
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import {
-  FileText, Download, ChevronDown, CheckCircle2, Loader2, X, AlertCircle,
+  FileText, Download, Loader2, X, ChevronRight, Search,
+  Clock, TrendingUp, Users, UserX, Calendar,
+  Lock, Unlock, ShieldCheck, AlertTriangle, Eye,
+  BarChart3, Building2, UserCheck, SlidersHorizontal,
 } from "lucide-react"
+import { reports as apiReports, reference as apiRef } from "../services/api"
+import { PageHeader } from "../componentes/PageHeader"
 import * as XLSX from "xlsx"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
-import type { TimeRecord, Justificacao, PageAction } from "../types"
-import { PageHeader } from "../componentes/PageHeader"
-import { formatMinutes, formatDataBR } from "../types"
-import { computeSaldo, filterMonthRecords, computeFilteredTotals } from "../services/workHoursEngine"
 
-interface RelatoriosPageProps {
-  allRecords: TimeRecord[]
-  justificacoes: Record<string, Justificacao>
-  pageAction?: PageAction | null
+interface ConsolidatedRow {
+  userId: string
+  colaborador: string
+  email: string
+  departamento: string
+  cargo: string
+  contrato: string
+  horasTrabalhadas: number
+  horasExtras: number
+  saldoBanco: number
+  faltas: number
+  atrasos: number
+  diasTrabalhados: number
+  diasUteis: number
+  justificativasPendentes: number
+  justificativasAprovadas: number
+  status: "ok" | "alerta" | "pendente" | "incompleto"
+  registros: { data: string; entrada: string | null; saida: string | null; totalMinutos: number | null; extraMinutos: number; status: string; reviewStatus: string | null }[]
+  justificativas: { motivo: string; status: string; inicio: string; fim: string }[]
 }
 
-function pad(n: number): string {
-  return String(n).padStart(2, "0")
+interface ReportData {
+  rows: ConsolidatedRow[]
+  indicadores: {
+    horasTrabalhadas: number
+    horasExtras: number
+    saldoBanco: number
+    colaboradoresComRegistros: number
+    ausencias: number
+    atrasos: number
+    diasUteis: number
+    totalColaboradores: number
+  }
+  fechamento: { status: string; closedAt: string | null; closedBy: string | null }
 }
 
-function getMonthOptions(): { value: string; label: string }[] {
+function pad(n: number): string { return String(n).padStart(2, "0") }
+
+function fmtMins(m: number): string {
+  const h = Math.floor(m / 60)
+  const r = Math.round(m % 60)
+  return `${h}h${pad(r)}m`
+}
+
+function fmtDate(iso: string): string {
+  if (!iso) return "---"
+  return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR")
+}
+
+function fmtDateTime(iso: string): string {
+  if (!iso) return "---"
+  const d = new Date(iso)
+  return d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+}
+
+const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
+  ok: { label: "OK", color: "text-accent-green", bg: "bg-accent-green/10" },
+  alerta: { label: "Alerta", color: "text-accent-amber", bg: "bg-accent-amber/10" },
+  pendente: { label: "Pendente", color: "text-accent-purple", bg: "bg-accent-purple/10" },
+  incompleto: { label: "Incompleto", color: "text-accent-red", bg: "bg-accent-red/10" },
+}
+
+function getMonthOptions() {
   const now = new Date()
   const opts: { value: string; label: string }[] = []
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
     const value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`
     const label = `${d.toLocaleDateString("pt-BR", { month: "long" })} de ${d.getFullYear()}`
@@ -35,660 +88,634 @@ function getMonthOptions(): { value: string; label: string }[] {
 const monthOptions = getMonthOptions()
 const defaultMonth = monthOptions[0].value
 
-const TIPO_OPTIONS = [
-  "Resumo Mensal",
-  "Banco de Horas",
-  "Horas Extras",
-  "Pendências",
-  "Jornada Completa",
-  "Ajustes e Correções",
-] as const
+const ITEMS_PER_PAGE = 20
 
-function getStatusBadge(tipo: string, hasJustificacao: boolean, justStatus?: string) {
-  if (tipo === "Pendente") {
-    if (hasJustificacao) {
-      if (justStatus === "aprovado") return { label: "Justificado", color: "text-[var(--accent-hover)]", bg: "bg-[var(--accent-hover)]/10" }
-      if (justStatus === "recusado") return { label: "Recusado", color: "text-[#C96B6B]", bg: "bg-[#C96B6B]/10" }
-      return { label: "Em análise", color: "text-[#C49A6B]", bg: "bg-[#C49A6B]/10" }
-    }
-    return { label: "Pendente", color: "text-[#C96B6B]", bg: "bg-[#C96B6B]/10" }
-  }
-  if (tipo === "Extra") return { label: "Extra", color: "text-[#C49A6B]", bg: "bg-[#C49A6B]/10" }
-  if (tipo === "Compensação") return { label: "Comp.", color: "text-[var(--accent-hover)]", bg: "bg-[var(--accent-hover)]/10" }
-  if (tipo === "Afastamento") return { label: "Negativo", color: "text-[#C96B6B]", bg: "bg-[#C96B6B]/10" }
-  return { label: "Normal", color: "text-[#5B9B7A]", bg: "bg-[#5B9B7A]/10" }
+interface RelatoriosPageProps {
+  user?: {
+    id: string
+    role: string
+    name: string
+  } | null
 }
 
-interface TableRow {
-  dataISO: string
-  data: string
-  entrada: string
-  saida: string
-  total: string
-  totalHours: number
-  tipo: string
-  hasJustificacao: boolean
-  justStatus?: string
-  justMotivo?: string
-}
-
-function getExportSlug(monthLabel: string): string {
-  return monthLabel.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
-}
-
-export function RelatoriosPage({ allRecords, justificacoes, pageAction }: RelatoriosPageProps) {
+export function RelatoriosPage({ user }: RelatoriosPageProps) {
   const [selectedMonth, setSelectedMonth] = useState(defaultMonth)
-  const [selectedTipo, setSelectedTipo] = useState<(typeof TIPO_OPTIONS)[number]>("Resumo Mensal")
+  const [departmentId, setDepartmentId] = useState("")
+  const [positionId, setPositionId] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
+  const [collaboratorSearch, setCollaboratorSearch] = useState("")
+
+  const [data, setData] = useState<ReportData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+
+  const [departments, setDepartments] = useState<any[]>([])
+  const [positions, setPositions] = useState<any[]>([])
+
+  const [drawerUser, setDrawerUser] = useState<ConsolidatedRow | null>(null)
   const [exporting, setExporting] = useState<string | null>(null)
-  const [successMsg, setSuccessMsg] = useState<string | null>(null)
-  const [exportModalOpen, setExportModalOpen] = useState(false)
-  const [modalState, setModalState] = useState<"select" | "reexport" | "exporting" | "success" | "error">("select")
-  const [modalFormat, setModalFormat] = useState<string | null>(null)
+  const [closingLoading, setClosingLoading] = useState(false)
+  const [closingMsg, setClosingMsg] = useState<string | null>(null)
+  const [auditLog, setAuditLog] = useState<any[]>([])
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+
+  const hasActiveFilters = departmentId || positionId || statusFilter || collaboratorSearch
+
+  function clearFilters() {
+    setDepartmentId("")
+    setPositionId("")
+    setStatusFilter("")
+    setCollaboratorSearch("")
+  }
 
   const [yearStr, monthStr] = selectedMonth.split("-")
   const year = Number(yearStr)
-  const monthNum = Number(monthStr)
-  const monthStart = `${year}-${pad(monthNum)}-01`
-  const daysInMonth = new Date(year, monthNum, 0).getDate()
-  const monthEnd = `${year}-${pad(monthNum)}-${pad(daysInMonth)}`
-  const monthLabel = monthOptions.find((o) => o.value === selectedMonth)?.label || selectedMonth
+  const month = Number(monthStr)
+  const monthLabel = monthOptions.find(o => o.value === selectedMonth)?.label || selectedMonth
 
-  const monthRecords = useMemo(() => {
-    return filterMonthRecords(allRecords, { start: monthStart, end: monthEnd })
-  }, [allRecords, monthStart, monthEnd])
-
-  const monthTotals = useMemo(() => computeFilteredTotals(monthRecords), [monthRecords])
-  const totalHours = monthTotals.totalMins / 60
-  const totalExtraMins = monthTotals.extraMins
-  const workedDays = monthTotals.workedDays
-  const monthSaldoData = useMemo(() => computeSaldo(monthRecords, justificacoes), [monthRecords, justificacoes])
-  const saldoMins = monthSaldoData.netSaldo
-
-  const tableRows = useMemo(() => {
-    const rows: TableRow[] = []
-
-    for (const r of monthRecords) {
-      const j = justificacoes[r.dataISO]
-      rows.push({
-        dataISO: r.dataISO,
-        data: formatDataBR(r.dataISO),
-        entrada: r.entrada,
-        saida: r.saida,
-        total: r.total,
-        totalHours: r.totalHours,
-        tipo: r.tipo,
-        hasJustificacao: !!j,
-        justStatus: j?.status,
-        justMotivo: j?.motivo,
-      })
-    }
-
-    rows.sort((a, b) => b.dataISO.localeCompare(a.dataISO))
-    return rows
-  }, [monthRecords, justificacoes])
-
-  const filteredRows = useMemo(() => {
-    if (selectedTipo === "Pendências") return tableRows.filter((r) => r.tipo === "Pendente")
-    if (selectedTipo === "Horas Extras") return tableRows.filter((r) => r.tipo === "Extra")
-    if (selectedTipo === "Jornada Completa") return tableRows
-    if (selectedTipo === "Resumo Mensal") return tableRows
-    if (selectedTipo === "Ajustes e Correções") return tableRows.filter((r) => r.hasJustificacao)
-    return tableRows
-  }, [tableRows, selectedTipo])
-
-  const filteredTotals = useMemo(() => computeFilteredTotals(filteredRows as unknown as TimeRecord[]), [filteredRows])
-  const totalHorasNoFiltro = filteredTotals.totalMins / 60
-  const totalExtraNoFiltro = filteredTotals.extraMins
-  const totalSaldoFiltro = filteredTotals.totalMins - filteredTotals.workedDays * 480
-  const isFullView = selectedTipo === "Resumo Mensal" || selectedTipo === "Jornada Completa"
-  const saldoNoFiltro = isFullView
-    ? monthSaldoData.netSaldo
-    : totalSaldoFiltro
+  const ind = data?.indicadores
+  const semRegistro = ind ? ind.totalColaboradores - ind.colaboradoresComRegistros : 0
+  const pendencias = ind ? ind.ausencias + ind.atrasos : 0
 
   useEffect(() => {
-    if (pageAction?.type === "openExport" && pageAction.payload) {
-      const m = pageAction.payload.month
-      const t = pageAction.payload.tipo
-      if (m && monthOptions.some((o) => o.value === m)) setSelectedMonth(m)
-      if (t && TIPO_OPTIONS.includes(t as any))     setSelectedTipo(t as (typeof TIPO_OPTIONS)[number])
-      const storageKey = `chronos-exported-${m || selectedMonth}`
-      if (localStorage.getItem(storageKey)) {
-        setModalState("reexport")
-      } else {
-        setModalState("select")
-      }
-      setExportModalOpen(true)
+    apiRef.departments().then(setDepartments).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (departmentId) {
+      apiRef.positions(departmentId).then(setPositions).catch(() => setPositions([]))
+    } else {
+      setPositions([])
     }
-  }, [pageAction])
+    setPositionId("")
+  }, [departmentId])
 
-  const slug = getExportSlug(monthLabel)
-  const filename = `chronos-relatorio-${slug}`
+  useEffect(() => { setPage(1) }, [selectedMonth, departmentId, positionId, statusFilter, collaboratorSearch])
 
-  const getExportData = useCallback(() => {
-    return filteredRows.map((r) => ({
-      Data: r.data,
-      Entrada: r.entrada,
-      Saída: r.saida,
-      Total: r.total,
-      Tipo: r.tipo === "Pendente" && r.hasJustificacao
-        ? `Justificado${r.justMotivo ? ` (${r.justMotivo})` : ""}`
-        : r.tipo,
-    }))
-  }, [filteredRows])
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+    try {
+      const result = await apiReports.consolidated({ year, month, departmentId: departmentId || undefined, positionId: positionId || undefined, status: statusFilter || undefined })
+      setData(result)
+    } catch { setData(null) } finally { setLoading(false) }
+  }, [year, month, departmentId, positionId, statusFilter])
 
-  async function exportCSV() {
-    const data = getExportData()
-    const headers = ["Data", "Entrada", "Saída", "Total", "Tipo"]
-    const rows = data.map((r) => [r.Data, r.Entrada, r.Saída, r.Total, r.Tipo])
-    const totalHoursStr = formatMinutes(Math.round(totalHorasNoFiltro * 60))
-    const totalExtraStr = formatMinutes(totalExtraNoFiltro)
-    const saldoStr = `${saldoNoFiltro >= 0 ? "+" : ""}${formatMinutes(Math.abs(saldoNoFiltro))}`
-    rows.push([], ["Resumo", "", "", "", ""], [`Total: ${totalHoursStr}`, `Extras: ${totalExtraStr}`, `Saldo: ${saldoStr}`, `Registros: ${filteredRows.length}`, ""])
+  useEffect(() => { fetchData() }, [fetchData])
 
-    let csv = "\uFEFF"
-    csv += headers.join(";") + "\n"
-    for (const row of rows) {
-      csv += row.join(";") + "\n"
+  const userRole = user?.role || ""
+
+  const rows = data?.rows || []
+  const filtered = useMemo(() => {
+    let list = rows
+    if (collaboratorSearch) {
+      const q = collaboratorSearch.toLowerCase()
+      list = list.filter(r => r.colaborador.toLowerCase().includes(q) || r.email.toLowerCase().includes(q))
     }
+    return list
+  }, [rows, collaboratorSearch])
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;charset=utf-8" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `${filename}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
+  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+
+  function handleCloseMonth() {
+    if (!confirm(`Fechar competência de ${monthLabel}? Após fechar, alterações serão bloqueadas.`)) return
+    setClosingLoading(true)
+    setClosingMsg(null)
+    apiReports.closeMonth(year, month)
+      .then(() => {
+        setClosingMsg("Competência fechada com sucesso!")
+        fetchData()
+        apiReports.auditLog(year, month).then(setAuditLog).catch(() => {})
+      })
+      .catch((err: any) => setClosingMsg(err.message || "Erro ao fechar"))
+      .finally(() => setClosingLoading(false))
+  }
+
+  function handleReopenMonth() {
+    if (!confirm(`Reabrir competência de ${monthLabel}? Esta ação será registrada em auditoria.`)) return
+    setClosingLoading(true)
+    setClosingMsg(null)
+    apiReports.reopenMonth(year, month)
+      .then(() => {
+        setClosingMsg("Competência reaberta com sucesso!")
+        fetchData()
+        apiReports.auditLog(year, month).then(setAuditLog).catch(() => {})
+      })
+      .catch((err: any) => setClosingMsg(err.message || "Erro ao reabrir"))
+      .finally(() => setClosingLoading(false))
+  }
+
+  useEffect(() => {
+    if (data?.fechamento?.status === "closed") {
+      apiReports.auditLog(year, month).then(setAuditLog).catch(() => {})
+    }
+  }, [data?.fechamento?.status, year, month])
+
+  async function exportPDF() {
+    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" })
+    doc.setFontSize(16)
+    doc.setTextColor(30, 41, 59)
+    doc.text("Relatório Corporativo", 14, 20)
+    doc.setFontSize(9)
+    doc.setTextColor(100, 116, 139)
+    doc.text(`${monthLabel} · ${filtered.length} colaboradores`, 14, 27)
+
+    const body = filtered.map(r => [
+      r.colaborador, r.departamento,
+      fmtMins(r.horasTrabalhadas), fmtMins(r.horasExtras),
+      `${r.saldoBanco >= 0 ? "+" : ""}${fmtMins(Math.abs(r.saldoBanco))}`,
+      String(r.faltas), String(r.atrasos),
+      STATUS_LABEL[r.status]?.label || r.status,
+    ])
+    autoTable(doc, {
+      startY: 33,
+      head: [["Colaborador", "Departamento", "Horas Trab.", "Extras", "Saldo", "Faltas", "Atrasos", "Status"]],
+      body,
+      theme: "grid",
+      headStyles: { fillColor: [98, 142, 203], textColor: [255, 255, 255], fontSize: 7 },
+      bodyStyles: { fontSize: 7 },
+      styles: { cellPadding: 1.5 },
+    })
+    doc.save(`relatorio-corporativo-${year}-${pad(month)}.pdf`)
   }
 
   async function exportExcel() {
-    const data = getExportData()
     const wb = XLSX.utils.book_new()
-
-    const wsData = [
-      ["Chronos - Banco de Horas"],
-      [`Relatório: ${monthLabel}`],
-      [`Tipo: ${selectedTipo}`],
-      [`Gerado em: ${new Date().toLocaleString("pt-BR")}`],
-      [],
-      ["Data", "Entrada", "Saída", "Total", "Tipo"],
-      ...data.map((r) => [r.Data, r.Entrada, r.Saída, r.Total, r.Tipo]),
-      [],
-      ["Resumo do Período", "", "", "", ""],
-      ["Total", formatMinutes(Math.round(totalHorasNoFiltro * 60)), "", "", ""],
-      ["Extras", formatMinutes(totalExtraNoFiltro), "", "", ""],
-      ["Saldo", `${saldoNoFiltro >= 0 ? "+" : ""}${formatMinutes(Math.abs(saldoNoFiltro))}`, "", "", ""],
-      ["Registros", String(filteredRows.length), "", "", ""],
-    ]
-
-    const ws = XLSX.utils.aoa_to_sheet(wsData)
-    ws["!cols"] = [{ wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 30 }]
-    XLSX.utils.book_append_sheet(wb, ws, "Relatório")
-    XLSX.writeFile(wb, `${filename}.xlsx`)
-  }
-
-  async function exportPDF() {
-    const doc = new jsPDF({ unit: "mm", format: "a4" })
-
-    doc.setFontSize(18)
-    doc.setTextColor(98, 142, 203)
-    doc.text("Chronos", 14, 20)
-
-    doc.setFontSize(10)
-    doc.setTextColor(100, 116, 139)
-    doc.text("Banco de Horas - Relatório", 14, 27)
-
-    doc.setFontSize(14)
-    doc.setTextColor(241, 245, 249)
-    doc.text(`Resumo de ${monthLabel}`, 14, 37)
-
-    doc.setFontSize(8)
-    doc.setTextColor(100, 116, 139)
-    doc.text(`Tipo: ${selectedTipo}  |  Gerado em: ${new Date().toLocaleString("pt-BR")}`, 14, 43)
-
-    const summaryData = [
-      ["Horas Trabalhadas", formatMinutes(Math.round(totalHours * 60))],
-      ["Horas Extras", formatMinutes(totalExtraMins)],
-      ["Saldo de Horas", `${saldoMins >= 0 ? "+" : ""}${formatMinutes(Math.abs(saldoMins))}`],
-      ["Dias Trabalhados", String(workedDays)],
-    ]
-    autoTable(doc, {
-      startY: 50,
-      head: [["Métrica", "Valor"]],
-      body: summaryData,
-      theme: "grid",
-      headStyles: { fillColor: [98, 142, 203], textColor: [255, 255, 255], fontSize: 8 },
-      bodyStyles: { textColor: [241, 245, 249], fontSize: 8 },
-      alternateRowStyles: { fillColor: [30, 41, 59] },
-      styles: { cellPadding: 2.5 },
-    })
-
-    const tableData = filteredRows.map((r) => [
-      r.data,
-      r.entrada,
-      r.saida,
-      r.total,
-      r.tipo === "Pendente" && r.hasJustificacao ? `Justificado${r.justMotivo ? ` (${r.justMotivo})` : ""}` : r.tipo,
+    const header = ["Colaborador", "Departamento", "Cargo", "Horas Trabalhadas", "Horas Extras", "Saldo Banco", "Faltas", "Atrasos", "Status"]
+    const body = filtered.map(r => [
+      r.colaborador, r.departamento, r.cargo,
+      fmtMins(r.horasTrabalhadas), fmtMins(r.horasExtras),
+      `${r.saldoBanco >= 0 ? "+" : ""}${fmtMins(Math.abs(r.saldoBanco))}`,
+      r.faltas, r.atrasos, STATUS_LABEL[r.status]?.label || r.status,
     ])
-
-    autoTable(doc, {
-      startY: (doc as any).lastAutoTable.finalY + 8,
-      head: [["Data", "Entrada", "Saída", "Total", "Tipo"]],
-      body: tableData,
-      theme: "grid",
-      headStyles: { fillColor: [98, 142, 203], textColor: [255, 255, 255], fontSize: 7 },
-      bodyStyles: { textColor: [241, 245, 249], fontSize: 7 },
-      alternateRowStyles: { fillColor: [30, 41, 59] },
-      styles: { cellPadding: 2 },
-    })
-
-    const finalY = (doc as any).lastAutoTable.finalY + 6
-    doc.setFontSize(9)
-    doc.setTextColor(241, 245, 249)
-    doc.text("Resumo do Período", 14, finalY)
-
-    doc.setFontSize(8)
-    doc.setTextColor(148, 163, 184)
-    doc.text(`Total: ${formatMinutes(Math.round(totalHorasNoFiltro * 60))}`, 14, finalY + 6)
-    doc.text(`Extras: ${formatMinutes(totalExtraNoFiltro)}`, 14, finalY + 11)
-    doc.text(`Saldo: ${saldoNoFiltro >= 0 ? "+" : ""}${formatMinutes(Math.abs(saldoNoFiltro))}`, 14, finalY + 16)
-    doc.text(`Registros: ${filteredRows.length}`, 14, finalY + 21)
-
-    doc.save(`${filename}.pdf`)
+    const wsData = [
+      [`Relatório Corporativo - ${monthLabel}`],
+      [],
+      header,
+      ...body,
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(wsData)
+    ws["!cols"] = [{ wch: 22 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }]
+    XLSX.utils.book_append_sheet(wb, ws, "Relatório")
+    XLSX.writeFile(wb, `relatorio-corporativo-${year}-${pad(month)}.xlsx`)
   }
 
   async function handleExport(format: string) {
     setExporting(format)
-    setSuccessMsg(null)
-    if (exportModalOpen) setModalState("exporting")
     try {
-      if (format === "csv") await exportCSV()
+      if (format === "pdf") await exportPDF()
       else if (format === "xlsx") await exportExcel()
-      else if (format === "pdf") await exportPDF()
-      const storageKey = `chronos-exported-${selectedMonth}`
-      localStorage.setItem(storageKey, new Date().toISOString())
-      if (exportModalOpen) {
-        setModalState("success")
-      } else {
-        setSuccessMsg(format)
-      }
-    } catch {
-      if (exportModalOpen) {
-        setModalState("error")
-      } else {
-        setSuccessMsg(`error_${format}`)
-      }
-    } finally {
-      setExporting(null)
-      if (!exportModalOpen) setTimeout(() => setSuccessMsg(null), 3000)
-    }
-  }
-
-  function closeExportModal() {
-    setExportModalOpen(false)
-    setModalState("select")
-    setModalFormat(null)
-  }
-
-  function handleModalExport(format: string) {
-    setModalFormat(format)
-    handleExport(format)
+    } catch { /* ignore */ } finally { setExporting(null) }
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <PageHeader
-        title="Relatórios"
-        subtitle="Acompanhe e exporte seus relatórios de horas."
+        title="Relatórios Corporativos"
+        subtitle="Acompanhamento geral da empresa e fechamento de competência."
       />
 
-        <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
-          <div className="relative w-full sm:w-auto">
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="appearance-none w-full sm:w-auto sm:min-w-[10rem] h-11 px-3 pr-7 rounded-lg border border-default/20 bg-input text-sm text-primary outline-none focus:border-[var(--accent-hover)]/50 transition-all duration-200 cursor-pointer"
+      {/* Filter bar */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative">
+          <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}
+            className="appearance-none h-9 pl-3 pr-7 rounded-lg border border-default bg-input text-xs text-primary outline-none focus:border-[var(--accent-ring)]"
           >
-            {monthOptions.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
+            {monthOptions.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">{o.label}</option>)}
           </select>
-          <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+          <ChevronRight size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted pointer-events-none rotate-90" />
         </div>
-
-        <div className="relative w-full sm:w-auto">
-          <select
-            value={selectedTipo}
-            onChange={(e) => setSelectedTipo(e.target.value as (typeof TIPO_OPTIONS)[number])}
-            className="appearance-none w-full sm:w-auto sm:min-w-[10rem] h-11 px-3 pr-7 rounded-lg border border-default/20 bg-input text-sm text-primary outline-none focus:border-[var(--accent-hover)]/50 transition-all duration-200 cursor-pointer"
+        <select value={departmentId} onChange={e => setDepartmentId(e.target.value)}
+          className="h-9 px-2.5 rounded-lg border border-default bg-input text-xs text-primary outline-none focus:border-[var(--accent-ring)]"
+        >
+          <option value="" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Todos os Departamentos</option>
+          {departments.map((d: any) => <option key={d.id} value={d.id} className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">{d.name}</option>)}
+        </select>
+        <div className="relative flex-1 max-w-xs">
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" strokeWidth={2} />
+          <input value={collaboratorSearch} onChange={e => setCollaboratorSearch(e.target.value)}
+            placeholder="Buscar colaborador..."
+            className="w-full h-9 pl-8 pr-3 rounded-lg border border-default bg-input text-xs text-primary placeholder:text-muted outline-none focus:border-[var(--accent-ring)]"
+          />
+        </div>
+        <button onClick={() => setShowAdvancedFilters(true)}
+          className={`flex items-center gap-1.5 h-9 px-3 rounded-lg border text-[11px] font-medium transition-all ${positionId || statusFilter ? "border-[var(--accent-primary)] text-[var(--accent-primary)] bg-[var(--accent-primary)]/8" : "border-default text-muted hover:text-primary hover:bg-elevated/20"}`}
+        >
+          <SlidersHorizontal size={13} />
+          Filtros Avançados
+          {(positionId || statusFilter) && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />}
+        </button>
+        <div className="flex items-center gap-1.5 ml-auto">
+          <button onClick={() => handleExport("pdf")} disabled={!rows.length || !!exporting}
+            className="flex items-center gap-1 h-7 px-2.5 rounded-md bg-[var(--accent-primary)] text-[10px] font-bold text-white shadow-[0_3px_8px_-4px_var(--accent-primary)] hover:brightness-110 active:scale-[0.96] transition-all duration-150 disabled:opacity-40"
           >
-            {TIPO_OPTIONS.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-          <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+            {exporting === "pdf" ? <Loader2 size={10} className="animate-spin" /> : <Download size={10} />}
+            PDF
+          </button>
+          <button onClick={() => handleExport("xlsx")} disabled={!rows.length || !!exporting}
+            className="flex items-center gap-1 h-7 px-2.5 rounded-md bg-[var(--accent-primary)] text-[10px] font-bold text-white shadow-[0_3px_8px_-4px_var(--accent-primary)] hover:brightness-110 active:scale-[0.96] transition-all duration-150 disabled:opacity-40"
+          >
+            {exporting === "xlsx" ? <Loader2 size={10} className="animate-spin" /> : <FileText size={10} />}
+            Excel
+          </button>
         </div>
-
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-            <button
-              onClick={() => handleExport("pdf")}
-              disabled={filteredRows.length === 0 || exporting !== null}
-              className="flex items-center gap-2 h-11 px-4 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {exporting === "pdf" ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} strokeWidth={2.5} />}
-              {exporting === "pdf" ? "Gerando PDF..." : "PDF"}
-            </button>
-            <button
-              onClick={() => handleExport("xlsx")}
-              disabled={filteredRows.length === 0 || exporting !== null}
-              className="flex items-center gap-2 h-11 px-4 rounded-lg border border-default/20 text-sm font-semibold text-primary hover:bg-elevated/20 dark:hover:bg-white/[0.02] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {exporting === "xlsx" ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} strokeWidth={2.5} />}
-              {exporting === "xlsx" ? "Gerando Excel..." : "Excel"}
-            </button>
-            <button
-              onClick={() => handleExport("csv")}
-              disabled={filteredRows.length === 0 || exporting !== null}
-              className="flex items-center gap-2 h-11 px-4 rounded-lg border border-default/20 text-sm font-semibold text-primary hover:bg-elevated/20 dark:hover:bg-white/[0.02] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {exporting === "csv" ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} strokeWidth={2.5} />}
-              {exporting === "csv" ? "Gerando CSV..." : "CSV"}
-            </button>
-          </div>
       </div>
 
-      {successMsg && (
-        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs ${
-          successMsg.startsWith("error")
-            ? "bg-[#C96B6B]/8 text-[#C96B6B]"
-            : "bg-[#5B9B7A]/8 text-[#5B9B7A]"
-        }`}>
-          <CheckCircle2 size={13} strokeWidth={2.5} />
-          {successMsg.startsWith("error")
-            ? "Não foi possível gerar o relatório. Tente novamente."
-            : `Relatório exportado com sucesso (${successMsg.toUpperCase()}).`}
+      {/* Metric cards — always visible */}
+      <div className="flex items-stretch overflow-hidden rounded-xl bg-app border border-default">
+        {[
+          { label: "Horas Trabalhadas", value: data ? fmtMins(data.indicadores.horasTrabalhadas) : "---", sub: "Total do período", icon: Clock, color: "text-accent-purple/80", bg: "bg-accent-purple/5" },
+          { label: "Horas Extras", value: data ? fmtMins(data.indicadores.horasExtras) : "---", sub: "Acima da jornada", icon: TrendingUp, color: "text-accent-amber/80", bg: "bg-accent-amber/5" },
+          { label: "Saldo Banco", value: data ? `${data.indicadores.saldoBanco >= 0 ? "+" : ""}${fmtMins(Math.abs(data.indicadores.saldoBanco))}` : "---", sub: "Horas acumuladas", icon: BarChart3, color: data && data.indicadores.saldoBanco >= 0 ? "text-accent-green/80" : "text-accent-red/80", bg: data && data.indicadores.saldoBanco >= 0 ? "bg-accent-green/5" : "bg-accent-red/5" },
+          { label: "C/ Registros", value: data ? String(data.indicadores.colaboradoresComRegistros) : "---", sub: data ? `de ${data.indicadores.totalColaboradores} colaboradores` : "Aguardando dados", icon: UserCheck, color: "text-accent-green/80", bg: "bg-accent-green/5" },
+          { label: "Ausências", value: data ? String(data.indicadores.ausencias) : "---", sub: "Faltas no período", icon: UserX, color: "text-accent-red/80", bg: "bg-accent-red/5" },
+          { label: "Dias Úteis", value: data ? String(data.indicadores.diasUteis) : "---", sub: "Dias letivos", icon: Calendar, color: "text-accent-blue/80", bg: "bg-accent-blue/5" },
+        ].map((c, i) => {
+          const Icon = c.icon
+          return (
+            <div key={c.label} className={`flex-1 flex flex-col gap-2 p-5 ${i < 5 ? "border-r border-default" : ""} ${c.bg}`}>
+              <div className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center`}>
+                  <Icon size={15} className={c.color} />
+                </div>
+                <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">{c.label}</span>
+              </div>
+              <span className="text-xl font-bold text-primary font-mono tracking-tight">{c.value}</span>
+              <span className="text-[10px] text-muted">{c.sub}</span>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Status da Competência + Resumo Operacional — always visible */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Status da Competência */}
+        <div className="rounded-xl bg-app border border-default p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                data?.fechamento?.status === "closed" ? "bg-accent-amber/10" : "bg-accent-green/10"
+              }`}>
+                {data?.fechamento?.status === "closed"
+                  ? <Lock size={18} className="text-accent-amber" />
+                  : <Unlock size={18} className="text-accent-green" />
+                }
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold text-muted uppercase tracking-wider">Competência</p>
+                <p className="text-sm font-bold text-primary mt-0.5">{monthLabel}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className={`w-2 h-2 rounded-full ${data?.fechamento?.status === "closed" ? "bg-accent-amber" : "bg-accent-green"}`} />
+                  <span className={`text-[11px] font-semibold ${data?.fechamento?.status === "closed" ? "text-accent-amber" : "text-accent-green"}`}>
+                    {data?.fechamento?.status === "closed" ? "Fechada" : "Aberta"}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5 mt-2">
+                  {data?.fechamento?.status === "closed" && data.fechamento.closedAt && (
+                    <p className="text-[11px] text-muted">
+                      Fechada em {fmtDateTime(data.fechamento.closedAt)}
+                    </p>
+                  )}
+                  {data?.fechamento?.status === "closed" && data.fechamento.closedBy && (
+                    <p className="text-[11px] text-muted">
+                      Responsável: <span className="text-primary font-medium">{data.fechamento.closedBy}</span>
+                    </p>
+                  )}
+                  {data?.fechamento?.status !== "closed" && (
+                    <p className="text-[11px] text-muted">Registros podem ser editados normalmente.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="shrink-0">
+              {data?.fechamento?.status === "closed" ? (
+                userRole === "DEVELOPER" && (
+                  <button onClick={handleReopenMonth} disabled={closingLoading}
+                    className="flex items-center gap-1.5 h-8 px-3.5 rounded-lg border border-accent-amber/30 text-[11px] font-semibold text-accent-amber hover:bg-accent-amber/8 transition-all disabled:opacity-40"
+                  >
+                    {closingLoading ? <Loader2 size={12} className="animate-spin" /> : <Unlock size={12} />}
+                    Reabrir
+                  </button>
+                )
+              ) : (
+                ["RH", "ADMIN", "DEVELOPER"].includes(userRole) && (
+                  <button onClick={handleCloseMonth} disabled={closingLoading}
+                    className="flex items-center gap-1.5 h-8 px-3.5 rounded-lg bg-[var(--accent-primary)] text-[11px] font-semibold text-white hover:bg-[var(--accent-hover)] transition-all disabled:opacity-40"
+                  >
+                    {closingLoading ? <Loader2 size={12} className="animate-spin" /> : <Lock size={12} />}
+                    Fechar Competência
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+          {/* Audit log inline */}
+          {auditLog.length > 0 && data?.fechamento?.status === "closed" && (
+            <details className="group mt-4 pt-3 border-t border-default">
+              <summary className="flex items-center gap-2 cursor-pointer text-[10px] font-medium text-muted hover:text-primary transition-all">
+                <ChevronRight size={11} className="group-open:rotate-90 transition-transform" />
+                Histórico ({auditLog.length})
+              </summary>
+              <div className="flex flex-col mt-2 gap-1">
+                {auditLog.map((log, i) => (
+                  <div key={i} className="flex items-center gap-3 py-1.5 px-2 rounded-lg text-[10px]">
+                    {log.action === "CLOSE_MONTH" ? <Lock size={10} className="text-accent-amber" /> : <Unlock size={10} className="text-accent-green" />}
+                    <span className="text-primary font-medium">{log.user}</span>
+                    <span className="text-muted">{log.action === "CLOSE_MONTH" ? "fechou" : "reabriu"}</span>
+                    <span className="text-muted ml-auto">{fmtDateTime(log.timestamp)}</span>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+        </div>
+
+        {/* Resumo Operacional */}
+        <div className="rounded-xl bg-app border border-default p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Building2 size={14} className="text-muted" />
+            <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">Resumo Operacional</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: "Total Colaboradores", value: data ? String(ind!.totalColaboradores) : "---", icon: Users, color: "text-accent-purple", bg: "bg-accent-purple/10" },
+              { label: "Com Registro", value: data ? String(ind!.colaboradoresComRegistros) : "---", icon: UserCheck, color: "text-accent-green", bg: "bg-accent-green/10" },
+              { label: "Sem Registro", value: data ? String(semRegistro) : "---", icon: UserX, color: data && semRegistro > 0 ? "text-accent-red" : "text-muted", bg: data && semRegistro > 0 ? "bg-accent-red/10" : "bg-elevated/20" },
+              { label: "Pendências", value: data ? String(pendencias) : "---", icon: AlertTriangle, color: data && pendencias > 0 ? "text-accent-amber" : "text-muted", bg: data && pendencias > 0 ? "bg-accent-amber/10" : "bg-elevated/20" },
+            ].map(item => {
+              const Icon = item.icon
+              return (
+                <div key={item.label} className="flex items-center gap-3 p-3 rounded-lg bg-elevated/20">
+                  <div className={`w-9 h-9 rounded-lg ${item.bg} flex items-center justify-center`}>
+                    <Icon size={15} className={item.color} />
+                  </div>
+                  <div>
+                    <span className="text-lg font-bold text-primary">{item.value}</span>
+                    <p className="text-[9px] text-muted font-medium uppercase tracking-wider">{item.label}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      {closingMsg && (
+        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs ${closingMsg.includes("sucesso") ? "bg-accent-green/10 text-accent-green" : "bg-accent-red/10 text-accent-red"}`}>
+          {closingMsg.includes("sucesso") ? <ShieldCheck size={13} /> : <AlertTriangle size={13} />}
+          {closingMsg}
         </div>
       )}
 
-      <div className="bg-elevated/50 h-px" />
+      {/* Collaborator count */}
+      <div className="flex items-center justify-end">
+        <span className="text-[11px] text-muted">{filtered.length} colaborador{filtered.length !== 1 ? "es" : ""}</span>
+      </div>
 
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2">
-          <FileText size={15} className="text-[var(--accent-hover)]" />
-          <h2 className="text-sm font-bold text-primary">Resumo de {monthLabel}</h2>
+      {/* Loading */}
+      {loading && (
+        <div className="flex flex-col gap-3">
+          {[1,2,3,4,5].map(i => (
+            <div key={i} className="h-12 rounded-lg bg-elevated/20 animate-pulse" />
+          ))}
         </div>
+      )}
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Horas Trabalhadas</span>
-            <span className="text-lg font-bold text-primary font-mono tracking-tight">{formatMinutes(Math.round(totalHours * 60))}</span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Horas Extras</span>
-            <span className="text-lg font-bold text-[#C49A6B] font-mono tracking-tight">{formatMinutes(totalExtraMins)}</span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Saldo de Horas</span>
-            <span className={`text-lg font-bold font-mono tracking-tight ${saldoMins >= 0 ? "text-[#5B9B7A]" : "text-[#C96B6B]"}`}>
-              {saldoMins >= 0 ? "+" : ""}{formatMinutes(Math.abs(saldoMins))}
-            </span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Dias Trabalhados</span>
-            <span className="text-lg font-bold text-primary font-mono tracking-tight">{workedDays}</span>
-          </div>
-        </div>
-
-        <div className="bg-elevated/50 h-px" />
-
-        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-          <table className="w-full min-w-[600px] lg:min-w-0">
+      {/* Table */}
+      {!loading && (
+        <div className="overflow-x-auto -mx-6 px-6">
+          <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-default">
-                <th className="text-left text-xs text-muted font-semibold uppercase tracking-wider pb-3 pr-2 sm:pr-4">Data</th>
-                <th className="text-left text-xs text-muted font-semibold uppercase tracking-wider pb-3 pr-2 sm:pr-4">Entrada</th>
-                <th className="text-left text-xs text-muted font-semibold uppercase tracking-wider pb-3 pr-2 sm:pr-4">Saída</th>
-                <th className="text-left text-xs text-muted font-semibold uppercase tracking-wider pb-3 pr-2 sm:pr-4">Total</th>
-                <th className="text-left text-xs text-muted font-semibold uppercase tracking-wider pb-3 pr-2 sm:pr-4">Tipo</th>
-                <th className="text-left text-xs text-muted font-semibold uppercase tracking-wider pb-3">Status</th>
+                <th className="text-left text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Colaborador</th>
+                <th className="text-left text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Departamento</th>
+                <th className="text-right text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Horas</th>
+                <th className="text-right text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Extras</th>
+                <th className="text-right text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Saldo</th>
+                <th className="text-center text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Faltas</th>
+                <th className="text-center text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Atrasos</th>
+                <th className="text-left text-[10px] text-muted font-semibold uppercase tracking-wider pb-3 pr-3">Status</th>
+                <th className="text-right text-[10px] text-muted font-semibold uppercase tracking-wider pb-3">Detalhes</th>
               </tr>
             </thead>
             <tbody>
-              {filteredRows.length === 0 ? (
+              {paginated.map(r => {
+                const st = STATUS_LABEL[r.status]
+                return (
+                  <tr key={r.userId} className="group border-b border-default last:border-b-0 hover:bg-elevated/10 transition-all">
+                    <td className="py-3 pr-3">
+                      <span className="text-xs font-semibold text-primary">{r.colaborador}</span>
+                      <p className="text-[10px] text-muted">{r.cargo}</p>
+                    </td>
+                    <td className="py-3 pr-3 text-xs text-secondary">{r.departamento}</td>
+                    <td className="py-3 pr-3 text-xs font-mono text-primary text-right font-medium">{fmtMins(r.horasTrabalhadas)}</td>
+                    <td className="py-3 pr-3 text-xs font-mono text-right">
+                      <span className={r.horasExtras > 0 ? "text-accent-amber font-medium" : "text-muted"}>{fmtMins(r.horasExtras)}</span>
+                    </td>
+                    <td className="py-3 pr-3 text-xs font-mono text-right font-medium">
+                      <span className={r.saldoBanco >= 0 ? "text-accent-green" : "text-accent-red"}>
+                        {r.saldoBanco >= 0 ? "+" : ""}{fmtMins(Math.abs(r.saldoBanco))}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-3 text-xs text-center">
+                      <span className={r.faltas > 0 ? "text-accent-red font-medium" : "text-muted"}>{r.faltas}</span>
+                    </td>
+                    <td className="py-3 pr-3 text-xs text-center">
+                      <span className={r.atrasos > 0 ? "text-accent-amber font-medium" : "text-muted"}>{r.atrasos}</span>
+                    </td>
+                    <td className="py-3 pr-3">
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${st.bg} ${st.color}`}>{st.label}</span>
+                    </td>
+                    <td className="py-3 text-right">
+                      <button onClick={() => setDrawerUser(drawerUser?.userId === r.userId ? null : r)}
+                        className="flex items-center gap-1 text-[11px] font-medium text-[var(--accent-primary)] hover:underline opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Eye size={12} /> Detalhes
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+              {paginated.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={6} className="pt-10 pb-10 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <FileText size={18} className="text-[var(--accent-hover)]" />
-                      <p className="text-xs text-muted">Nenhum registro encontrado para este período.</p>
+                  <td colSpan={9} className="text-center py-20">
+                    <div className="w-16 h-16 rounded-2xl bg-elevated/30 flex items-center justify-center mx-auto mb-4">
+                      <BarChart3 size={28} className="text-muted/50" />
                     </div>
+                    <p className="text-sm font-bold text-primary mb-1">Nenhum relatório encontrado</p>
+                    <p className="text-xs text-muted max-w-xs mx-auto leading-relaxed">
+                      {hasActiveFilters
+                        ? "Nenhum colaborador corresponde aos filtros aplicados. Tente ajustar os filtros."
+                        : "Selecione outra competência ou ajuste os filtros para visualizar os dados."
+                      }
+                    </p>
+                    {hasActiveFilters && (
+                      <button onClick={clearFilters}
+                        className="mt-4 h-8 px-4 rounded-lg bg-[var(--accent-primary)] text-[11px] font-semibold text-white hover:bg-[var(--accent-hover)] transition-all"
+                      >
+                        Limpar filtros
+                      </button>
+                    )}
                   </td>
                 </tr>
-              ) : (
-                filteredRows.map((row) => {
-                  const badge = getStatusBadge(row.tipo, row.hasJustificacao, row.justStatus)
-                  return (
-                    <tr
-                      key={row.dataISO + (row.tipo === "Pendente" ? "_pend" : "")}
-                      className="transition-all duration-200 hover:bg-elevated/20 group border-b border-default last:border-b-0"
-                    >
-                      <td className="py-3 pr-2 sm:pr-4">
-                        <span className="text-sm font-medium text-primary font-mono">{row.data}</span>
-                      </td>
-                      <td className="py-3 pr-2 sm:pr-4">
-                        <span className={`text-sm font-mono ${row.entrada === "---" ? "text-[var(--accent-hover)]" : "text-secondary"}`}>
-                          {row.entrada}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-2 sm:pr-4">
-                        <span className={`text-sm font-mono ${row.saida === "---" ? "text-[var(--accent-hover)]" : "text-secondary"}`}>
-                          {row.saida}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-2 sm:pr-4">
-                        <span className={`text-sm font-semibold font-mono ${row.total === "---" ? "text-[var(--accent-hover)]" : "text-primary"}`}>
-                          {row.total}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-2 sm:pr-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${badge.bg} ${badge.color}`}>
-                          {badge.label}
-                        </span>
-                      </td>
-                      <td className="py-3">
-                        {row.hasJustificacao && row.justMotivo ? (
-                            <span className="text-xs text-muted whitespace-normal break-words max-w-[140px] sm:max-w-[220px] inline-block leading-relaxed">
-                            {row.justMotivo}
-                          </span>
-                        ) : row.tipo === "Pendente" ? (
-                          <span className="text-xs text-[#C96B6B]">Pendente</span>
-                        ) : (
-                          <span className="text-xs text-[#5B9B7A]">OK</span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })
               )}
             </tbody>
           </table>
         </div>
+      )}
 
-        <div className="bg-elevated/50 h-px" />
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] text-muted">{filtered.length} registro{filtered.length !== 1 ? "s" : ""}</span>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all disabled:opacity-30"
+            >
+              <ChevronRight size={13} className="rotate-180" />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+              const start = Math.max(1, Math.min(page - 3, totalPages - 6))
+              return start + i
+            }).map(p => (
+              <button key={p} onClick={() => setPage(p)}
+                className={`w-8 h-8 rounded-lg text-[11px] font-semibold transition-all ${p === page ? "bg-[var(--accent-primary)] text-white" : "text-muted hover:text-primary hover:bg-elevated"}`}
+              >{p}</button>
+            ))}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all disabled:opacity-30"
+            >
+              <ChevronRight size={13} />
+            </button>
+          </div>
+        </div>
+      )}
 
-        {filteredRows.length > 0 && (
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-4 sm:gap-8 pt-4">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Total no período</span>
-              <span className="text-sm font-bold text-primary font-mono">{formatMinutes(Math.round(totalHorasNoFiltro * 60))}</span>
+      {/* Advanced Filters Drawer */}
+      {showAdvancedFilters && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowAdvancedFilters(false)} />
+          <div className="relative w-full max-w-sm bg-surface border-l border-default shadow-modal overflow-y-auto animate-in slide-in-from-right duration-200">
+            <div className="sticky top-0 flex items-center justify-between p-5 border-b border-default bg-surface z-10">
+              <div>
+                <h3 className="text-sm font-bold text-primary">Filtros Avançados</h3>
+                <p className="text-[11px] text-secondary">Filtrar por cargo e status</p>
+              </div>
+              <button onClick={() => setShowAdvancedFilters(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all"
+              >
+                <X size={15} />
+              </button>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Extras</span>
-              <span className="text-sm font-bold text-[#C49A6B] font-mono">{formatMinutes(totalExtraNoFiltro)}</span>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Saldo</span>
-              <span className={`text-sm font-bold font-mono ${saldoNoFiltro >= 0 ? "text-[#5B9B7A]" : "text-[#C96B6B]"}`}>
-                {saldoNoFiltro >= 0 ? "+" : ""}{formatMinutes(Math.abs(saldoNoFiltro))}
-              </span>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] text-muted font-semibold uppercase tracking-wider">Registros</span>
-              <span className="text-sm font-bold text-primary font-mono">{filteredRows.length}</span>
+            <div className="p-5 space-y-5">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-muted">Cargo</label>
+                <select value={positionId} onChange={e => setPositionId(e.target.value)} disabled={!positions.length}
+                  className="h-9 px-2.5 rounded-lg border border-default bg-input text-xs text-primary outline-none focus:border-[var(--accent-ring)] disabled:opacity-40 w-full"
+                >
+                  <option value="" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Todos os Cargos</option>
+                  {positions.map((p: any) => <option key={p.id} value={p.id} className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">{p.name}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-muted">Status</label>
+                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+                  className="h-9 px-2.5 rounded-lg border border-default bg-input text-xs text-primary outline-none focus:border-[var(--accent-ring)] w-full"
+                >
+                  <option value="" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Todos</option>
+                  <option value="ok" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">OK</option>
+                  <option value="alerta" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Alerta</option>
+                  <option value="pendente" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Pendente</option>
+                  <option value="incompleto" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Incompleto</option>
+                </select>
+              </div>
+              {(positionId || statusFilter) && (
+                <button onClick={() => { setPositionId(""); setStatusFilter("") }}
+                  className="w-full h-9 rounded-lg border border-default text-[11px] font-medium text-muted hover:text-primary hover:bg-elevated/20 transition-all"
+                >
+                  Limpar filtros avançados
+                </button>
+              )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {exportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeExportModal} />
-          <div className="relative w-full max-w-md mx-4 bg-surface rounded-xl animate-in fade-in zoom-in duration-200 dark:border dark:border-white/6">
-            <button
-              onClick={closeExportModal}
-              className="absolute top-4 right-4 w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all duration-200"
-            >
-              <X size={16} strokeWidth={2} />
-            </button>
-
-            <div className="px-6 py-5">
-              <div className="flex flex-col gap-1 mb-5">
-                <h2 className="text-lg font-bold text-primary tracking-tight">Exportar Relatório</h2>
-                <p className="text-sm text-secondary">{monthLabel} · {selectedTipo}</p>
+      {/* Detail Drawer */}
+      {drawerUser && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerUser(null)} />
+          <div className="relative w-full max-w-xl bg-surface border-l border-default shadow-modal overflow-y-auto animate-in slide-in-from-right duration-200">
+            <div className="sticky top-0 flex items-center justify-between p-5 border-b border-default bg-surface z-10">
+              <div>
+                <h3 className="text-base font-bold text-primary">{drawerUser.colaborador}</h3>
+                <p className="text-xs text-secondary">{drawerUser.departamento} · {drawerUser.cargo}</p>
+              </div>
+              <button onClick={() => setDrawerUser(null)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all">
+                <X size={15} />
+              </button>
+            </div>
+            <div className="p-5 space-y-5">
+              {/* Summary cards */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Horas Trabalhadas", value: fmtMins(drawerUser.horasTrabalhadas), color: "text-accent-purple" },
+                  { label: "Horas Extras", value: fmtMins(drawerUser.horasExtras), color: "text-accent-amber" },
+                  { label: "Saldo Banco", value: `${drawerUser.saldoBanco >= 0 ? "+" : ""}${fmtMins(Math.abs(drawerUser.saldoBanco))}`, color: drawerUser.saldoBanco >= 0 ? "text-accent-green" : "text-accent-red" },
+                  { label: "Dias Trabalhados", value: `${drawerUser.diasTrabalhados}/${drawerUser.diasUteis}`, color: "text-primary" },
+                  { label: "Faltas", value: String(drawerUser.faltas), color: drawerUser.faltas > 0 ? "text-accent-red" : "text-muted" },
+                  { label: "Atrasos", value: String(drawerUser.atrasos), color: drawerUser.atrasos > 0 ? "text-accent-amber" : "text-muted" },
+                ].map(item => (
+                  <div key={item.label} className="flex flex-col gap-0.5 p-3 rounded-lg bg-elevated/20">
+                    <span className="text-[9px] font-semibold uppercase tracking-wider text-muted">{item.label}</span>
+                    <span className={`text-sm font-bold font-mono ${item.color}`}>{item.value}</span>
+                  </div>
+                ))}
               </div>
 
-              {modalState === "reexport" && (
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-start gap-3 rounded-lg bg-[#C49A6B]/8 px-4 py-3">
-                    <AlertCircle size={15} className="text-[#C49A6B] shrink-0 mt-0.5" />
-                    <p className="text-xs text-secondary leading-relaxed">
-                      Você já exportou este relatório anteriormente. Deseja exportar novamente?
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => { setModalState("select") }}
-                      className="flex-1 h-11 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200"
-                    >
-                      Exportar novamente
-                    </button>
-                    <button
-                      onClick={closeExportModal}
-                      className="flex-1 h-11 rounded-lg bg-surface border border-default/40 dark:border-white/6 text-sm font-medium text-secondary hover:text-primary transition-all duration-200"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {modalState === "select" && (
-                <div className="flex flex-col gap-4">
-                  <div className="rounded-lg bg-elevated/30 px-4 py-3 flex flex-col gap-2 dark:bg-transparent dark:border dark:border-white/6">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-muted">Período</span>
-                      <span className="text-xs font-semibold text-primary">{monthLabel}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-muted">Registros</span>
-                      <span className="text-xs font-semibold text-primary font-mono">{filteredRows.length}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-muted">Horas trabalhadas</span>
-                      <span className="text-xs font-semibold text-primary font-mono">{formatMinutes(Math.round(totalHours * 60))}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-muted">Saldo</span>
-                      <span className={`text-xs font-semibold font-mono ${saldoMins >= 0 ? "text-[#5B9B7A]" : "text-[#C96B6B]"}`}>
-                        {saldoMins >= 0 ? "+" : ""}{formatMinutes(Math.abs(saldoMins))}
-                      </span>
-                    </div>
-                  </div>
-
+              {/* Justifications */}
+              {drawerUser.justificativas.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-bold text-primary mb-3">Justificativas</h4>
                   <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => handleModalExport("pdf")}
-                      disabled={exporting !== null}
-                      className="flex items-center gap-3 w-full h-11 px-4 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {exporting && modalFormat === "pdf" ? <Loader2 size={15} className="animate-spin" /> : <FileText size={15} />}
-                      {exporting && modalFormat === "pdf" ? "Gerando PDF..." : "Exportar PDF"}
-                    </button>
-                    <button
-                      onClick={() => handleModalExport("xlsx")}
-                      disabled={exporting !== null}
-                      className="flex items-center gap-3 w-full h-11 px-4 rounded-lg bg-surface border border-default/40 dark:border-white/6 text-sm font-semibold text-secondary hover:text-primary hover:bg-elevated transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {exporting && modalFormat === "xlsx" ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
-                      {exporting && modalFormat === "xlsx" ? "Gerando Excel..." : "Exportar Excel (.xlsx)"}
-                    </button>
-                    <button
-                      onClick={() => handleModalExport("csv")}
-                      disabled={exporting !== null}
-                      className="flex items-center gap-3 w-full h-11 px-4 rounded-lg bg-surface border border-default/40 dark:border-white/6 text-sm font-semibold text-secondary hover:text-primary hover:bg-elevated transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {exporting && modalFormat === "csv" ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
-                      {exporting && modalFormat === "csv" ? "Gerando CSV..." : "Exportar CSV"}
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={closeExportModal}
-                    className="text-xs font-medium text-muted hover:text-primary transition-colors self-center"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              )}
-
-              {modalState === "exporting" && (
-                <div className="flex flex-col items-center gap-4 py-6">
-                  <Loader2 size={24} className="animate-spin text-[var(--accent-hover)]" />
-                  <p className="text-sm text-secondary">Gerando relatório...</p>
-                </div>
-              )}
-
-              {modalState === "success" && (
-                <div className="flex flex-col items-center gap-4 py-4">
-                  <div className="w-11 h-11 rounded-lg bg-[#5B9B7A]/8 flex items-center justify-center">
-                    <CheckCircle2 size={20} className="text-[#5B9B7A]" />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-primary">Relatório exportado com sucesso</p>
-                    <p className="text-xs text-muted mt-1">O download foi iniciado automaticamente.</p>
-                  </div>
-                  <button
-                    onClick={closeExportModal}
-                    className="h-11 px-5 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200"
-                  >
-                    Fechar
-                  </button>
-                </div>
-              )}
-
-              {modalState === "error" && (
-                <div className="flex flex-col items-center gap-4 py-4">
-                  <div className="w-11 h-11 rounded-lg bg-[#C96B6B]/8 flex items-center justify-center">
-                    <AlertCircle size={20} className="text-[#C96B6B]" />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-primary">Não foi possível exportar</p>
-                    <p className="text-xs text-muted mt-1">Tente novamente ou escolha outro formato.</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => { setModalState("select"); setModalFormat(null) }}
-                      className="h-11 px-5 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200"
-                    >
-                      Tentar novamente
-                    </button>
-                    <button
-                      onClick={closeExportModal}
-                      className="h-11 px-5 rounded-lg bg-surface border border-default/40 dark:border-white/6 text-sm font-medium text-secondary hover:text-primary transition-all duration-200"
-                    >
-                      Fechar
-                    </button>
+                    {drawerUser.justificativas.map((j, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-elevated/20 text-[11px]">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${j.status === "APPROVED" ? "bg-accent-green/10" : j.status === "REJECTED" ? "bg-accent-red/10" : "bg-accent-amber/10"}`}>
+                          {j.status === "APPROVED" ? <ShieldCheck size={11} className="text-accent-green" /> : j.status === "REJECTED" ? <X size={11} className="text-accent-red" /> : <AlertTriangle size={11} className="text-accent-amber" />}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-primary">{j.motivo}</p>
+                          <p className="text-muted">{fmtDate(j.inicio)} → {fmtDate(j.fim)}</p>
+                        </div>
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${j.status === "APPROVED" ? "bg-accent-green/10 text-accent-green" : j.status === "REJECTED" ? "bg-accent-red/10 text-accent-red" : "bg-accent-amber/10 text-accent-amber"}`}>
+                          {j.status === "APPROVED" ? "Aprovado" : j.status === "REJECTED" ? "Recusado" : "Pendente"}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
+
+              {/* Daily records */}
+              <div>
+                <h4 className="text-xs font-bold text-primary mb-3">Registros do Período</h4>
+                {drawerUser.registros.length === 0 ? (
+                  <p className="text-[11px] text-muted">Nenhum registro no período.</p>
+                ) : (
+                  <div className="flex flex-col">
+                    {drawerUser.registros.map((reg, i) => (
+                      <div key={i} className="flex items-center gap-3 py-2.5 border-b border-default last:border-b-0 text-[11px]">
+                        <span className="w-24 font-medium text-primary">{fmtDate(reg.data)}</span>
+                        <span className="w-16 text-center font-mono text-secondary">{reg.entrada || "---"}</span>
+                        <span className="w-16 text-center font-mono text-secondary">{reg.saida || "---"}</span>
+                        <span className="w-16 text-right font-mono font-medium text-primary">{reg.totalMinutos != null ? fmtMins(reg.totalMinutos) : "---"}</span>
+                        {reg.extraMinutos > 0 && <span className="text-[9px] text-accent-amber font-medium">+{fmtMins(reg.extraMinutos)}</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -19,6 +19,7 @@ import { referenceRouter } from './modules/reference/reference.routes.js'
 import { pointRecordRouter } from './modules/pointRecord/pointRecord.routes.js'
 import { termAcceptanceRouter } from './modules/termAcceptance/termAcceptance.routes.js'
 import { faceRegistrationRouter } from './modules/faceRegistration/faceRegistration.routes.js'
+import { reportRouter } from './modules/reports/reports.routes.js'
 import { startScheduler } from './utils/scheduler.js'
 
 const app = express()
@@ -40,6 +41,7 @@ app.use('/api/documents', documentRouter)
 app.use('/api/point-records', pointRecordRouter)
 app.use('/api/term-acceptance', termAcceptanceRouter)
 app.use('/api/face-registration', faceRegistrationRouter)
+app.use('/api/reports', reportRouter)
 
 app.use(errorHandler)
 

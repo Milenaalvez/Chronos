@@ -462,6 +462,27 @@ export const faceRegistration = {
     request<{ descriptors: number[][] | null; status: string | null }>('/face-registration/descriptors'),
 }
 
+export const reports = {
+  consolidated: (params: { year: number; month: number; departmentId?: string; positionId?: string; collaboratorId?: string; status?: string }) => {
+    const qs = new URLSearchParams()
+    qs.set('year', String(params.year))
+    qs.set('month', String(params.month))
+    if (params.departmentId) qs.set('departmentId', params.departmentId)
+    if (params.positionId) qs.set('positionId', params.positionId)
+    if (params.collaboratorId) qs.set('collaboratorId', params.collaboratorId)
+    if (params.status) qs.set('status', params.status)
+    return request<any>(`/reports/consolidated?${qs.toString()}`)
+  },
+  closingStatus: (year: number, month: number) =>
+    request<{ status: string; closedAt: string | null; closedBy: string | null }>(`/reports/closing-status?year=${year}&month=${month}`),
+  closeMonth: (year: number, month: number) =>
+    request<{ ok: boolean; status: string }>('/reports/close', { method: 'POST', body: JSON.stringify({ year, month }) }),
+  reopenMonth: (year: number, month: number) =>
+    request<{ ok: boolean; status: string }>('/reports/reopen', { method: 'POST', body: JSON.stringify({ year, month }) }),
+  auditLog: (year: number, month: number) =>
+    request<{ action: string; user: string; timestamp: string }[]>(`/reports/audit-log?year=${year}&month=${month}`),
+}
+
 export const documents = {
   list: (userId: string) =>
     request<any[]>(`/documents/user/${userId}`),

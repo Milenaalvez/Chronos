@@ -591,11 +591,7 @@ export default function App() {
         )
       case "relatorios":
         return (
-          <RelatoriosPage
-            allRecords={allRecords}
-            justificacoes={justificacoes}
-            pageAction={pageAction?.type === "openExport" ? pageAction : null}
-          />
+          <RelatoriosPage user={user} />
         )
       case "calendario":
         return (
