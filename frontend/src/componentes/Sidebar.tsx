@@ -222,7 +222,7 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
               <svg viewBox="0 0 48 48" className="w-full h-full">
                 <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#FFFFFF" strokeWidth="1.5" />
                 <line x1="24" y1="24" x2="24" y2="13" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
-                <line x1="24" y1="24" x2="20" y2="18" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" />
+                <line x1="24" y1="24" x2="33" y2="24" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" />
                 <circle cx="24" cy="24" r="2" fill="#FFFFFF" />
               </svg>
             </div>
