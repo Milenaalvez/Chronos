@@ -116,7 +116,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-x sm:divide-y-0 divide-default/10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-x sm:divide-y-0 divide-default/5">
         <StatsCard
           icon={TrendingUp}
           title="Saldo de Horas"
