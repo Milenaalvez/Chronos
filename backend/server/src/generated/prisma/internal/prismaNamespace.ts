@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Company: 'Company',
+  Branch: 'Branch',
   Department: 'Department',
   Position: 'Position',
   User: 'User',
@@ -397,7 +398,8 @@ export const ModelName = {
   Integration: 'Integration',
   TermAcceptance: 'TermAcceptance',
   FaceRegistration: 'FaceRegistration',
-  MonthClosing: 'MonthClosing'
+  MonthClosing: 'MonthClosing',
+  CompanyConfig: 'CompanyConfig'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -413,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "company" | "department" | "position" | "user" | "timeRecord" | "pointEvent" | "justification" | "notification" | "activityLog" | "document" | "integration" | "termAcceptance" | "faceRegistration" | "monthClosing"
+    modelProps: "company" | "branch" | "department" | "position" | "user" | "timeRecord" | "pointEvent" | "justification" | "notification" | "activityLog" | "document" | "integration" | "termAcceptance" | "faceRegistration" | "monthClosing" | "companyConfig"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -488,6 +490,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CompanyCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CompanyCountAggregateOutputType> | number
+        }
+      }
+    }
+    Branch: {
+      payload: Prisma.$BranchPayload<ExtArgs>
+      fields: Prisma.BranchFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BranchFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BranchFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>
+        }
+        findFirst: {
+          args: Prisma.BranchFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BranchFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>
+        }
+        findMany: {
+          args: Prisma.BranchFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>[]
+        }
+        create: {
+          args: Prisma.BranchCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>
+        }
+        createMany: {
+          args: Prisma.BranchCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BranchCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>[]
+        }
+        delete: {
+          args: Prisma.BranchDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>
+        }
+        update: {
+          args: Prisma.BranchUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>
+        }
+        deleteMany: {
+          args: Prisma.BranchDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BranchUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BranchUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>[]
+        }
+        upsert: {
+          args: Prisma.BranchUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BranchPayload>
+        }
+        aggregate: {
+          args: Prisma.BranchAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBranch>
+        }
+        groupBy: {
+          args: Prisma.BranchGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BranchGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BranchCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BranchCountAggregateOutputType> | number
         }
       }
     }
@@ -1453,6 +1529,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CompanyConfig: {
+      payload: Prisma.$CompanyConfigPayload<ExtArgs>
+      fields: Prisma.CompanyConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CompanyConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CompanyConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.CompanyConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CompanyConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>
+        }
+        findMany: {
+          args: Prisma.CompanyConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>[]
+        }
+        create: {
+          args: Prisma.CompanyConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>
+        }
+        createMany: {
+          args: Prisma.CompanyConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CompanyConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.CompanyConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>
+        }
+        update: {
+          args: Prisma.CompanyConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.CompanyConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CompanyConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CompanyConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.CompanyConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.CompanyConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCompanyConfig>
+        }
+        groupBy: {
+          args: Prisma.CompanyConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CompanyConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CompanyConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CompanyConfigCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1501,6 +1651,10 @@ export const CompanyScalarFieldEnum = {
   address: 'address',
   logo: 'logo',
   isActive: 'isActive',
+  plan: 'plan',
+  userLimit: 'userLimit',
+  contractAt: 'contractAt',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1508,13 +1662,33 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const BranchScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  cnpj: 'cnpj',
+  address: 'address',
+  city: 'city',
+  state: 'state',
+  zip: 'zip',
+  phone: 'phone',
+  responsible: 'responsible',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  companyId: 'companyId'
+} as const
+
+export type BranchScalarFieldEnum = (typeof BranchScalarFieldEnum)[keyof typeof BranchScalarFieldEnum]
+
+
 export const DepartmentScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  slug: 'slug',
   active: 'active',
   order: 'order',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  companyId: 'companyId'
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
@@ -1523,10 +1697,10 @@ export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof
 export const PositionScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  slug: 'slug',
   active: 'active',
   departmentId: 'departmentId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  companyId: 'companyId'
 } as const
 
 export type PositionScalarFieldEnum = (typeof PositionScalarFieldEnum)[keyof typeof PositionScalarFieldEnum]
@@ -1569,7 +1743,8 @@ export const UserScalarFieldEnum = {
   refreshTokenVersion: 'refreshTokenVersion',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  companyId: 'companyId'
+  companyId: 'companyId',
+  branchId: 'branchId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1747,6 +1922,22 @@ export const MonthClosingScalarFieldEnum = {
 export type MonthClosingScalarFieldEnum = (typeof MonthClosingScalarFieldEnum)[keyof typeof MonthClosingScalarFieldEnum]
 
 
+export const CompanyConfigScalarFieldEnum = {
+  id: 'id',
+  logo: 'logo',
+  primaryColor: 'primaryColor',
+  requireGeo: 'requireGeo',
+  requireFace: 'requireFace',
+  defaultWeeklyHours: 'defaultWeeklyHours',
+  lunchDuration: 'lunchDuration',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  companyId: 'companyId'
+} as const
+
+export type CompanyConfigScalarFieldEnum = (typeof CompanyConfigScalarFieldEnum)[keyof typeof CompanyConfigScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1816,20 +2007,6 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'DateTime'
- */
-export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-/**
- * Reference to a field of type 'DateTime[]'
- */
-export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1840,6 +2017,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -2093,6 +2284,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   company?: Prisma.CompanyOmit
+  branch?: Prisma.BranchOmit
   department?: Prisma.DepartmentOmit
   position?: Prisma.PositionOmit
   user?: Prisma.UserOmit
@@ -2106,6 +2298,7 @@ export type GlobalOmitConfig = {
   termAcceptance?: Prisma.TermAcceptanceOmit
   faceRegistration?: Prisma.FaceRegistrationOmit
   monthClosing?: Prisma.MonthClosingOmit
+  companyConfig?: Prisma.CompanyConfigOmit
 }
 
 /* Types for Logging */

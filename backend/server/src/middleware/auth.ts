@@ -9,6 +9,7 @@ export interface AuthPayload {
   userId: string
   role: string
   companyId: string
+  branchId: string | null
   name: string
 }
 

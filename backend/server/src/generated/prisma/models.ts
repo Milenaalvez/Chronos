@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Company.ts'
+export type * from './models/Branch.ts'
 export type * from './models/Department.ts'
 export type * from './models/Position.ts'
 export type * from './models/User.ts'
@@ -22,4 +23,5 @@ export type * from './models/Integration.ts'
 export type * from './models/TermAcceptance.ts'
 export type * from './models/FaceRegistration.ts'
 export type * from './models/MonthClosing.ts'
+export type * from './models/CompanyConfig.ts'
 export type * from './commonInputTypes.ts'

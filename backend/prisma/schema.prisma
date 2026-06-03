@@ -8,9 +8,11 @@ datasource db {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   DEVELOPER
   ADMIN
   RH
+  MANAGER
   EMPLOYEE
 }
 
@@ -72,18 +74,52 @@ model Company {
   address   String?
   logo      String?
   isActive  Boolean  @default(true)
+
+  plan        String  @default("starter")
+  userLimit   Int     @default(20)
+  contractAt  DateTime?
+  status      String  @default("active")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users User[]
+  users       User[]
+  branches    Branch[]
+  departments Department[]
+  positions   Position[]
+  config      CompanyConfig?
 
   @@map("companies")
+}
+
+model Branch {
+  id          String   @id @default(cuid())
+  name        String
+  code        String?
+  cnpj        String?
+  address     String?
+  city        String?
+  state       String?
+  zip         String?
+  phone       String?
+  responsible String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  users User[]
+
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@map("branches")
 }
 
 model Department {
   id        String      @id @default(cuid())
   name      String
-  slug      String      @unique
   active    Boolean     @default(true)
   order     Int         @default(0)
   createdAt DateTime    @default(now())
@@ -91,7 +127,10 @@ model Department {
   positions Position[]
   users     User[]
 
-  @@index([slug])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
   @@index([order])
   @@map("departments")
 }
@@ -99,7 +138,6 @@ model Department {
 model Position {
   id           String      @id @default(cuid())
   name         String
-  slug         String      @unique
   active       Boolean     @default(true)
   departmentId String
   department   Department  @relation(fields: [departmentId], references: [id])
@@ -107,8 +145,11 @@ model Position {
 
   users        User[]
 
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
   @@index([departmentId])
-  @@index([slug])
+  @@index([companyId])
   @@map("positions")
 }
 
@@ -164,6 +205,9 @@ model User {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+
   timeRecords          TimeRecord[]
   reviewedRecords      TimeRecord[]        @relation("TimeRecordReviewer")
   justifications Justification[]
@@ -178,6 +222,7 @@ model User {
   faceRegistration    FaceRegistration?
 
   @@index([companyId])
+  @@index([branchId])
   @@index([email])
   @@index([role])
   @@index([cpf])
@@ -385,7 +430,7 @@ model MonthClosing {
   companyId String
   year      Int
   month     Int
-  status    String   @default("open") // "open" | "closed"
+  status    String   @default("open")
   closedAt  DateTime?
   closedBy  String?
   reopenedAt DateTime?
@@ -395,4 +440,21 @@ model MonthClosing {
   @@index([companyId])
   @@index([status])
   @@map("month_closings")
+}
+
+model CompanyConfig {
+  id                  String   @id @default(cuid())
+  logo               String?
+  primaryColor       String   @default("#3B82F6")
+  requireGeo         Boolean  @default(false)
+  requireFace        Boolean  @default(false)
+  defaultWeeklyHours Int      @default(40)
+  lunchDuration      Int      @default(60)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  companyId String @unique
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@map("company_configs")
 }

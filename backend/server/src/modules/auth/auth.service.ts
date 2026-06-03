@@ -34,8 +34,8 @@ export async function generateRegistrationNumber(): Promise<string> {
   return String(nextNum)
 }
 
-async function loginResponse(user: { id: string; role: string; companyId: string; name: string }, rememberMe = false) {
-  const token = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, name: user.name })
+async function loginResponse(user: { id: string; role: string; companyId: string; branchId: string | null; name: string }, rememberMe = false) {
+  const token = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, branchId: user.branchId ?? null, name: user.name })
   const refreshToken = await generateRefreshToken(user.id, rememberMe)
   const fullUser = await prisma.user.findUnique({ where: { id: user.id } })
   return { token, refreshToken, user: sanitizeUser(fullUser!) }
@@ -148,7 +148,7 @@ export async function registerUser(data: {
     console.warn('[Auth] Erro ao criar usuário no Supabase Auth (não crítico):', err?.message)
   }
 
-  const token = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, name: user.name })
+  const token = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, branchId: user.branchId ?? null, name: user.name })
   const refreshTok = await generateRefreshToken(user.id, false)
 
   return {
@@ -196,7 +196,7 @@ export async function verifyEmail(token: string) {
     throw Object.assign(new Error('Token de verificação inválido ou expirado'), { statusCode: 400 })
   }
   if (user.emailVerified) {
-    const tok = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, name: user.name })
+    const tok = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, branchId: user.branchId ?? null, name: user.name })
     return { token: tok, user: sanitizeUser(user), message: 'Email já estava verificado.' }
   }
 
@@ -212,7 +212,7 @@ export async function verifyEmail(token: string) {
 
   logActivity(user.id, 'EMAIL_VERIFIED', `Email ${user.email} verificado com sucesso`, 'User', user.id, user.id)
 
-  const tok = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, name: user.name })
+  const tok = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, branchId: user.branchId ?? null, name: user.name })
   return { token: tok, user: sanitizeUser(user), message: 'Email verificado com sucesso' }
 }
 
@@ -380,7 +380,7 @@ export async function updatePassword(token: string, newPassword: string) {
     method: 'reset_token',
   })
 
-  const tok = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, name: user.name })
+  const tok = generateToken({ userId: user.id, role: user.role, companyId: user.companyId, branchId: user.branchId ?? null, name: user.name })
   return { token: tok, user: sanitizeUser(user), message: 'Senha atualizada com sucesso' }
 }
 
@@ -546,7 +546,7 @@ export async function impersonateUser(actor: { userId: string; role: string; com
     throw Object.assign(new Error('Sem permissão para trocar de conta'), { statusCode: 403 })
   }
 
-  const token = generateToken({ userId: target.id, role: target.role, companyId: target.companyId, name: target.name })
+  const token = generateToken({ userId: target.id, role: target.role, companyId: target.companyId, branchId: target.branchId ?? null, name: target.name })
 
   logActivity(actor.userId, 'IMPERSONATE', `${actor.name} acessou o perfil de ${target.name}`, 'User', target.id, target.id, {
     actorName: actor.name, targetName: target.name,

@@ -75,6 +75,7 @@ export type UserMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   companyId: string | null
+  branchId: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -114,6 +115,7 @@ export type UserMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   companyId: string | null
+  branchId: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -154,6 +156,7 @@ export type UserCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   companyId: number
+  branchId: number
   _all: number
 }
 
@@ -207,6 +210,7 @@ export type UserMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   companyId?: true
+  branchId?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -246,6 +250,7 @@ export type UserMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   companyId?: true
+  branchId?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -286,6 +291,7 @@ export type UserCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   companyId?: true
+  branchId?: true
   _all?: true
 }
 
@@ -413,6 +419,7 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   companyId: string
+  branchId: string | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -476,9 +483,11 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   companyId?: Prisma.StringFilter<"User"> | string
+  branchId?: Prisma.StringNullableFilter<"User"> | string | null
   departmentRel?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
   positionRel?: Prisma.XOR<Prisma.PositionNullableScalarRelationFilter, Prisma.PositionWhereInput> | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  branch?: Prisma.XOR<Prisma.BranchNullableScalarRelationFilter, Prisma.BranchWhereInput> | null
   timeRecords?: Prisma.TimeRecordListRelationFilter
   reviewedRecords?: Prisma.TimeRecordListRelationFilter
   justifications?: Prisma.JustificationListRelationFilter
@@ -531,9 +540,11 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  branchId?: Prisma.SortOrderInput | Prisma.SortOrder
   departmentRel?: Prisma.DepartmentOrderByWithRelationInput
   positionRel?: Prisma.PositionOrderByWithRelationInput
   company?: Prisma.CompanyOrderByWithRelationInput
+  branch?: Prisma.BranchOrderByWithRelationInput
   timeRecords?: Prisma.TimeRecordOrderByRelationAggregateInput
   reviewedRecords?: Prisma.TimeRecordOrderByRelationAggregateInput
   justifications?: Prisma.JustificationOrderByRelationAggregateInput
@@ -589,9 +600,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   companyId?: Prisma.StringFilter<"User"> | string
+  branchId?: Prisma.StringNullableFilter<"User"> | string | null
   departmentRel?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
   positionRel?: Prisma.XOR<Prisma.PositionNullableScalarRelationFilter, Prisma.PositionWhereInput> | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  branch?: Prisma.XOR<Prisma.BranchNullableScalarRelationFilter, Prisma.BranchWhereInput> | null
   timeRecords?: Prisma.TimeRecordListRelationFilter
   reviewedRecords?: Prisma.TimeRecordListRelationFilter
   justifications?: Prisma.JustificationListRelationFilter
@@ -644,6 +657,7 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  branchId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -692,6 +706,7 @@ export type UserScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   companyId?: Prisma.StringWithAggregatesFilter<"User"> | string
+  branchId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -732,6 +747,7 @@ export type UserCreateInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -784,6 +800,7 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -836,6 +853,7 @@ export type UserUpdateInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -888,6 +906,7 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -940,6 +959,7 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -1017,6 +1037,7 @@ export type UserUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserListRelationFilter = {
@@ -1067,6 +1088,7 @@ export type UserCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -1112,6 +1134,7 @@ export type UserMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -1151,6 +1174,7 @@ export type UserMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -1208,6 +1232,48 @@ export type UserUncheckedUpdateManyWithoutCompanyNestedInput = {
   connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
   update?: Prisma.UserUpdateWithWhereUniqueWithoutCompanyInput | Prisma.UserUpdateWithWhereUniqueWithoutCompanyInput[]
   updateMany?: Prisma.UserUpdateManyWithWhereWithoutCompanyInput | Prisma.UserUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserCreateNestedManyWithoutBranchInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBranchInput, Prisma.UserUncheckedCreateWithoutBranchInput> | Prisma.UserCreateWithoutBranchInput[] | Prisma.UserUncheckedCreateWithoutBranchInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBranchInput | Prisma.UserCreateOrConnectWithoutBranchInput[]
+  createMany?: Prisma.UserCreateManyBranchInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutBranchInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBranchInput, Prisma.UserUncheckedCreateWithoutBranchInput> | Prisma.UserCreateWithoutBranchInput[] | Prisma.UserUncheckedCreateWithoutBranchInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBranchInput | Prisma.UserCreateOrConnectWithoutBranchInput[]
+  createMany?: Prisma.UserCreateManyBranchInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutBranchNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBranchInput, Prisma.UserUncheckedCreateWithoutBranchInput> | Prisma.UserCreateWithoutBranchInput[] | Prisma.UserUncheckedCreateWithoutBranchInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBranchInput | Prisma.UserCreateOrConnectWithoutBranchInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutBranchInput | Prisma.UserUpsertWithWhereUniqueWithoutBranchInput[]
+  createMany?: Prisma.UserCreateManyBranchInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutBranchInput | Prisma.UserUpdateWithWhereUniqueWithoutBranchInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutBranchInput | Prisma.UserUpdateManyWithWhereWithoutBranchInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutBranchNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBranchInput, Prisma.UserUncheckedCreateWithoutBranchInput> | Prisma.UserCreateWithoutBranchInput[] | Prisma.UserUncheckedCreateWithoutBranchInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBranchInput | Prisma.UserCreateOrConnectWithoutBranchInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutBranchInput | Prisma.UserUpsertWithWhereUniqueWithoutBranchInput[]
+  createMany?: Prisma.UserCreateManyBranchInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutBranchInput | Prisma.UserUpdateWithWhereUniqueWithoutBranchInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutBranchInput | Prisma.UserUpdateManyWithWhereWithoutBranchInput[]
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
@@ -1301,10 +1367,6 @@ export type EnumUserRoleFieldUpdateOperationsInput = {
 
 export type NullableEnumContractTypeFieldUpdateOperationsInput = {
   set?: $Enums.ContractType | null
-}
-
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
 }
 
 export type UserCreateNestedOneWithoutReviewedRecordsInput = {
@@ -1516,6 +1578,7 @@ export type UserCreateWithoutCompanyInput = {
   updatedAt?: Date | string
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -1567,6 +1630,7 @@ export type UserUncheckedCreateWithoutCompanyInput = {
   refreshTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -1648,6 +1712,137 @@ export type UserScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   companyId?: Prisma.StringFilter<"User"> | string
+  branchId?: Prisma.StringNullableFilter<"User"> | string | null
+}
+
+export type UserCreateWithoutBranchInput = {
+  id?: string
+  email: string
+  password: string
+  name: string
+  cpf?: string | null
+  phone?: string | null
+  avatar?: string | null
+  role?: $Enums.UserRole
+  department?: string | null
+  position?: string | null
+  contractType?: $Enums.ContractType | null
+  employeeCode?: string | null
+  weeklyHours?: number
+  workSchedule?: string
+  hireDate?: Date | string
+  birthDate?: Date | string | null
+  address?: string | null
+  isActive?: boolean
+  lastAccessAt?: Date | string | null
+  registrationNumber?: string | null
+  emailVerified?: boolean
+  verificationCode?: string | null
+  verificationExpiresAt?: Date | string | null
+  reportNotificationDay?: number
+  themeMode?: string
+  themeAccent?: string
+  permissions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resetPasswordCode?: string | null
+  resetPasswordExpiresAt?: Date | string | null
+  refreshTokenHash?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  refreshTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
+  company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
+  reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
+  justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutUserInput
+  targetedActivityLogs?: Prisma.ActivityLogCreateNestedManyWithoutTargetUserInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutUserInput
+  uploadedDocuments?: Prisma.DocumentCreateNestedManyWithoutUploaderInput
+  pointEvents?: Prisma.PointEventCreateNestedManyWithoutUserInput
+  integrations?: Prisma.IntegrationCreateNestedManyWithoutUserInput
+  termAcceptance?: Prisma.TermAcceptanceCreateNestedOneWithoutUserInput
+  faceRegistration?: Prisma.FaceRegistrationCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBranchInput = {
+  id?: string
+  email: string
+  password: string
+  name: string
+  cpf?: string | null
+  phone?: string | null
+  avatar?: string | null
+  role?: $Enums.UserRole
+  department?: string | null
+  departmentId?: string | null
+  position?: string | null
+  positionId?: string | null
+  contractType?: $Enums.ContractType | null
+  employeeCode?: string | null
+  weeklyHours?: number
+  workSchedule?: string
+  hireDate?: Date | string
+  birthDate?: Date | string | null
+  address?: string | null
+  isActive?: boolean
+  lastAccessAt?: Date | string | null
+  registrationNumber?: string | null
+  emailVerified?: boolean
+  verificationCode?: string | null
+  verificationExpiresAt?: Date | string | null
+  reportNotificationDay?: number
+  themeMode?: string
+  themeAccent?: string
+  permissions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resetPasswordCode?: string | null
+  resetPasswordExpiresAt?: Date | string | null
+  refreshTokenHash?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  refreshTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companyId: string
+  timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
+  reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
+  justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutUserInput
+  targetedActivityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutTargetUserInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUserInput
+  uploadedDocuments?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploaderInput
+  pointEvents?: Prisma.PointEventUncheckedCreateNestedManyWithoutUserInput
+  integrations?: Prisma.IntegrationUncheckedCreateNestedManyWithoutUserInput
+  termAcceptance?: Prisma.TermAcceptanceUncheckedCreateNestedOneWithoutUserInput
+  faceRegistration?: Prisma.FaceRegistrationUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBranchInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBranchInput, Prisma.UserUncheckedCreateWithoutBranchInput>
+}
+
+export type UserCreateManyBranchInputEnvelope = {
+  data: Prisma.UserCreateManyBranchInput | Prisma.UserCreateManyBranchInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutBranchInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBranchInput, Prisma.UserUncheckedUpdateWithoutBranchInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBranchInput, Prisma.UserUncheckedCreateWithoutBranchInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutBranchInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBranchInput, Prisma.UserUncheckedUpdateWithoutBranchInput>
+}
+
+export type UserUpdateManyWithWhereWithoutBranchInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutBranchInput>
 }
 
 export type UserCreateWithoutDepartmentRelInput = {
@@ -1687,6 +1882,7 @@ export type UserCreateWithoutDepartmentRelInput = {
   updatedAt?: Date | string
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -1738,6 +1934,7 @@ export type UserUncheckedCreateWithoutDepartmentRelInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -1815,6 +2012,7 @@ export type UserCreateWithoutPositionRelInput = {
   updatedAt?: Date | string
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -1866,6 +2064,7 @@ export type UserUncheckedCreateWithoutPositionRelInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -1944,6 +2143,7 @@ export type UserCreateWithoutReviewedRecordsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
@@ -1995,6 +2195,7 @@ export type UserUncheckedCreateWithoutReviewedRecordsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
@@ -2051,6 +2252,7 @@ export type UserCreateWithoutTimeRecordsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
@@ -2102,6 +2304,7 @@ export type UserUncheckedCreateWithoutTimeRecordsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
@@ -2169,6 +2372,7 @@ export type UserUpdateWithoutReviewedRecordsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
@@ -2220,6 +2424,7 @@ export type UserUncheckedUpdateWithoutReviewedRecordsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2282,6 +2487,7 @@ export type UserUpdateWithoutTimeRecordsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
@@ -2333,6 +2539,7 @@ export type UserUncheckedUpdateWithoutTimeRecordsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2384,6 +2591,7 @@ export type UserCreateWithoutPointEventsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -2435,6 +2643,7 @@ export type UserUncheckedCreateWithoutPointEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -2502,6 +2711,7 @@ export type UserUpdateWithoutPointEventsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -2553,6 +2763,7 @@ export type UserUncheckedUpdateWithoutPointEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2604,6 +2815,7 @@ export type UserCreateWithoutJustificationsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
@@ -2655,6 +2867,7 @@ export type UserUncheckedCreateWithoutJustificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
@@ -2722,6 +2935,7 @@ export type UserUpdateWithoutJustificationsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
@@ -2773,6 +2987,7 @@ export type UserUncheckedUpdateWithoutJustificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2824,6 +3039,7 @@ export type UserCreateWithoutNotificationsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -2875,6 +3091,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -2942,6 +3159,7 @@ export type UserUpdateWithoutNotificationsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -2993,6 +3211,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3044,6 +3263,7 @@ export type UserCreateWithoutActivityLogsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -3095,6 +3315,7 @@ export type UserUncheckedCreateWithoutActivityLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -3151,6 +3372,7 @@ export type UserCreateWithoutTargetedActivityLogsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -3202,6 +3424,7 @@ export type UserUncheckedCreateWithoutTargetedActivityLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -3269,6 +3492,7 @@ export type UserUpdateWithoutActivityLogsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -3320,6 +3544,7 @@ export type UserUncheckedUpdateWithoutActivityLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3382,6 +3607,7 @@ export type UserUpdateWithoutTargetedActivityLogsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -3433,6 +3659,7 @@ export type UserUncheckedUpdateWithoutTargetedActivityLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3484,6 +3711,7 @@ export type UserCreateWithoutDocumentsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -3535,6 +3763,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -3591,6 +3820,7 @@ export type UserCreateWithoutUploadedDocumentsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -3642,6 +3872,7 @@ export type UserUncheckedCreateWithoutUploadedDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -3709,6 +3940,7 @@ export type UserUpdateWithoutDocumentsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -3760,6 +3992,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3822,6 +4055,7 @@ export type UserUpdateWithoutUploadedDocumentsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -3873,6 +4107,7 @@ export type UserUncheckedUpdateWithoutUploadedDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3924,6 +4159,7 @@ export type UserCreateWithoutIntegrationsInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -3975,6 +4211,7 @@ export type UserUncheckedCreateWithoutIntegrationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -4042,6 +4279,7 @@ export type UserUpdateWithoutIntegrationsInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -4093,6 +4331,7 @@ export type UserUncheckedUpdateWithoutIntegrationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4144,6 +4383,7 @@ export type UserCreateWithoutTermAcceptanceInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -4195,6 +4435,7 @@ export type UserUncheckedCreateWithoutTermAcceptanceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -4262,6 +4503,7 @@ export type UserUpdateWithoutTermAcceptanceInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -4313,6 +4555,7 @@ export type UserUncheckedUpdateWithoutTermAcceptanceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4364,6 +4607,7 @@ export type UserCreateWithoutFaceRegistrationInput = {
   departmentRel?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
   positionRel?: Prisma.PositionCreateNestedOneWithoutUsersInput
   company: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
   timeRecords?: Prisma.TimeRecordCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationCreateNestedManyWithoutUserInput
@@ -4415,6 +4659,7 @@ export type UserUncheckedCreateWithoutFaceRegistrationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
   timeRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutUserInput
   reviewedRecords?: Prisma.TimeRecordUncheckedCreateNestedManyWithoutReviewerInput
   justifications?: Prisma.JustificationUncheckedCreateNestedManyWithoutUserInput
@@ -4482,6 +4727,7 @@ export type UserUpdateWithoutFaceRegistrationInput = {
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -4533,6 +4779,7 @@ export type UserUncheckedUpdateWithoutFaceRegistrationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4583,6 +4830,7 @@ export type UserCreateManyCompanyInput = {
   refreshTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  branchId?: string | null
 }
 
 export type UserUpdateWithoutCompanyInput = {
@@ -4622,6 +4870,7 @@ export type UserUpdateWithoutCompanyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -4673,6 +4922,7 @@ export type UserUncheckedUpdateWithoutCompanyInput = {
   refreshTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4724,6 +4974,191 @@ export type UserUncheckedUpdateManyWithoutCompanyInput = {
   refreshTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type UserCreateManyBranchInput = {
+  id?: string
+  email: string
+  password: string
+  name: string
+  cpf?: string | null
+  phone?: string | null
+  avatar?: string | null
+  role?: $Enums.UserRole
+  department?: string | null
+  departmentId?: string | null
+  position?: string | null
+  positionId?: string | null
+  contractType?: $Enums.ContractType | null
+  employeeCode?: string | null
+  weeklyHours?: number
+  workSchedule?: string
+  hireDate?: Date | string
+  birthDate?: Date | string | null
+  address?: string | null
+  isActive?: boolean
+  lastAccessAt?: Date | string | null
+  registrationNumber?: string | null
+  emailVerified?: boolean
+  verificationCode?: string | null
+  verificationExpiresAt?: Date | string | null
+  reportNotificationDay?: number
+  themeMode?: string
+  themeAccent?: string
+  permissions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resetPasswordCode?: string | null
+  resetPasswordExpiresAt?: Date | string | null
+  refreshTokenHash?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  refreshTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companyId: string
+}
+
+export type UserUpdateWithoutBranchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  cpf?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractType?: Prisma.NullableEnumContractTypeFieldUpdateOperationsInput | $Enums.ContractType | null
+  employeeCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.IntFieldUpdateOperationsInput | number
+  workSchedule?: Prisma.StringFieldUpdateOperationsInput | string
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastAccessAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  registrationNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reportNotificationDay?: Prisma.IntFieldUpdateOperationsInput | number
+  themeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  themeAccent?: Prisma.StringFieldUpdateOperationsInput | string
+  permissions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resetPasswordCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
+  reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
+  justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutUserNestedInput
+  targetedActivityLogs?: Prisma.ActivityLogUpdateManyWithoutTargetUserNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutUserNestedInput
+  uploadedDocuments?: Prisma.DocumentUpdateManyWithoutUploaderNestedInput
+  pointEvents?: Prisma.PointEventUpdateManyWithoutUserNestedInput
+  integrations?: Prisma.IntegrationUpdateManyWithoutUserNestedInput
+  termAcceptance?: Prisma.TermAcceptanceUpdateOneWithoutUserNestedInput
+  faceRegistration?: Prisma.FaceRegistrationUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBranchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  cpf?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractType?: Prisma.NullableEnumContractTypeFieldUpdateOperationsInput | $Enums.ContractType | null
+  employeeCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.IntFieldUpdateOperationsInput | number
+  workSchedule?: Prisma.StringFieldUpdateOperationsInput | string
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastAccessAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  registrationNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reportNotificationDay?: Prisma.IntFieldUpdateOperationsInput | number
+  themeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  themeAccent?: Prisma.StringFieldUpdateOperationsInput | string
+  permissions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resetPasswordCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
+  reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
+  justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+  targetedActivityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutUserNestedInput
+  uploadedDocuments?: Prisma.DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+  pointEvents?: Prisma.PointEventUncheckedUpdateManyWithoutUserNestedInput
+  integrations?: Prisma.IntegrationUncheckedUpdateManyWithoutUserNestedInput
+  termAcceptance?: Prisma.TermAcceptanceUncheckedUpdateOneWithoutUserNestedInput
+  faceRegistration?: Prisma.FaceRegistrationUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutBranchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  cpf?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractType?: Prisma.NullableEnumContractTypeFieldUpdateOperationsInput | $Enums.ContractType | null
+  employeeCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.IntFieldUpdateOperationsInput | number
+  workSchedule?: Prisma.StringFieldUpdateOperationsInput | string
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastAccessAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  registrationNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reportNotificationDay?: Prisma.IntFieldUpdateOperationsInput | number
+  themeMode?: Prisma.StringFieldUpdateOperationsInput | string
+  themeAccent?: Prisma.StringFieldUpdateOperationsInput | string
+  permissions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resetPasswordCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type UserCreateManyDepartmentRelInput = {
@@ -4763,6 +5198,7 @@ export type UserCreateManyDepartmentRelInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
 }
 
 export type UserUpdateWithoutDepartmentRelInput = {
@@ -4802,6 +5238,7 @@ export type UserUpdateWithoutDepartmentRelInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   positionRel?: Prisma.PositionUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -4853,6 +5290,7 @@ export type UserUncheckedUpdateWithoutDepartmentRelInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4904,6 +5342,7 @@ export type UserUncheckedUpdateManyWithoutDepartmentRelInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCreateManyPositionRelInput = {
@@ -4943,6 +5382,7 @@ export type UserCreateManyPositionRelInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   companyId: string
+  branchId?: string | null
 }
 
 export type UserUpdateWithoutPositionRelInput = {
@@ -4982,6 +5422,7 @@ export type UserUpdateWithoutPositionRelInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   departmentRel?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutUsersNestedInput
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
   timeRecords?: Prisma.TimeRecordUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUpdateManyWithoutUserNestedInput
@@ -5033,6 +5474,7 @@ export type UserUncheckedUpdateWithoutPositionRelInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutUserNestedInput
   reviewedRecords?: Prisma.TimeRecordUncheckedUpdateManyWithoutReviewerNestedInput
   justifications?: Prisma.JustificationUncheckedUpdateManyWithoutUserNestedInput
@@ -5084,6 +5526,7 @@ export type UserUncheckedUpdateManyWithoutPositionRelInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -5236,9 +5679,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
+  branchId?: boolean
   departmentRel?: boolean | Prisma.User$departmentRelArgs<ExtArgs>
   positionRel?: boolean | Prisma.User$positionRelArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  branch?: boolean | Prisma.User$branchArgs<ExtArgs>
   timeRecords?: boolean | Prisma.User$timeRecordsArgs<ExtArgs>
   reviewedRecords?: boolean | Prisma.User$reviewedRecordsArgs<ExtArgs>
   justifications?: boolean | Prisma.User$justificationsArgs<ExtArgs>
@@ -5292,9 +5737,11 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
+  branchId?: boolean
   departmentRel?: boolean | Prisma.User$departmentRelArgs<ExtArgs>
   positionRel?: boolean | Prisma.User$positionRelArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  branch?: boolean | Prisma.User$branchArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -5335,9 +5782,11 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
+  branchId?: boolean
   departmentRel?: boolean | Prisma.User$departmentRelArgs<ExtArgs>
   positionRel?: boolean | Prisma.User$positionRelArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  branch?: boolean | Prisma.User$branchArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -5378,13 +5827,15 @@ export type UserSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   companyId?: boolean
+  branchId?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "name" | "cpf" | "phone" | "avatar" | "role" | "department" | "departmentId" | "position" | "positionId" | "contractType" | "employeeCode" | "weeklyHours" | "workSchedule" | "hireDate" | "birthDate" | "address" | "isActive" | "lastAccessAt" | "registrationNumber" | "emailVerified" | "verificationCode" | "verificationExpiresAt" | "reportNotificationDay" | "themeMode" | "themeAccent" | "permissions" | "resetPasswordCode" | "resetPasswordExpiresAt" | "refreshTokenHash" | "refreshTokenExpiresAt" | "refreshTokenVersion" | "createdAt" | "updatedAt" | "companyId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "name" | "cpf" | "phone" | "avatar" | "role" | "department" | "departmentId" | "position" | "positionId" | "contractType" | "employeeCode" | "weeklyHours" | "workSchedule" | "hireDate" | "birthDate" | "address" | "isActive" | "lastAccessAt" | "registrationNumber" | "emailVerified" | "verificationCode" | "verificationExpiresAt" | "reportNotificationDay" | "themeMode" | "themeAccent" | "permissions" | "resetPasswordCode" | "resetPasswordExpiresAt" | "refreshTokenHash" | "refreshTokenExpiresAt" | "refreshTokenVersion" | "createdAt" | "updatedAt" | "companyId" | "branchId", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   departmentRel?: boolean | Prisma.User$departmentRelArgs<ExtArgs>
   positionRel?: boolean | Prisma.User$positionRelArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  branch?: boolean | Prisma.User$branchArgs<ExtArgs>
   timeRecords?: boolean | Prisma.User$timeRecordsArgs<ExtArgs>
   reviewedRecords?: boolean | Prisma.User$reviewedRecordsArgs<ExtArgs>
   justifications?: boolean | Prisma.User$justificationsArgs<ExtArgs>
@@ -5403,11 +5854,13 @@ export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   departmentRel?: boolean | Prisma.User$departmentRelArgs<ExtArgs>
   positionRel?: boolean | Prisma.User$positionRelArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  branch?: boolean | Prisma.User$branchArgs<ExtArgs>
 }
 export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   departmentRel?: boolean | Prisma.User$departmentRelArgs<ExtArgs>
   positionRel?: boolean | Prisma.User$positionRelArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  branch?: boolean | Prisma.User$branchArgs<ExtArgs>
 }
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5416,6 +5869,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     departmentRel: Prisma.$DepartmentPayload<ExtArgs> | null
     positionRel: Prisma.$PositionPayload<ExtArgs> | null
     company: Prisma.$CompanyPayload<ExtArgs>
+    branch: Prisma.$BranchPayload<ExtArgs> | null
     timeRecords: Prisma.$TimeRecordPayload<ExtArgs>[]
     reviewedRecords: Prisma.$TimeRecordPayload<ExtArgs>[]
     justifications: Prisma.$JustificationPayload<ExtArgs>[]
@@ -5467,6 +5921,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt: Date
     updatedAt: Date
     companyId: string
+    branchId: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -5864,6 +6319,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   departmentRel<T extends Prisma.User$departmentRelArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$departmentRelArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   positionRel<T extends Prisma.User$positionRelArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$positionRelArgs<ExtArgs>>): Prisma.Prisma__PositionClient<runtime.Types.Result.GetResult<Prisma.$PositionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  branch<T extends Prisma.User$branchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$branchArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   timeRecords<T extends Prisma.User$timeRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$timeRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimeRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewedRecords<T extends Prisma.User$reviewedRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewedRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimeRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   justifications<T extends Prisma.User$justificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$justificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JustificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5942,6 +6398,7 @@ export interface UserFieldRefs {
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly companyId: Prisma.FieldRef<"User", 'String'>
+  readonly branchId: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -6378,6 +6835,25 @@ export type User$positionRelArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   include?: Prisma.PositionInclude<ExtArgs> | null
   where?: Prisma.PositionWhereInput
+}
+
+/**
+ * User.branch
+ */
+export type User$branchArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Branch
+   */
+  select?: Prisma.BranchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Branch
+   */
+  omit?: Prisma.BranchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BranchInclude<ExtArgs> | null
+  where?: Prisma.BranchWhereInput
 }
 
 /**

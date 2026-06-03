@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Company: 'Company',
+  Branch: 'Branch',
   Department: 'Department',
   Position: 'Position',
   User: 'User',
@@ -64,7 +65,8 @@ export const ModelName = {
   Integration: 'Integration',
   TermAcceptance: 'TermAcceptance',
   FaceRegistration: 'FaceRegistration',
-  MonthClosing: 'MonthClosing'
+  MonthClosing: 'MonthClosing',
+  CompanyConfig: 'CompanyConfig'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -92,6 +94,10 @@ export const CompanyScalarFieldEnum = {
   address: 'address',
   logo: 'logo',
   isActive: 'isActive',
+  plan: 'plan',
+  userLimit: 'userLimit',
+  contractAt: 'contractAt',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -99,13 +105,33 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const BranchScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  cnpj: 'cnpj',
+  address: 'address',
+  city: 'city',
+  state: 'state',
+  zip: 'zip',
+  phone: 'phone',
+  responsible: 'responsible',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  companyId: 'companyId'
+} as const
+
+export type BranchScalarFieldEnum = (typeof BranchScalarFieldEnum)[keyof typeof BranchScalarFieldEnum]
+
+
 export const DepartmentScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  slug: 'slug',
   active: 'active',
   order: 'order',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  companyId: 'companyId'
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
@@ -114,10 +140,10 @@ export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof
 export const PositionScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  slug: 'slug',
   active: 'active',
   departmentId: 'departmentId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  companyId: 'companyId'
 } as const
 
 export type PositionScalarFieldEnum = (typeof PositionScalarFieldEnum)[keyof typeof PositionScalarFieldEnum]
@@ -160,7 +186,8 @@ export const UserScalarFieldEnum = {
   refreshTokenVersion: 'refreshTokenVersion',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  companyId: 'companyId'
+  companyId: 'companyId',
+  branchId: 'branchId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -336,6 +363,22 @@ export const MonthClosingScalarFieldEnum = {
 } as const
 
 export type MonthClosingScalarFieldEnum = (typeof MonthClosingScalarFieldEnum)[keyof typeof MonthClosingScalarFieldEnum]
+
+
+export const CompanyConfigScalarFieldEnum = {
+  id: 'id',
+  logo: 'logo',
+  primaryColor: 'primaryColor',
+  requireGeo: 'requireGeo',
+  requireFace: 'requireFace',
+  defaultWeeklyHours: 'defaultWeeklyHours',
+  lunchDuration: 'lunchDuration',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  companyId: 'companyId'
+} as const
+
+export type CompanyConfigScalarFieldEnum = (typeof CompanyConfigScalarFieldEnum)[keyof typeof CompanyConfigScalarFieldEnum]
 
 
 export const SortOrder = {

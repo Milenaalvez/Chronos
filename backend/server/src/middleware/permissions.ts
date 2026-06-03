@@ -18,6 +18,7 @@ export function requirePermission(...required: Permission[]) {
         res.status(401).json({ error: 'Usuário não encontrado' })
         return
       }
+      if (user.role === 'SUPER_ADMIN') { next(); return }
       const perms = getEffectivePermissions(user.role, user.permissions as string[] | null, user.department)
       const hasAll = required.every((p) => perms.includes(p))
       if (!hasAll) {

@@ -7,7 +7,7 @@ export function requireRole(...roles: string[]) {
       res.status(401).json({ error: 'Não autenticado' })
       return
     }
-    if (req.user.role === 'DEVELOPER' || roles.includes(req.user.role)) {
+    if (req.user.role === 'SUPER_ADMIN' || req.user.role === 'DEVELOPER' || roles.includes(req.user.role)) {
       next()
       return
     }

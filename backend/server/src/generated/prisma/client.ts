@@ -47,6 +47,11 @@ export { Prisma }
  */
 export type Company = Prisma.CompanyModel
 /**
+ * Model Branch
+ * 
+ */
+export type Branch = Prisma.BranchModel
+/**
  * Model Department
  * 
  */
@@ -111,3 +116,8 @@ export type FaceRegistration = Prisma.FaceRegistrationModel
  * 
  */
 export type MonthClosing = Prisma.MonthClosingModel
+/**
+ * Model CompanyConfig
+ * 
+ */
+export type CompanyConfig = Prisma.CompanyConfigModel

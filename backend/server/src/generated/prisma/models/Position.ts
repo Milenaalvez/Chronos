@@ -27,28 +27,28 @@ export type AggregatePosition = {
 export type PositionMinAggregateOutputType = {
   id: string | null
   name: string | null
-  slug: string | null
   active: boolean | null
   departmentId: string | null
   createdAt: Date | null
+  companyId: string | null
 }
 
 export type PositionMaxAggregateOutputType = {
   id: string | null
   name: string | null
-  slug: string | null
   active: boolean | null
   departmentId: string | null
   createdAt: Date | null
+  companyId: string | null
 }
 
 export type PositionCountAggregateOutputType = {
   id: number
   name: number
-  slug: number
   active: number
   departmentId: number
   createdAt: number
+  companyId: number
   _all: number
 }
 
@@ -56,28 +56,28 @@ export type PositionCountAggregateOutputType = {
 export type PositionMinAggregateInputType = {
   id?: true
   name?: true
-  slug?: true
   active?: true
   departmentId?: true
   createdAt?: true
+  companyId?: true
 }
 
 export type PositionMaxAggregateInputType = {
   id?: true
   name?: true
-  slug?: true
   active?: true
   departmentId?: true
   createdAt?: true
+  companyId?: true
 }
 
 export type PositionCountAggregateInputType = {
   id?: true
   name?: true
-  slug?: true
   active?: true
   departmentId?: true
   createdAt?: true
+  companyId?: true
   _all?: true
 }
 
@@ -156,10 +156,10 @@ export type PositionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type PositionGroupByOutputType = {
   id: string
   name: string
-  slug: string
   active: boolean
   departmentId: string
   createdAt: Date
+  companyId: string | null
   _count: PositionCountAggregateOutputType | null
   _min: PositionMinAggregateOutputType | null
   _max: PositionMaxAggregateOutputType | null
@@ -186,28 +186,29 @@ export type PositionWhereInput = {
   NOT?: Prisma.PositionWhereInput | Prisma.PositionWhereInput[]
   id?: Prisma.StringFilter<"Position"> | string
   name?: Prisma.StringFilter<"Position"> | string
-  slug?: Prisma.StringFilter<"Position"> | string
   active?: Prisma.BoolFilter<"Position"> | boolean
   departmentId?: Prisma.StringFilter<"Position"> | string
   createdAt?: Prisma.DateTimeFilter<"Position"> | Date | string
+  companyId?: Prisma.StringNullableFilter<"Position"> | string | null
   department?: Prisma.XOR<Prisma.DepartmentScalarRelationFilter, Prisma.DepartmentWhereInput>
   users?: Prisma.UserListRelationFilter
+  company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
 }
 
 export type PositionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  slug?: Prisma.SortOrder
   active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   department?: Prisma.DepartmentOrderByWithRelationInput
   users?: Prisma.UserOrderByRelationAggregateInput
+  company?: Prisma.CompanyOrderByWithRelationInput
 }
 
 export type PositionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  slug?: string
   AND?: Prisma.PositionWhereInput | Prisma.PositionWhereInput[]
   OR?: Prisma.PositionWhereInput[]
   NOT?: Prisma.PositionWhereInput | Prisma.PositionWhereInput[]
@@ -215,17 +216,19 @@ export type PositionWhereUniqueInput = Prisma.AtLeast<{
   active?: Prisma.BoolFilter<"Position"> | boolean
   departmentId?: Prisma.StringFilter<"Position"> | string
   createdAt?: Prisma.DateTimeFilter<"Position"> | Date | string
+  companyId?: Prisma.StringNullableFilter<"Position"> | string | null
   department?: Prisma.XOR<Prisma.DepartmentScalarRelationFilter, Prisma.DepartmentWhereInput>
   users?: Prisma.UserListRelationFilter
-}, "id" | "slug">
+  company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
+}, "id">
 
 export type PositionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  slug?: Prisma.SortOrder
   active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PositionCountOrderByAggregateInput
   _max?: Prisma.PositionMaxOrderByAggregateInput
   _min?: Prisma.PositionMinOrderByAggregateInput
@@ -237,65 +240,64 @@ export type PositionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PositionScalarWhereWithAggregatesInput | Prisma.PositionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Position"> | string
   name?: Prisma.StringWithAggregatesFilter<"Position"> | string
-  slug?: Prisma.StringWithAggregatesFilter<"Position"> | string
   active?: Prisma.BoolWithAggregatesFilter<"Position"> | boolean
   departmentId?: Prisma.StringWithAggregatesFilter<"Position"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Position"> | Date | string
+  companyId?: Prisma.StringNullableWithAggregatesFilter<"Position"> | string | null
 }
 
 export type PositionCreateInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   createdAt?: Date | string
   department: Prisma.DepartmentCreateNestedOneWithoutPositionsInput
   users?: Prisma.UserCreateNestedManyWithoutPositionRelInput
+  company?: Prisma.CompanyCreateNestedOneWithoutPositionsInput
 }
 
 export type PositionUncheckedCreateInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   departmentId: string
   createdAt?: Date | string
+  companyId?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutPositionRelInput
 }
 
 export type PositionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   department?: Prisma.DepartmentUpdateOneRequiredWithoutPositionsNestedInput
   users?: Prisma.UserUpdateManyWithoutPositionRelNestedInput
+  company?: Prisma.CompanyUpdateOneWithoutPositionsNestedInput
 }
 
 export type PositionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutPositionRelNestedInput
 }
 
 export type PositionCreateManyInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   departmentId: string
   createdAt?: Date | string
+  companyId?: string | null
 }
 
 export type PositionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -303,10 +305,10 @@ export type PositionUpdateManyMutationInput = {
 export type PositionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PositionListRelationFilter = {
@@ -322,33 +324,75 @@ export type PositionOrderByRelationAggregateInput = {
 export type PositionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  slug?: Prisma.SortOrder
   active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
 }
 
 export type PositionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  slug?: Prisma.SortOrder
   active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
 }
 
 export type PositionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  slug?: Prisma.SortOrder
   active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
 }
 
 export type PositionNullableScalarRelationFilter = {
   is?: Prisma.PositionWhereInput | null
   isNot?: Prisma.PositionWhereInput | null
+}
+
+export type PositionCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.PositionCreateWithoutCompanyInput, Prisma.PositionUncheckedCreateWithoutCompanyInput> | Prisma.PositionCreateWithoutCompanyInput[] | Prisma.PositionUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.PositionCreateOrConnectWithoutCompanyInput | Prisma.PositionCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.PositionCreateManyCompanyInputEnvelope
+  connect?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+}
+
+export type PositionUncheckedCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.PositionCreateWithoutCompanyInput, Prisma.PositionUncheckedCreateWithoutCompanyInput> | Prisma.PositionCreateWithoutCompanyInput[] | Prisma.PositionUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.PositionCreateOrConnectWithoutCompanyInput | Prisma.PositionCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.PositionCreateManyCompanyInputEnvelope
+  connect?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+}
+
+export type PositionUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.PositionCreateWithoutCompanyInput, Prisma.PositionUncheckedCreateWithoutCompanyInput> | Prisma.PositionCreateWithoutCompanyInput[] | Prisma.PositionUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.PositionCreateOrConnectWithoutCompanyInput | Prisma.PositionCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.PositionUpsertWithWhereUniqueWithoutCompanyInput | Prisma.PositionUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.PositionCreateManyCompanyInputEnvelope
+  set?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  disconnect?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  delete?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  connect?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  update?: Prisma.PositionUpdateWithWhereUniqueWithoutCompanyInput | Prisma.PositionUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.PositionUpdateManyWithWhereWithoutCompanyInput | Prisma.PositionUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.PositionScalarWhereInput | Prisma.PositionScalarWhereInput[]
+}
+
+export type PositionUncheckedUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.PositionCreateWithoutCompanyInput, Prisma.PositionUncheckedCreateWithoutCompanyInput> | Prisma.PositionCreateWithoutCompanyInput[] | Prisma.PositionUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.PositionCreateOrConnectWithoutCompanyInput | Prisma.PositionCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.PositionUpsertWithWhereUniqueWithoutCompanyInput | Prisma.PositionUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.PositionCreateManyCompanyInputEnvelope
+  set?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  disconnect?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  delete?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  connect?: Prisma.PositionWhereUniqueInput | Prisma.PositionWhereUniqueInput[]
+  update?: Prisma.PositionUpdateWithWhereUniqueWithoutCompanyInput | Prisma.PositionUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.PositionUpdateManyWithWhereWithoutCompanyInput | Prisma.PositionUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.PositionScalarWhereInput | Prisma.PositionScalarWhereInput[]
 }
 
 export type PositionCreateNestedManyWithoutDepartmentInput = {
@@ -409,21 +453,77 @@ export type PositionUpdateOneWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PositionUpdateToOneWithWhereWithoutUsersInput, Prisma.PositionUpdateWithoutUsersInput>, Prisma.PositionUncheckedUpdateWithoutUsersInput>
 }
 
+export type PositionCreateWithoutCompanyInput = {
+  id?: string
+  name: string
+  active?: boolean
+  createdAt?: Date | string
+  department: Prisma.DepartmentCreateNestedOneWithoutPositionsInput
+  users?: Prisma.UserCreateNestedManyWithoutPositionRelInput
+}
+
+export type PositionUncheckedCreateWithoutCompanyInput = {
+  id?: string
+  name: string
+  active?: boolean
+  departmentId: string
+  createdAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutPositionRelInput
+}
+
+export type PositionCreateOrConnectWithoutCompanyInput = {
+  where: Prisma.PositionWhereUniqueInput
+  create: Prisma.XOR<Prisma.PositionCreateWithoutCompanyInput, Prisma.PositionUncheckedCreateWithoutCompanyInput>
+}
+
+export type PositionCreateManyCompanyInputEnvelope = {
+  data: Prisma.PositionCreateManyCompanyInput | Prisma.PositionCreateManyCompanyInput[]
+  skipDuplicates?: boolean
+}
+
+export type PositionUpsertWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.PositionWhereUniqueInput
+  update: Prisma.XOR<Prisma.PositionUpdateWithoutCompanyInput, Prisma.PositionUncheckedUpdateWithoutCompanyInput>
+  create: Prisma.XOR<Prisma.PositionCreateWithoutCompanyInput, Prisma.PositionUncheckedCreateWithoutCompanyInput>
+}
+
+export type PositionUpdateWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.PositionWhereUniqueInput
+  data: Prisma.XOR<Prisma.PositionUpdateWithoutCompanyInput, Prisma.PositionUncheckedUpdateWithoutCompanyInput>
+}
+
+export type PositionUpdateManyWithWhereWithoutCompanyInput = {
+  where: Prisma.PositionScalarWhereInput
+  data: Prisma.XOR<Prisma.PositionUpdateManyMutationInput, Prisma.PositionUncheckedUpdateManyWithoutCompanyInput>
+}
+
+export type PositionScalarWhereInput = {
+  AND?: Prisma.PositionScalarWhereInput | Prisma.PositionScalarWhereInput[]
+  OR?: Prisma.PositionScalarWhereInput[]
+  NOT?: Prisma.PositionScalarWhereInput | Prisma.PositionScalarWhereInput[]
+  id?: Prisma.StringFilter<"Position"> | string
+  name?: Prisma.StringFilter<"Position"> | string
+  active?: Prisma.BoolFilter<"Position"> | boolean
+  departmentId?: Prisma.StringFilter<"Position"> | string
+  createdAt?: Prisma.DateTimeFilter<"Position"> | Date | string
+  companyId?: Prisma.StringNullableFilter<"Position"> | string | null
+}
+
 export type PositionCreateWithoutDepartmentInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   createdAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutPositionRelInput
+  company?: Prisma.CompanyCreateNestedOneWithoutPositionsInput
 }
 
 export type PositionUncheckedCreateWithoutDepartmentInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   createdAt?: Date | string
+  companyId?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutPositionRelInput
 }
 
@@ -453,34 +553,22 @@ export type PositionUpdateManyWithWhereWithoutDepartmentInput = {
   data: Prisma.XOR<Prisma.PositionUpdateManyMutationInput, Prisma.PositionUncheckedUpdateManyWithoutDepartmentInput>
 }
 
-export type PositionScalarWhereInput = {
-  AND?: Prisma.PositionScalarWhereInput | Prisma.PositionScalarWhereInput[]
-  OR?: Prisma.PositionScalarWhereInput[]
-  NOT?: Prisma.PositionScalarWhereInput | Prisma.PositionScalarWhereInput[]
-  id?: Prisma.StringFilter<"Position"> | string
-  name?: Prisma.StringFilter<"Position"> | string
-  slug?: Prisma.StringFilter<"Position"> | string
-  active?: Prisma.BoolFilter<"Position"> | boolean
-  departmentId?: Prisma.StringFilter<"Position"> | string
-  createdAt?: Prisma.DateTimeFilter<"Position"> | Date | string
-}
-
 export type PositionCreateWithoutUsersInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   createdAt?: Date | string
   department: Prisma.DepartmentCreateNestedOneWithoutPositionsInput
+  company?: Prisma.CompanyCreateNestedOneWithoutPositionsInput
 }
 
 export type PositionUncheckedCreateWithoutUsersInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   departmentId: string
   createdAt?: Date | string
+  companyId?: string | null
 }
 
 export type PositionCreateOrConnectWithoutUsersInput = {
@@ -502,16 +590,50 @@ export type PositionUpdateToOneWithWhereWithoutUsersInput = {
 export type PositionUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   department?: Prisma.DepartmentUpdateOneRequiredWithoutPositionsNestedInput
+  company?: Prisma.CompanyUpdateOneWithoutPositionsNestedInput
 }
 
 export type PositionUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  departmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PositionCreateManyCompanyInput = {
+  id?: string
+  name: string
+  active?: boolean
+  departmentId: string
+  createdAt?: Date | string
+}
+
+export type PositionUpdateWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  department?: Prisma.DepartmentUpdateOneRequiredWithoutPositionsNestedInput
+  users?: Prisma.UserUpdateManyWithoutPositionRelNestedInput
+}
+
+export type PositionUncheckedUpdateWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  departmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutPositionRelNestedInput
+}
+
+export type PositionUncheckedUpdateManyWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -520,35 +642,35 @@ export type PositionUncheckedUpdateWithoutUsersInput = {
 export type PositionCreateManyDepartmentInput = {
   id?: string
   name: string
-  slug: string
   active?: boolean
   createdAt?: Date | string
+  companyId?: string | null
 }
 
 export type PositionUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutPositionRelNestedInput
+  company?: Prisma.CompanyUpdateOneWithoutPositionsNestedInput
 }
 
 export type PositionUncheckedUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutPositionRelNestedInput
 }
 
 export type PositionUncheckedUpdateManyWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -585,55 +707,61 @@ export type PositionCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.
 export type PositionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  slug?: boolean
   active?: boolean
   departmentId?: boolean
   createdAt?: boolean
+  companyId?: boolean
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
   users?: boolean | Prisma.Position$usersArgs<ExtArgs>
+  company?: boolean | Prisma.Position$companyArgs<ExtArgs>
   _count?: boolean | Prisma.PositionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["position"]>
 
 export type PositionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  slug?: boolean
   active?: boolean
   departmentId?: boolean
   createdAt?: boolean
+  companyId?: boolean
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.Position$companyArgs<ExtArgs>
 }, ExtArgs["result"]["position"]>
 
 export type PositionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  slug?: boolean
   active?: boolean
   departmentId?: boolean
   createdAt?: boolean
+  companyId?: boolean
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.Position$companyArgs<ExtArgs>
 }, ExtArgs["result"]["position"]>
 
 export type PositionSelectScalar = {
   id?: boolean
   name?: boolean
-  slug?: boolean
   active?: boolean
   departmentId?: boolean
   createdAt?: boolean
+  companyId?: boolean
 }
 
-export type PositionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "active" | "departmentId" | "createdAt", ExtArgs["result"]["position"]>
+export type PositionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "active" | "departmentId" | "createdAt" | "companyId", ExtArgs["result"]["position"]>
 export type PositionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
   users?: boolean | Prisma.Position$usersArgs<ExtArgs>
+  company?: boolean | Prisma.Position$companyArgs<ExtArgs>
   _count?: boolean | Prisma.PositionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PositionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.Position$companyArgs<ExtArgs>
 }
 export type PositionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.Position$companyArgs<ExtArgs>
 }
 
 export type $PositionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -641,14 +769,15 @@ export type $PositionPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     department: Prisma.$DepartmentPayload<ExtArgs>
     users: Prisma.$UserPayload<ExtArgs>[]
+    company: Prisma.$CompanyPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
-    slug: string
     active: boolean
     departmentId: string
     createdAt: Date
+    companyId: string | null
   }, ExtArgs["result"]["position"]>
   composites: {}
 }
@@ -1045,6 +1174,7 @@ export interface Prisma__PositionClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   department<T extends Prisma.DepartmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentDefaultArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   users<T extends Prisma.Position$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Position$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  company<T extends Prisma.Position$companyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Position$companyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1076,10 +1206,10 @@ export interface Prisma__PositionClient<T, Null = never, ExtArgs extends runtime
 export interface PositionFieldRefs {
   readonly id: Prisma.FieldRef<"Position", 'String'>
   readonly name: Prisma.FieldRef<"Position", 'String'>
-  readonly slug: Prisma.FieldRef<"Position", 'String'>
   readonly active: Prisma.FieldRef<"Position", 'Boolean'>
   readonly departmentId: Prisma.FieldRef<"Position", 'String'>
   readonly createdAt: Prisma.FieldRef<"Position", 'DateTime'>
+  readonly companyId: Prisma.FieldRef<"Position", 'String'>
 }
     
 
@@ -1502,6 +1632,25 @@ export type Position$usersArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+}
+
+/**
+ * Position.company
+ */
+export type Position$companyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Company
+   */
+  select?: Prisma.CompanySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Company
+   */
+  omit?: Prisma.CompanyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CompanyInclude<ExtArgs> | null
+  where?: Prisma.CompanyWhereInput
 }
 
 /**
