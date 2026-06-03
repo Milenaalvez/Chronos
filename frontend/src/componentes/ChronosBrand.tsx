@@ -4,18 +4,19 @@ interface ClockIconProps {
   className?: string
 }
 
-export function ClockIcon({ size = 48, accent, className }: ClockIconProps) {
+export function ClockIcon({ size = 48, accent: _accent, className }: ClockIconProps) {
   return (
-    <svg viewBox="0 0 48 48" width={size} height={size} className={className} fill="none">
-      <circle cx="24" cy="24" r="21" stroke={accent || "currentColor"} strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="18.5" stroke={accent || "currentColor"} strokeWidth="0.75" opacity="0.4" />
-      <line x1="24" y1="6" x2="24" y2="10" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
-      <line x1="42" y1="24" x2="38" y2="24" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
-      <line x1="24" y1="42" x2="24" y2="38" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
-      <line x1="6" y1="24" x2="10" y2="24" stroke={accent || "currentColor"} strokeWidth="2" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="24" y2="15" stroke={accent || "currentColor"} strokeWidth="3" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="31" y2="24" stroke={accent || "currentColor"} strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="3" fill={accent || "currentColor"} />
+    <svg viewBox="0 0 48 48" width={size} height={size} className={className}>
+      <defs>
+        <filter id="clock-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#3B82F6" floodOpacity="0.35" />
+        </filter>
+      </defs>
+      <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#F0F3FA" strokeWidth="2" filter="url(#clock-glow)" />
+      <circle cx="24" cy="24" r="19" stroke="#F0F3FA" strokeWidth="0.5" opacity="0.15" />
+      <line x1="24" y1="24" x2="24" y2="12" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="18" y2="18" stroke="#F0F3FA" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="24" cy="24" r="2.5" fill="#F0F3FA" />
     </svg>
   )
 }
@@ -75,16 +76,12 @@ export function ChronosBrand({ size = "md", variant = "horizontal", dark = true,
 
 export function FaviconSvg({ size = 32 }: { size?: number }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <circle cx="24" cy="24" r="21" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="18.5" stroke="#3B82F6" strokeWidth="0.75" opacity="0.4" />
-      <line x1="24" y1="6" x2="24" y2="10" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
-      <line x1="42" y1="24" x2="38" y2="24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
-      <line x1="24" y1="42" x2="24" y2="38" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
-      <line x1="6" y1="24" x2="10" y2="24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="24" y2="15" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="31" y2="24" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="3" fill="#3B82F6" />
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#F0F3FA" strokeWidth="2" />
+      <circle cx="24" cy="24" r="19" stroke="#F0F3FA" strokeWidth="0.5" opacity="0.15" />
+      <line x1="24" y1="24" x2="24" y2="12" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="18" y2="18" stroke="#F0F3FA" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="24" cy="24" r="2.5" fill="#F0F3FA" />
     </svg>
   )
 }

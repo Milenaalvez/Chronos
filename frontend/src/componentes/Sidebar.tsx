@@ -218,17 +218,13 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
         {/* Logo + collapse */}
         <div className={`flex items-center gap-3 px-8 pt-10 pb-7 ${collapsed ? "justify-center px-0" : ""}`}>
           {collapsed ? (
-            <div className="relative w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ boxShadow: '0 0 20px color-mix(in srgb, var(--accent-primary) 35%, transparent)' }}>
-              <svg viewBox="0 0 48 48" className="w-full h-full" fill="none">
-                <circle cx="24" cy="24" r="21" stroke="#60A5FA" strokeWidth="2.5" strokeLinecap="round" />
-                <circle cx="24" cy="24" r="18.5" stroke="#60A5FA" strokeWidth="0.75" opacity="0.4" />
-                <line x1="24" y1="6" x2="24" y2="10" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" />
-                <line x1="42" y1="24" x2="38" y2="24" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" />
-                <line x1="24" y1="42" x2="24" y2="38" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" />
-                <line x1="6" y1="24" x2="10" y2="24" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" />
-                <line x1="24" y1="24" x2="24" y2="15" stroke="#60A5FA" strokeWidth="3" strokeLinecap="round" />
-                <line x1="24" y1="24" x2="31" y2="24" stroke="#60A5FA" strokeWidth="2.5" strokeLinecap="round" />
-                <circle cx="24" cy="24" r="3" fill="#60A5FA" />
+            <div className="relative w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ boxShadow: '0 0 20px color-mix(in srgb, #60A5FA 35%, transparent)' }}>
+              <svg viewBox="0 0 48 48" className="w-full h-full">
+                <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#F0F3FA" strokeWidth="2" />
+                <circle cx="24" cy="24" r="19" stroke="#F0F3FA" strokeWidth="0.5" opacity="0.15" />
+                <line x1="24" y1="24" x2="24" y2="12" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="24" y1="24" x2="18" y2="18" stroke="#F0F3FA" strokeWidth="2" strokeLinecap="round" />
+                <circle cx="24" cy="24" r="2.5" fill="#F0F3FA" />
               </svg>
             </div>
           ) : (
