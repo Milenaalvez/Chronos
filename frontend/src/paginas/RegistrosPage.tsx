@@ -359,7 +359,7 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
             {filtered.map((r) => {
               const just = justificacoes[r.dataISO]
               const statusInfo = getStatusInfo(r, just)
-              const isPending = r.tipo === "Pendente"
+              const semBatida = r.tipo === "Pendente" && r.entrada === "---"
               return (
                 <tr
                   key={r.id}
@@ -367,20 +367,20 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
                 >
                   <td className="py-3 pr-4">
                     <div className="flex flex-col">
-                      <span className={`text-sm font-medium ${isPending ? "text-[#C49A6B]" : "text-primary"}`}>
+                      <span className={`text-sm font-medium ${semBatida ? "text-[#C49A6B]" : "text-primary"}`}>
                         {r.data}
                       </span>
                       <span className="text-[10px] text-muted">{r.dataISO}</span>
                     </div>
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <span className={`text-sm font-mono tracking-wide ${isPending ? "text-muted" : "text-secondary"}`}>
-                      {isPending ? "---" : r.entrada}
+                    <span className={`text-sm font-mono tracking-wide ${semBatida ? "text-muted" : "text-secondary"}`}>
+                      {semBatida ? "---" : r.entrada}
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <div className={`flex flex-col items-center gap-0.5 ${isPending ? "text-muted" : "text-secondary"}`}>
-                      {isPending ? (
+                    <div className={`flex flex-col items-center gap-0.5 ${semBatida ? "text-muted" : "text-secondary"}`}>
+                      {semBatida ? (
                         <span className="text-sm font-mono tracking-wide">---</span>
                       ) : (
                         <>
@@ -391,18 +391,18 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
                     </div>
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <span className={`text-sm font-mono tracking-wide ${isPending ? "text-muted" : "text-secondary"}`}>
-                      {isPending ? "---" : r.saida}
+                    <span className={`text-sm font-mono tracking-wide ${semBatida ? "text-muted" : "text-secondary"}`}>
+                      {semBatida ? "---" : r.saida}
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <span className={`text-sm font-mono font-semibold ${isPending ? "text-muted" : "text-primary"}`}>
-                      {isPending ? "---" : r.total}
+                    <span className={`text-sm font-mono font-semibold ${semBatida ? "text-muted" : "text-primary"}`}>
+                      {semBatida ? "---" : r.total}
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusInfo.bg} ${statusInfo.color}`}>
-                      {isPending ? "Pendente" : r.tipo}
+                      {r.tipo === "Pendente" && semBatida ? "Pendente" : r.tipo}
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">
@@ -426,7 +426,7 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
                         >
                           <Eye size={12} strokeWidth={2} />
                         </button>
-                      {isPending && !just && (
+                      {semBatida && !just && (
                         <button
                           onClick={() => handleJustificarClick(r.dataISO)}
                           className="w-7 h-7 rounded flex items-center justify-center text-muted hover:text-[#5B9B7A] hover:bg-[#5B9B7A]/8 transition-all duration-200"
