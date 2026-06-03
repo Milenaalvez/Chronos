@@ -612,7 +612,7 @@ export default function App() {
         return <ConfiguracoesPage userId={user?.id} user={user ?? undefined} onAvatarUpdate={(url) => setUser((prev) => prev ? { ...prev, avatar: url } : prev)} />
       case "registrar-ponto":
       case "ponto-registrar":
-        return <RegistrarPontoPage user={user ?? undefined} onPointCreated={() => apiRecords.list().then((data) => setRecords(data.map(apiRecordToTimeRecord)))} />
+        return <RegistrarPontoPage user={user ?? undefined} onPointCreated={() => apiRecords.list().then((data) => setRecords(data.map(apiRecordToTimeRecord))).catch((err) => console.warn('[App] onPointCreated: erro ao atualizar registros:', err))} />
       case "ponto-meus-registros":
         return (
           <MeusRegistrosPage

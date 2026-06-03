@@ -348,16 +348,16 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
 
       const hasPhoto = !!capturedPhoto
 
-      // Face verification already done inside modal — use the match result
       let faceVerified: boolean | null = null
       if (faceRegistered && faceDescriptors && capturedPhoto) {
-        // Modal already verified, but we store that verification took place
         faceVerified = true
       }
 
       if (!locData) {
         throw new Error("Localização não disponível. Ative o GPS e tente novamente.")
       }
+
+      console.log('[Ponto] Enviando ponto:', { selectedType, formattedTime, hasPhoto, locData: !!locData })
 
       await apiPointRecords.create({
         pointType: selectedType,
@@ -375,11 +375,16 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
         faceVerified,
       })
 
+      console.log('[Ponto] Ponto salvo com sucesso')
+
       setSuccessMsg(POINT_CONFIG[selectedType].label)
       setSelectedType(null)
       setModalOpen(false)
       await fetchEvents()
       onPointCreated?.()
+    } catch (err: any) {
+      console.error('[Ponto] Erro ao salvar ponto:', err)
+      setError(err?.message || 'Erro ao registrar ponto')
     } finally {
       setRecording(false)
     }
