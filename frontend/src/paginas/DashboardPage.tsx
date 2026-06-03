@@ -116,7 +116,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-x sm:divide-y-0 divide-default/3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-x sm:divide-y-0 divide-slate-800/30">
         <StatsCard
           icon={TrendingUp}
           title="Saldo de Horas"
@@ -150,7 +150,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
       <div className="bg-elevated/50 h-px" />
 
       <div className="flex flex-col lg:flex-row">
-        <div className="flex-1 min-w-0 pb-6 lg:pb-0 lg:pr-8 lg:border-r border-default/3 lg:last:border-r-0">
+        <div className="flex-1 min-w-0 pb-6 lg:pb-0 lg:pr-8 lg:border-r border-slate-800/30 lg:last:border-r-0">
           <ChartCard title="Evolução do Banco de Horas" subtitle="Saldo acumulado por semana" insight={evolutionInsight}>
             <LineChart data={weekEvolution} />
           </ChartCard>
@@ -172,7 +172,7 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
       <div className="bg-elevated/50 h-px" />
 
       <div className="flex flex-col lg:flex-row">
-        <div className="flex-1 min-w-0 pb-6 lg:pb-0 lg:pr-8 lg:border-r border-default/3 lg:last:border-r-0">
+        <div className="flex-1 min-w-0 pb-6 lg:pb-0 lg:pr-8 lg:border-r border-slate-800/30 lg:last:border-r-0">
           <RecentRecords records={allRecords} onEdit={onEdit} onNavigate={onNavigate} />
         </div>
         <div className="flex-1 min-w-0 pt-6 lg:pt-0 lg:pl-8">
