@@ -26,38 +26,38 @@
 
 ## Funcionalidades
 
-### 📌 Registro de Ponto
+###  Registro de Ponto
 - Marcação de entrada, almoço (início/fim) e saída
 - Verificação facial opcional com **face-api.js**
 - Captura de foto via webcam
 - Geolocalização (latitude, longitude, endereço) via navegador
 - Informações de dispositivo (IP, navegador, OS, timezone)
 
-### 👥 Gestão de Equipe
+### Gestão de Equipe
 - CRUD completo de colaboradores
 - Controle de cargos, departamentos e contratos (CLT, PJ, Estágio)
 - Permissões granulares por usuário
 - Métricas em tempo real (presentes, atrasados, ausentes)
 - Histórico de atividades por colaborador
 
-### 📊 Relatórios
+###  Relatórios
 - Relatório consolidado mensal com filtros (departamento, cargo, colaborador, status)
 - Fechamento mensal (abrir/fechar períodos)
 - Exportação para **PDF** (jsPDF) e **Excel** (SheetJS)
 - Log de auditoria
 
-### 📅 Calendário
+###  Calendário
 - Visualização mensal dos registros em calendário (FullCalendar)
 - Código de cores por status (Normal, Extra, Falta, Pendente)
 - Edição rápida e justificativa
 
-### 🔔 Notificações Inteligentes
+###  Notificações Inteligentes
 - Scheduler automático (verificação a cada 1h)
 - Alertas: face pendente, almoço não registrado, atraso, hora extra, falta de entrada/saída
 - Resolução automática de notificações resolvidas
 - Tipos: INFO, WARNING, APPROVAL, SECURITY
 
-### 🔐 Autenticação e Segurança
+###  Autenticação e Segurança
 - Login com email/senha ou Google OAuth (via Supabase)
 - JWT + Refresh Token (com "lembrar-me")
 - Verificação de email obrigatória
@@ -65,17 +65,17 @@
 - Impersonação de usuários (DEVELOPER)
 - Senha com bcrypt (10 rounds)
 
-### ⚙️ Configurações
+###  Configurações
 - Perfil do usuário (nome, email, telefone, CPF, endereço, data de nascimento)
 - Upload de avatar
 - Tema (claro/escuro/sistema) e cor de destaque
 
 ### Outros
-- 📄 Gestão de documentos por colaborador
-- 🏖️ Controle de férias
-- 📝 Justificativas de ausência com fluxo de aprovação
-- 🗺️ Mapa interativo com Leaflet
-- 🧠 Detecção de diagnóstico (dev only)
+-  Gestão de documentos por colaborador
+-  Controle de férias
+-  Justificativas de ausência com fluxo de aprovação
+-  Mapa interativo com Leaflet
+-  Detecção de diagnóstico (dev only)
 
 ---
 
