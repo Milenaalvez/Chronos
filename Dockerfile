@@ -7,7 +7,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --include=dev
 
 # Prisma
-COPY backend/prisma.config.ts ./
+COPY backend/prisma.config.ts ./backend/prisma.config.ts
 COPY backend/prisma ./backend/prisma
 RUN npx prisma generate --config=backend/prisma.config.ts
 
