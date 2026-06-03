@@ -6,17 +6,11 @@ interface ClockIconProps {
 
 export function ClockIcon({ size = 48, accent: _accent, className }: ClockIconProps) {
   return (
-    <svg viewBox="0 0 48 48" width={size} height={size} className={className}>
-      <defs>
-        <filter id="clock-glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#60A5FA" floodOpacity="0.35" />
-        </filter>
-      </defs>
-      <circle cx="24" cy="24" r="22" fill="#0A1628" />
-      <circle cx="24" cy="24" r="22" fill="none" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" strokeDasharray="129 9" strokeDashoffset="13" filter="url(#clock-glow)" />
-      <line x1="24" y1="24" x2="24" y2="13" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="33" y2="24" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="2" fill="#FFFFFF" />
+    <svg viewBox="0 0 48 48" width={size} height={size} className={className} fill="none">
+      <circle cx="24" cy="24" r="21" stroke="#B1C9EF" strokeWidth="2.5" strokeDasharray="118 14" strokeDashoffset="16" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="24" y2="14" stroke="#F0F3FA" strokeWidth="3" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="33" y2="24" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
+      <circle cx="24" cy="24" r="3" fill="#F0F3FA" />
     </svg>
   )
 }
@@ -76,12 +70,11 @@ export function ChronosBrand({ size = "md", variant = "horizontal", dark = true,
 
 export function FaviconSvg({ size = 32 }: { size?: number }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48">
-      <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#F0F3FA" strokeWidth="2" />
-      <circle cx="24" cy="24" r="19" stroke="#F0F3FA" strokeWidth="0.5" opacity="0.15" />
-      <line x1="24" y1="24" x2="24" y2="12" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="24" y1="24" x2="18" y2="18" stroke="#F0F3FA" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="24" cy="24" r="2.5" fill="#F0F3FA" />
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="21" stroke="#B1C9EF" strokeWidth="2.5" strokeDasharray="118 14" strokeDashoffset="16" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="24" y2="14" stroke="#F0F3FA" strokeWidth="3" strokeLinecap="round" />
+      <line x1="24" y1="24" x2="33" y2="24" stroke="#F0F3FA" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
+      <circle cx="24" cy="24" r="3" fill="#F0F3FA" />
     </svg>
   )
 }
