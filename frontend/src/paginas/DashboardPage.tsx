@@ -149,13 +149,13 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
       <div className="bg-elevated/50 h-px" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        <div className="flex flex-col gap-5 min-w-0">
+      <div className="flex flex-col lg:flex-row">
+        <div className="flex-1 min-w-0 pb-6 lg:pb-0 lg:pr-8 lg:border-r border-default/10 lg:last:border-r-0">
           <ChartCard title="Evolução do Banco de Horas" subtitle="Saldo acumulado por semana" insight={evolutionInsight}>
             <LineChart data={weekEvolution} />
           </ChartCard>
         </div>
-        <div className="flex flex-col gap-5 min-w-0">
+        <div className="flex-1 min-w-0 pt-6 lg:pt-0 lg:pl-8">
           <ChartCard title="Distribuição de Horas" subtitle="Total do período atual">
             <DonutChart
               segments={[
@@ -171,9 +171,13 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
       <div className="bg-elevated/50 h-px" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        <RecentRecords records={allRecords} onEdit={onEdit} onNavigate={onNavigate} />
-        <MetaSemanal weekDays={weekDays} monthTotalMins={monthStats.totalMins} monthRecords={monthRecordsStrict} />
+      <div className="flex flex-col lg:flex-row">
+        <div className="flex-1 min-w-0 pb-6 lg:pb-0 lg:pr-8 lg:border-r border-default/10 lg:last:border-r-0">
+          <RecentRecords records={allRecords} onEdit={onEdit} onNavigate={onNavigate} />
+        </div>
+        <div className="flex-1 min-w-0 pt-6 lg:pt-0 lg:pl-8">
+          <MetaSemanal weekDays={weekDays} monthTotalMins={monthStats.totalMins} monthRecords={monthRecordsStrict} />
+        </div>
       </div>
     </div>
   )
