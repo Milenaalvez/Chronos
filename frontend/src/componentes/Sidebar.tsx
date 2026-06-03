@@ -220,7 +220,8 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
           {collapsed ? (
             <div className="relative w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ boxShadow: '0 0 20px color-mix(in srgb, #60A5FA 35%, transparent)' }}>
               <svg viewBox="0 0 48 48" className="w-full h-full">
-                <circle cx="24" cy="24" r="22" fill="#0A1628" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="24" cy="24" r="22" fill="#0A1628" />
+                <circle cx="24" cy="24" r="22" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="129 9" strokeDashoffset="99" />
                 <line x1="24" y1="24" x2="24" y2="13" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
                 <line x1="24" y1="24" x2="33" y2="24" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" />
                 <circle cx="24" cy="24" r="2" fill="#FFFFFF" />
