@@ -76,7 +76,6 @@ export function ChronosBrand({ size = "md", variant = "horizontal", dark = true,
 export function FaviconSvg({ size = 32 }: { size?: number }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <rect width="48" height="48" rx="8" fill="#081528" />
       <circle cx="24" cy="24" r="21" stroke="#3B82F6" strokeWidth="2" strokeDasharray="125 7" strokeDashoffset="3" strokeLinecap="round" />
       <circle cx="24" cy="24" r="18.5" stroke="#3B82F6" strokeWidth="0.5" opacity="0.3" />
       <line x1="24" y1="6" x2="24" y2="9.5" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
