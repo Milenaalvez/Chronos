@@ -56,28 +56,34 @@ app.get('/api/diagnostics/smtp', async (_req, res) => {
     host: env.smtpHost || null,
     user: env.smtpUser || null,
     from: env.smtpFrom || null,
-    port: env.smtpPort,
+    ports: {},
   }
 
   if (!hasSmtp) {
-    result.error = 'SMTP não configurado — envie SMTP_HOST, SMTP_USER e SMTP_PASS no .env'
+    result.error = 'SMTP não configurado'
     return res.json(result)
   }
 
-  const transporter = nodemailer.createTransport({
-    host: env.smtpHost,
-    port: env.smtpPort,
-    secure: env.smtpPort === 465,
-    auth: { user: env.smtpUser, pass: env.smtpPass },
-  })
-
-  try {
-    await transporter.verify()
-    result.verified = true
-    result.message = 'Conexão SMTP OK'
-  } catch (err: any) {
-    result.verified = false
-    result.error = err.message
+  for (const port of [587, 465]) {
+    const test: any = { port, secure: port === 465 }
+    const transport = nodemailer.createTransport({
+      host: env.smtpHost,
+      port,
+      secure: port === 465,
+      auth: { user: env.smtpUser, pass: env.smtpPass },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+    })
+    try {
+      await transport.verify()
+      test.ok = true
+    } catch (err: any) {
+      test.ok = false
+      test.error = err.message?.split('\n')[0] || err.message
+    }
+    transport.close()
+    result.ports[port] = test
   }
 
   res.json(result)
