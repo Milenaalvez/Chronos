@@ -8,7 +8,7 @@ import ptBrLocale from "@fullcalendar/core/locales/pt-br"
 import type { EventClickArg, EventContentArg, DatesSetArg } from "@fullcalendar/core"
 import type { EventInput } from "@fullcalendar/core"
 import {
-  ChevronLeft, ChevronRight, Clock, CalendarCheck, AlertTriangle, TrendingUp,
+  ChevronLeft, ChevronRight, Clock, CalendarCheck, AlertTriangle, TrendingUp, ShieldCheck,
   LogIn, LogOut, Coffee, Undo2, X,
 } from "lucide-react"
 import type { TimeRecord, Justificacao, PageAction } from "../types"
@@ -177,6 +177,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
   }, [daysInMonth])
 
   const absences = useMemo(() => computeAbsences(allRecords, monthWeekdayISOs, justificacoes), [allRecords, monthWeekdayISOs, justificacoes])
+  const abonosCount = useMemo(() => Object.values(justificacoes).filter(j => j.status === "aprovado").length, [justificacoes])
 
   const saldoMonthRecords = useMemo(() => filterMonthRecords(allRecords, monthBounds), [allRecords, monthBounds])
   const saldoData = useMemo(() => computeSaldo(saldoMonthRecords, justificacoes), [saldoMonthRecords, justificacoes])
@@ -188,7 +189,8 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
     { label: "Horas Extras", value: formatMinutes(monthStats.extraMins), color: "text-purple-400", bg: "bg-purple-500/8", icon: TrendingUp },
     { label: "Dias Trabalhados", value: `${monthStats.workedDays}`, color: "text-green-400", bg: "bg-green-500/8", icon: CalendarCheck },
     { label: "Faltas", value: `${absences.faltasCount}`, color: absences.faltasCount > 0 ? "text-red-400" : "text-green-400", bg: absences.faltasCount > 0 ? "bg-red-500/8" : "bg-green-500/8", icon: AlertTriangle },
-  ], [monthStats, saldoMins, absences])
+    { label: "Abonos", value: `${abonosCount}`, color: "text-emerald-400", bg: "bg-emerald-500/8", icon: ShieldCheck },
+  ], [monthStats, saldoMins, absences, abonosCount])
 
   function handleEventClick(arg: EventClickArg) {
     const iso = arg.event.startStr.split("T")[0]
