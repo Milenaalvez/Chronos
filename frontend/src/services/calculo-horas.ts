@@ -91,26 +91,14 @@ export function computeSaldo(records: TimeRecord[], justificacoes: Record<string
   for (const r of records) {
     if (r.tipo === "Pendente") {
       if (r.entrada !== "---") {
-        const j = justificacoes[r.dataISO]
-        if (j && j.status === "aprovado") {
-          totalAbsences++
-          justifiedAbsences++
-        }
         const mins = Math.round(r.totalHours * 60)
         totalWorkedMins += mins
-        const saldo = mins - STD_DAY_MINS
-        if (saldo > 0) {
-          positiveMins += saldo
-          extraMins += saldo
-        } else if (saldo < 0) {
-          negativeMins += Math.abs(saldo)
-        }
         const idx = dayIndex.size
         dayIndex.set(r.dataISO, idx)
         dailyList.push({
           iso: r.dataISO,
           label: r.dataISO.slice(8, 10) + "/" + r.dataISO.slice(5, 7),
-          saldo,
+          saldo: 0,
         })
         continue
       }
