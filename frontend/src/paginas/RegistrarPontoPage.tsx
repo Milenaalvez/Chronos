@@ -22,7 +22,8 @@ function nowTime(): number {
 }
 
 function todayISO(): string {
-  return new Date().toISOString().split("T")[0]
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
 }
 
 function getDeviceInfo(): DeviceInfo {
@@ -362,6 +363,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
       await apiPointRecords.create({
         pointType: selectedType,
         timeValue: formattedTime,
+        date: todayISO(),
         latitude: locData.latitude,
         longitude: locData.longitude,
         locationAccuracy: locData.accuracy,
@@ -394,6 +396,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
     setSelectedType(type)
     setError(null)
     setSuccessMsg(null)
+    setLocationModalOpen(false)
     setModalOpen(true)
   }, [])
 

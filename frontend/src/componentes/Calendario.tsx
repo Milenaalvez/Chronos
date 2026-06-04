@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react"
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
 import timeGridPlugin from "@fullcalendar/timegrid"
@@ -9,12 +9,11 @@ import type { EventClickArg, EventContentArg, DatesSetArg } from "@fullcalendar/
 import type { EventInput } from "@fullcalendar/core"
 import {
   ChevronLeft, ChevronRight, Clock, CalendarCheck, AlertTriangle, TrendingUp, ShieldCheck,
-  LogIn, LogOut, Coffee, Undo2, X,
+  LogIn, LogOut, Coffee, Undo2, X, CheckCircle2, Loader2,
 } from "lucide-react"
 import type { TimeRecord, Justificacao, PageAction } from "../types"
 import { formatMinutes } from "../types"
 import { PageHeader } from "./PageHeader"
-import { RegisterModal } from "./RegisterModal"
 import { JustificacaoModal } from "./JustificacaoModal"
 import type { FormData } from "../types"
 import { computeSaldo, computeMonthStats, filterMonthRecordsStrict, filterMonthRecords, computeDayBalanceMins, computeAbsences } from "../services/workHoursEngine"
@@ -30,7 +29,10 @@ interface CalendarioProps {
   onClearAction?: () => void
 }
 
-const todayISO = () => new Date().toISOString().split("T")[0]
+const todayISO = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
 const today = todayISO()
 const STD_DAY_MINS = 480
 
@@ -39,12 +41,13 @@ const WEEKDAY_NAMES = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira
 export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onSave, justificacoes, onJustificar, pageAction, onClearAction }: CalendarioProps) {
   const calendarRef = useRef<FullCalendar>(null)
   const [selectedISO, setSelectedISO] = useState<string | null>(null)
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [editDate, setEditDate] = useState<string | undefined>(undefined)
   const [justificarOpen, setJustificarOpen] = useState(false)
   const [justificarDate, setJustificarDate] = useState("")
   const [currentTitle, setCurrentTitle] = useState("")
   const [view, setView] = useState("dayGridMonth")
+  const [editMode, setEditMode] = useState(false)
+  const [editForm, setEditForm] = useState<{ entrada: string; saidaIntervalo: string; retornoIntervalo: string; saida: string } | null>(null)
+  const [saving, setSaving] = useState(false)
 
   function getRecord(iso: string) {
     return allRecords.find((r) => r.dataISO === iso) ?? null
@@ -229,11 +232,38 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
     if ((!rec || rec.tipo === "Pendente") && iso <= today) {
       setJustificarDate(iso)
       setJustificarOpen(true)
-    } else {
-      setEditDate(iso)
-      setEditModalOpen(true)
+    } else if (rec) {
+      const now = new Date()
+      const nowStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+      setEditForm({
+        entrada: rec.entrada !== "---" ? rec.entrada : nowStr,
+        saidaIntervalo: rec.saidaIntervalo !== "---" ? rec.saidaIntervalo : "",
+        retornoIntervalo: rec.retornoIntervalo !== "---" ? rec.retornoIntervalo : "",
+        saida: rec.saida !== "---" ? rec.saida : "",
+      })
+      setEditMode(true)
     }
   }
+
+  const handleSaveInline = useCallback(() => {
+    if (!selectedISO || !editForm) return
+    setSaving(true)
+    onSave({
+      data: selectedISO,
+      entrada: editForm.entrada,
+      saidaIntervalo: editForm.saidaIntervalo,
+      retornoIntervalo: editForm.retornoIntervalo,
+      saida: editForm.saida,
+    })
+    setEditMode(false)
+    setEditForm(null)
+    setSaving(false)
+  }, [selectedISO, editForm, onSave])
+
+  const handleCancelEdit = useCallback(() => {
+    setEditMode(false)
+    setEditForm(null)
+  }, [])
 
   useEffect(() => {
     if (pageAction?.type === "selectDay" && pageAction.payload?.dataISO) {
@@ -261,15 +291,15 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
 
   function DayEvents({ record }: { record: TimeRecord }) {
     if (!record || record.tipo === "Pendente") return null
-    const events: { icon: any; label: string; time: string; color: string }[] = []
+    const events: { icon: any; label: string; time: string; color: string; key: string }[] = []
     if (record.entrada && record.entrada !== "---")
-      events.push({ icon: LogIn, label: "Entrada", time: record.entrada, color: "text-green-400" })
+      events.push({ icon: LogIn, label: "Entrada", time: record.entrada, color: "text-green-400", key: "entrada" })
     if (record.saidaIntervalo && record.saidaIntervalo !== "---")
-      events.push({ icon: Coffee, label: "Intervalo", time: record.saidaIntervalo, color: "text-yellow-400" })
+      events.push({ icon: Coffee, label: "Intervalo", time: record.saidaIntervalo, color: "text-yellow-400", key: "saidaIntervalo" })
     if (record.retornoIntervalo && record.retornoIntervalo !== "---")
-      events.push({ icon: Undo2, label: "Retorno", time: record.retornoIntervalo, color: "text-blue-400" })
+      events.push({ icon: Undo2, label: "Retorno", time: record.retornoIntervalo, color: "text-blue-400", key: "retornoIntervalo" })
     if (record.saida && record.saida !== "---")
-      events.push({ icon: LogOut, label: "Saída", time: record.saida, color: "text-red-400" })
+      events.push({ icon: LogOut, label: "Saída", time: record.saida, color: "text-red-400", key: "saida" })
     return (
       <div className="space-y-2 mt-1">
         {events.map((e, i) => (
@@ -281,6 +311,41 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
             <span className="text-[12px] font-mono font-bold text-primary">{e.time}</span>
           </div>
         ))}
+      </div>
+    )
+  }
+
+  function EditableDayEvents({ record, form, onChange }: { record: TimeRecord; form: { entrada: string; saidaIntervalo: string; retornoIntervalo: string; saida: string }; onChange: (field: string, value: string) => void }) {
+    if (!record) return null
+    const fields: { icon: any; label: string; value: string; color: string; key: string; readonly: boolean }[] = [
+      { icon: LogIn, label: "Entrada", value: form.entrada, color: "text-green-400", key: "entrada", readonly: true },
+      { icon: Coffee, label: "Intervalo", value: form.saidaIntervalo, color: "text-yellow-400", key: "saidaIntervalo", readonly: false },
+      { icon: Undo2, label: "Retorno", value: form.retornoIntervalo, color: "text-blue-400", key: "retornoIntervalo", readonly: false },
+      { icon: LogOut, label: "Saída", value: form.saida, color: "text-red-400", key: "saida", readonly: false },
+    ]
+    return (
+      <div className="space-y-2 mt-1">
+        {fields.map((f, i) => {
+          const locked = !f.value || f.value === "---" ? false : f.readonly
+          return (
+            <div key={i} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg ${locked ? "bg-elevated/40" : "bg-blue-500/5 border border-blue-500/20"}`}>
+              <div className={`w-6 h-6 rounded flex items-center justify-center ${f.color.replace("text-", "bg-")}/10`}>
+                <f.icon size={11} className={f.color} />
+              </div>
+              <span className="text-[11px] font-semibold text-secondary flex-1">{f.label}</span>
+              {locked ? (
+                <span className="text-[12px] font-mono font-bold text-primary">{f.value}</span>
+              ) : (
+                <input
+                  type="time"
+                  value={f.value || ""}
+                  onChange={(e) => onChange(f.key, e.target.value)}
+                  className="w-24 h-7 px-2 rounded-lg bg-surface border border-blue-500/30 text-[12px] font-mono font-bold text-primary outline-none focus:border-blue-400 transition-all"
+                />
+              )}
+            </div>
+          )
+        })}
       </div>
     )
   }
@@ -608,7 +673,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
                   <h3 className="text-sm font-bold text-primary tracking-tight">{dayDetail.label}</h3>
                 </div>
               </div>
-              <button onClick={() => setSelectedISO(null)} className="w-6 h-6 rounded flex items-center justify-center text-muted hover:text-primary hover:bg-elevated/50 transition-all">
+              <button onClick={() => { setSelectedISO(null); setEditMode(false); setEditForm(null) }} className="w-6 h-6 rounded flex items-center justify-center text-muted hover:text-primary hover:bg-elevated/50 transition-all">
                 <X size={12} />
               </button>
             </div>
@@ -646,12 +711,26 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
               </div>
             )}
 
-            {dayDetail.record && dayDetail.record.tipo !== "Pendente" && !dayDetail.isJustified && (
+            {dayDetail.record && dayDetail.record.tipo !== "Pendente" && !dayDetail.isJustified && !editMode && (
               <div>
                 <span className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-2 block">Linha do tempo</span>
                 <div className="relative">
                   <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-elevated/50" />
                   <DayEvents record={dayDetail.record} />
+                </div>
+              </div>
+            )}
+
+            {dayDetail.record && dayDetail.record.tipo !== "Pendente" && !dayDetail.isJustified && editMode && editForm && (
+              <div>
+                <span className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-2 block">Editar horários</span>
+                <div className="relative">
+                  <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-elevated/50" />
+                  <EditableDayEvents
+                    record={dayDetail.record}
+                    form={editForm}
+                    onChange={(field, value) => setEditForm(prev => prev ? { ...prev, [field]: value } : prev)}
+                  />
                 </div>
               </div>
             )}
@@ -672,7 +751,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
               </div>
             )}
 
-            {!dayDetail.isWeekend && !dayDetail.isFuture && (
+            {!dayDetail.isWeekend && !dayDetail.isFuture && !editMode && (
               <button
                 onClick={() => handleQuickEdit(dayDetail.iso)}
                 className="w-full h-9 rounded-lg bg-blue-500/10 text-[11px] font-semibold text-blue-400 hover:bg-blue-500/20 transition-all"
@@ -680,16 +759,28 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
                 {dayDetail.isMissing || dayDetail.isJustified ? "Justificar falta" : "Editar registro"}
               </button>
             )}
+
+            {editMode && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex-1 h-9 rounded-lg bg-surface border border-default/40 text-[11px] font-semibold text-secondary hover:text-primary transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveInline}
+                  disabled={saving}
+                  className="flex-1 h-9 rounded-lg bg-blue-500 text-[11px] font-semibold text-white hover:bg-blue-600 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  {saving ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+                  {saving ? "Salvando..." : "Salvar"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
-
-      <RegisterModal
-        open={editModalOpen}
-        onClose={() => { setEditModalOpen(false); setEditDate(undefined) }}
-        onSave={(fd) => { setEditModalOpen(false); setEditDate(undefined); onSave(fd) }}
-        editDate={editDate}
-      />
 
       <JustificacaoModal
         open={justificarOpen}

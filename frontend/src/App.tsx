@@ -743,14 +743,16 @@ export default function App() {
         <FeedbackModal
           open={saveFeedback.open}
           onClose={() => setSaveFeedback({ open: false })}
-          type="success"
-          title="Jornada registrada com sucesso"
-          message="Seu registro de jornada foi salvo corretamente."
+          type="pending"
+          title="Jornada registrada"
+          message="Seu registro foi salvo e enviado para análise.\nVocê receberá uma notificação quando for aprovado."
           details={saveFeedback.record ? [
             { label: "Entrada", value: saveFeedback.record.entrada },
             { label: "Saída", value: saveFeedback.record.saida },
             { label: "Total do dia", value: saveFeedback.record.total },
           ] : undefined}
+          statusText="Aguardando aprovação"
+          statusColor="#C49A6B"
           secondaryButton={{
             text: "Ver registro",
             onClick: () => {

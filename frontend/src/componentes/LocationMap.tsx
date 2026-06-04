@@ -97,7 +97,7 @@ export function LocationMap({ latitude, longitude, accuracy, address, city, stat
         <MapBoundsUpdater latitude={latitude} longitude={longitude} live={live} />
       </MapContainer>
 
-      <div className="absolute bottom-0 left-0 right-0 z-[1000] flex items-center justify-between px-3 py-2 bg-gradient-to-t from-black/70 to-transparent pointer-events-none">
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-2 bg-gradient-to-t from-black/70 to-transparent pointer-events-none">
         <span className="text-[10px] font-medium text-white/80 truncate max-w-[70%]">
           {address && `${address}${city ? ", " : ""}`}{city && `${city}/${state}`}
         </span>

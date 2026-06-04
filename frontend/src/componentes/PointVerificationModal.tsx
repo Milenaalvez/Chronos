@@ -337,7 +337,7 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
   if (error && step === "result" && faceMatch === false) {
     // Show failure result
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
         <div className="relative w-full max-w-md mx-4 bg-surface border border-white/10 rounded-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
           <div className="p-6 text-center">
@@ -363,7 +363,7 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
   if (step === "result" && faceMatch === true) {
     // Show success
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
         <div className="relative w-full max-w-md mx-4 bg-surface border border-white/10 rounded-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
           <div className="p-6 text-center">
@@ -400,7 +400,7 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
 
   if (step === "processing") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
         <div className="relative w-full max-w-md mx-4 bg-surface border border-white/10 rounded-xl p-8 text-center">
           <Loader2 size={32} className="animate-spin text-[var(--accent-primary)] mx-auto mb-4" />
@@ -413,7 +413,7 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
 
   if (step === "face") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
         <div className="relative w-full max-w-lg mx-4 bg-surface border border-white/10 rounded-xl overflow-hidden shadow-2xl">
           <button onClick={onCancel} className="absolute top-4 right-4 z-10 md:w-11 md:h-11 w-10 h-10 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-white/5 transition-all">
@@ -493,7 +493,7 @@ export function PointVerificationModal({ pointLabel, pointDesc, pointIcon: Point
 
   // Step: Password + captcha
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative w-full max-w-md mx-4 bg-surface border border-white/10 rounded-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
         <button onClick={onCancel} className="absolute top-4 right-4 z-10 md:w-11 md:h-11 w-10 h-10 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-white/5 transition-all">

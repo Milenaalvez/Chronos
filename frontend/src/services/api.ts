@@ -425,6 +425,7 @@ export const pointRecords = {
   create: (data: {
     pointType: string
     timeValue: string
+    date?: string
     latitude?: number | null
     longitude?: number | null
     locationAccuracy?: number | null

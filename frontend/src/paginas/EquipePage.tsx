@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import {
   Users, UserCheck, Clock, AlertTriangle, ShieldCheck,
-  Search, Loader2, RefreshCw, ChevronDown, MoreHorizontal,
+  Search, Loader2, RefreshCw, MoreHorizontal,
   CheckCircle, XCircle, Ban, Trash2, Key,
   Mail, Activity, FileText,
   X, UserPlus, Edit3, Eye,
@@ -76,10 +76,11 @@ const STATUS_CFG: Record<StatusKey, { label: string; color: string; dot: string 
 }
 
 const ROLE_STYLES: Record<string, { label: string; color: string; bg: string }> = {
-  ADMIN:     { label: "Admin",  color: "text-accent-amber/80",  bg: "bg-accent-amber/5" },
-  RH:        { label: "RH",     color: "text-accent-purple/80", bg: "bg-accent-purple/5" },
-  DEVELOPER: { label: "DEV",    color: "text-accent-green/80",  bg: "bg-accent-green/5" },
-  EMPLOYEE:  { label: "Membro", color: "text-muted/60",         bg: "bg-muted/5" },
+  ADMIN:     { label: "Admin",      color: "text-accent-amber/80",  bg: "bg-accent-amber/5" },
+  RH:        { label: "RH",         color: "text-accent-purple/80", bg: "bg-accent-purple/5" },
+  DEVELOPER: { label: "DEV",        color: "text-accent-green/80",  bg: "bg-accent-green/5" },
+  EMPLOYEE:  { label: "Colaborador", color: "text-muted/60",         bg: "bg-muted/5" },
+  SUPER_ADMIN: { label: "DEV",      color: "text-accent-green/80",  bg: "bg-accent-green/5" },
 }
 
 const CONTRACT_LABEL: Record<string, string> = {
@@ -135,9 +136,7 @@ function fmtMins(m: number | null | undefined): string {
 
 function fmtBal(h: number): { t: string; neg: boolean } {
   const m = Math.round(Math.abs(h * 60))
-  if (h > 0) return { t: `+${String(Math.floor(m / 60)).padStart(2, "0")}h${String(m % 60).padStart(2, "0")}m`, neg: false }
-  if (h < 0) return { t: `-${String(Math.floor(m / 60)).padStart(2, "0")}h${String(m % 60).padStart(2, "0")}m`, neg: true }
-  return { t: "00h00m", neg: false }
+  return { t: `${String(Math.floor(m / 60)).padStart(2, "0")}h${String(m % 60).padStart(2, "0")}m`, neg: h < 0 }
 }
 
 function fmtDate(s: string): string {
@@ -176,7 +175,8 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
   const [pendingReviews, setPendingReviews] = useState<PendingReviewItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"equipe" | "justificativas" | "atividades" | "analises">("equipe")
+  const [activeTab, setActiveTab] = useState<"equipe" | "pendencias" | "atividades">("equipe")
+  const [pendSubTab, setPendSubTab] = useState<"em_analise" | "aprovado" | "recusado">("em_analise")
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("todas")
   const [statusFilter, setStatusFilter] = useState("todos")
@@ -410,7 +410,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
       ["Nome", m.name],
       ["Email", m.email],
       ["Matrícula", m.registrationNumber ? `CHR${m.registrationNumber}` : "---"],
-      ["Cargo", ROLE_STYLES[m.role]?.label || m.role],
+      ["Cargo", user?.id === m.id ? (ROLE_STYLES[m.role]?.label || m.role) : "Colaborador"],
       ["Departamento", inferDepartment(m)],
       ["Função", m.position || "---"],
       ["Contrato", CONTRACT_LABEL[m.contractType ?? ""] || m.contractType || "---"],
@@ -579,13 +579,16 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
       {/* Tabs */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 rounded-lg bg-elevated/30 p-0.5">
-          {(["equipe"] as const).map(t => (
-            <button key={t} onClick={() => setActiveTab(t as typeof activeTab)}
+          {(["equipe", "pendencias", "atividades"] as const).map(t => (
+            <button key={t} onClick={() => setActiveTab(t)}
               className={`relative px-3.5 py-1.5 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all duration-200 ${
                 activeTab === t ? "bg-elevated/60 text-primary" : "text-muted hover:text-primary"
               }`}
             >
-              {t === "equipe" && "Equipe"}
+              {t === "equipe" ? "Equipe" : t === "pendencias" ? "Pendências" : "Atividades"}
+              {t === "pendencias" && pendingJusts.length > 0 && (
+                <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-accent-amber inline-block animate-pulse" />
+              )}
             </button>
           ))}
         </div>
@@ -651,7 +654,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
               {filtered.map((m, idx) => {
                 const st = statusOf(m)
                 const sc = STATUS_CFG[st]
-                const rb = ROLE_STYLES[m.role] ?? ROLE_STYLES.EMPLOYEE
+                const rb = user?.id === m.id ? (ROLE_STYLES[m.role] ?? ROLE_STYLES.EMPLOYEE) : ROLE_STYLES.EMPLOYEE
                 const dept = inferDepartment(m)
                 return (
                   <div key={m.id}
@@ -733,9 +736,9 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                               </button>
                             )
                           )}
-                        </div>
-                      )}
-                    </div>
+                </div>
+              )}
+            </div>
                   </div>
                 )
               })}
@@ -760,100 +763,202 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
         </div>
       )}
 
-      {/* ═══ JUSTIFICATIVAS TAB ═══ */}
-      {activeTab === "justificativas" && (
+      {/* ═══ PENDÊNCIAS TAB ═══ */}
+      {activeTab === "pendencias" && (
         <div className="flex flex-col gap-4">
-          {justifications.length > 0 && (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-amber/10">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-amber animate-pulse" />
-                <span className="text-[11px] font-medium text-accent-amber">{pendingJusts.length} pendente{pendingJusts.length !== 1 ? "s" : ""}</span>
-              </div>
-              <span className="text-[11px] text-muted">{justifications.length} no total</span>
+          {/* Sub-tabs */}
+          <div className="flex items-center gap-2">
+            {(["em_analise", "aprovado", "recusado"] as const).map(st => {
+              const dots: Record<string, { color: string; bg: string }> = {
+                em_analise: { color: "bg-accent-amber", bg: "bg-accent-amber/10" },
+                aprovado: { color: "bg-accent-green", bg: "bg-accent-green/10" },
+                recusado: { color: "bg-accent-red", bg: "bg-accent-red/10" },
+              }
+              return (
+                <button key={st} onClick={() => setPendSubTab(st)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-200 ${
+                    pendSubTab === st ? `${dots[st].bg} text-primary` : "text-muted hover:text-primary"
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${dots[st].color}`} />
+                  {st === "em_analise" ? "Em análise" : st === "aprovado" ? "Aprovado" : "Recusado"}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Em análise: pending justifications + pending reviews */}
+          {pendSubTab === "em_analise" && (
+            <div className="flex flex-col gap-2">
+              {pendingJusts.length === 0 && pendingReviews.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-300">
+                  <div className="w-16 h-16 rounded-2xl bg-elevated/30 flex items-center justify-center mb-5">
+                    <ShieldCheck size={28} className="text-muted" />
+                  </div>
+                  <p className="text-base font-semibold text-primary">Nada pendente</p>
+                  <p className="text-sm text-secondary mt-1.5 max-w-xs">Justificativas e registros em análise aparecerão aqui.</p>
+                </div>
+              ) : (
+                <>
+                  {pendingJusts.length > 0 && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">Justificativas</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-amber animate-pulse" />
+                    </div>
+                  )}
+                  {pendingJusts.map(j => (
+                    <div key={j.id} onClick={() => { setSelJust(j); setRejectText("") }}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-accent-amber/20 hover:border-accent-amber/30 transition-all duration-200 cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-accent-amber/10 flex items-center justify-center shrink-0">
+                        <FileText size={15} className="text-accent-amber" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-sm font-semibold text-primary">{j.user?.name || "Colaborador"}</span>
+                          {j.user?.department && <span className="text-[10px] text-muted hidden sm:inline">{j.user.department}</span>}
+                          <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-accent-amber/10 text-accent-amber uppercase tracking-wider">
+                            <span className="w-1 h-1 rounded-full bg-accent-amber animate-pulse" />
+                            Pendente
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[11px] text-secondary">{j.reason}</span>
+                          <span className="text-[9px] text-muted">·</span>
+                          <span className="text-[11px] text-muted">{fmtDate(j.startDate)} → {fmtDate(j.endDate)}</span>
+                        </div>
+                      </div>
+                      <div className="hidden sm:flex items-center gap-2 shrink-0">
+                        <button onClick={(e) => { e.stopPropagation(); handleApprove(j.id) }} disabled={justLoading}
+                          className="w-8 h-8 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green hover:bg-accent-green/20 transition-all duration-200 disabled:opacity-50"
+                        ><CheckCircle size={14} /></button>
+                        <button onClick={(e) => { e.stopPropagation(); setSelJust(j); setRejectText("") }}
+                          className="w-8 h-8 rounded-lg bg-accent-red/10 flex items-center justify-center text-accent-red hover:bg-accent-red/20 transition-all duration-200"
+                        ><XCircle size={14} /></button>
+                      </div>
+                      <span className="text-[10px] text-muted shrink-0 hidden sm:block">{fmtRel(j.createdAt)}</span>
+                      <ExternalLink size={13} className="text-muted opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0" />
+                    </div>
+                  ))}
+
+                  {pendingReviews.length > 0 && (
+                    <div className="flex items-center gap-2 mt-3 mb-1">
+                      <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">Registros de ponto</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-amber animate-pulse" />
+                    </div>
+                  )}
+                  {pendingReviews.map(r => (
+                    <div key={r.id} onClick={() => setSelReview(r)}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-accent-amber/20 hover:border-accent-amber/30 transition-all duration-200 cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-accent-amber/10 flex items-center justify-center shrink-0">
+                        <Clock size={15} className="text-accent-amber" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-sm font-semibold text-primary">{r.user?.name || "Colaborador"}</span>
+                          {r.user?.department && <span className="text-[10px] text-muted hidden sm:inline">{r.user.department}</span>}
+                          <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-accent-amber/10 text-accent-amber uppercase tracking-wider">
+                            <span className="w-1 h-1 rounded-full bg-accent-amber animate-pulse" />
+                            Pendente
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[11px] text-secondary">
+                            {r.date?.substring?.(0, 10) ? new Date(r.date.substring(0, 10)).toLocaleDateString("pt-BR") : r.date}
+                          </span>
+                          <span className="text-[9px] text-muted">·</span>
+                          <span className="text-[11px] text-muted">{r.clockIn} → {r.clockOut || "---"}</span>
+                          {r.totalMinutes != null && (
+                            <>
+                              <span className="text-[9px] text-muted">·</span>
+                              <span className="text-[11px] text-muted">{fmtMins(r.totalMinutes)}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="hidden sm:flex items-center gap-2 shrink-0">
+                        <button onClick={(e) => { e.stopPropagation(); handleReviewApprove(r.id) }} disabled={reviewLoading}
+                          className="w-8 h-8 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green hover:bg-accent-green/20 transition-all duration-200 disabled:opacity-50"
+                          title="Aprovar"
+                        ><ThumbsUp size={13} /></button>
+                        <button onClick={(e) => { e.stopPropagation(); setSelReview(r); setReviewNote("") }}
+                          className="w-8 h-8 rounded-lg bg-accent-red/10 flex items-center justify-center text-accent-red hover:bg-accent-red/20 transition-all duration-200"
+                          title="Recusar"
+                        ><ThumbsDown size={13} /></button>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           )}
 
-          {loading ? (
-            <div className="flex flex-col">
-              {[1,2,3].map(i => <div key={i} className="h-16 bg-elevated/20 animate-pulse border-b border-default last:border-b-0 first:border-t border-default" />)}
-            </div>
-          ) : justifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-300">
-              <div className="w-16 h-16 rounded-2xl bg-elevated/30 flex items-center justify-center mb-5">
-                <ShieldCheck size={28} className="text-muted" />
-              </div>
-              <p className="text-base font-semibold text-primary">Nenhuma justificativa</p>
-              <p className="text-sm text-secondary mt-1.5 max-w-xs">
-                {pendingJusts.length > 0
-                  ? "Carregando justificativas..."
-                  : "Justificativas enviadas aparecerão aqui."}
-              </p>
-            </div>
-          ) : (
+          {/* Aprovado */}
+          {pendSubTab === "aprovado" && (
             <div className="flex flex-col gap-2">
-              {/* Pending */}
-              {pendingJusts.map(j => (
-                <div key={j.id} onClick={() => { setSelJust(j); setRejectText("") }}
-                  className="flex items-center gap-4 p-4 rounded-xl border border-accent-amber/20 hover:border-accent-amber/30 transition-all duration-200 cursor-pointer group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-accent-amber/10 flex items-center justify-center shrink-0">
-                    <FileText size={15} className="text-accent-amber" />
+              {justifications.filter(j => j.status === "APPROVED").length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-300">
+                  <div className="w-16 h-16 rounded-2xl bg-elevated/30 flex items-center justify-center mb-5">
+                    <CheckCircle size={28} className="text-accent-green" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-sm font-semibold text-primary">{j.user?.name || "Colaborador"}</span>
-                      {j.user?.department && <span className="text-[10px] text-muted hidden sm:inline">{j.user.department}</span>}
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-accent-amber/10 text-accent-amber uppercase tracking-wider">Pendente</span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className="text-[11px] text-secondary">{j.reason}</span>
-                      <span className="text-[9px] text-muted">·</span>
-                      <span className="text-[11px] text-muted">{fmtDate(j.startDate)} → {fmtDate(j.endDate)}</span>
-                    </div>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-2 shrink-0">
-                    <button onClick={(e) => { e.stopPropagation(); handleApprove(j.id) }} disabled={justLoading}
-                      className="w-8 h-8 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green hover:bg-accent-green/20 transition-all duration-200 disabled:opacity-50"
-                    ><CheckCircle size={14} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); setSelJust(j); setRejectText("") }}
-                      className="w-8 h-8 rounded-lg bg-accent-red/10 flex items-center justify-center text-accent-red hover:bg-accent-red/20 transition-all duration-200"
-                    ><XCircle size={14} /></button>
-                  </div>
-                  <span className="text-[10px] text-muted shrink-0 hidden sm:block">{fmtRel(j.createdAt)}</span>
-                  <ExternalLink size={13} className="text-muted opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0" />
+                  <p className="text-base font-semibold text-primary">Nenhuma aprovada</p>
+                  <p className="text-sm text-secondary mt-1.5 max-w-xs">Justificativas aprovadas aparecerão aqui.</p>
                 </div>
-              ))}
-
-              {/* History */}
-              {justifications.filter(j => j.status !== "PENDING").length > 0 && (
-                <details className="group mt-2">
-                  <summary className="flex items-center gap-2 cursor-pointer text-[11px] font-medium text-muted hover:text-primary transition-all duration-200 px-1 py-2">
-                    <ChevronDown size={14} className="group-open:rotate-180 transition-transform duration-200" />
-                    Histórico ({justifications.filter(j => j.status !== "PENDING").length})
-                  </summary>
-                  <div className="flex flex-col">
-                    {justifications.filter(j => j.status !== "PENDING").map((j, ji) => (
-                      <div key={j.id} className={`flex items-center gap-3 py-3 border-b border-default last:border-b-0 ${ji === 0 ? "border-t border-default" : ""}`}>
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${j.status === "APPROVED" ? "bg-accent-green/8" : "bg-accent-red/8"}`}>
-                          {j.status === "APPROVED"
-                            ? <CheckCircle size={14} className="text-accent-green" />
-                            : <XCircle size={14} className="text-accent-red" />
-                          }
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2.5">
-                            <span className="text-xs font-semibold text-primary">{j.user?.name || "Colaborador"}</span>
-                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${j.status === "APPROVED" ? "bg-accent-green/10 text-accent-green" : "bg-accent-red/10 text-accent-red"}`}>
-                              {j.status === "APPROVED" ? "Aprovado" : "Recusado"}
-                            </span>
-                          </div>
-                          <p className="text-[10px] text-muted mt-0.5">{j.reason} · {fmtDate(j.startDate)} → {fmtDate(j.endDate)}</p>
-                        </div>
-                        <span className="text-[10px] text-muted shrink-0">{fmtRel(j.createdAt)}</span>
+              ) : (
+                justifications.filter(j => j.status === "APPROVED").map((j, ji) => (
+                  <div key={j.id} className={`flex items-center gap-3 py-3 ${ji > 0 ? "border-t border-default/5" : ""}`}>
+                    <div className="w-8 h-8 rounded-lg bg-accent-green/8 flex items-center justify-center shrink-0">
+                      <CheckCircle size={14} className="text-accent-green" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-xs font-semibold text-primary">{j.user?.name || "Colaborador"}</span>
+                        <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-accent-green/10 text-accent-green uppercase tracking-wider">
+                          <span className="w-1 h-1 rounded-full bg-accent-green" />
+                          Aprovado
+                        </span>
                       </div>
-                    ))}
+                      <p className="text-[10px] text-muted mt-0.5">{j.reason} · {fmtDate(j.startDate)} → {fmtDate(j.endDate)}</p>
+                    </div>
+                    <span className="text-[10px] text-muted shrink-0">{fmtRel(j.createdAt)}</span>
                   </div>
-                </details>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Recusado */}
+          {pendSubTab === "recusado" && (
+            <div className="flex flex-col gap-2">
+              {justifications.filter(j => j.status === "REJECTED").length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-300">
+                  <div className="w-16 h-16 rounded-2xl bg-elevated/30 flex items-center justify-center mb-5">
+                    <XCircle size={28} className="text-accent-red" />
+                  </div>
+                  <p className="text-base font-semibold text-primary">Nenhuma recusada</p>
+                  <p className="text-sm text-secondary mt-1.5 max-w-xs">Justificativas recusadas aparecerão aqui.</p>
+                </div>
+              ) : (
+                justifications.filter(j => j.status === "REJECTED").map((j, ji) => (
+                  <div key={j.id} className={`flex items-center gap-3 py-3 ${ji > 0 ? "border-t border-default/5" : ""}`}>
+                    <div className="w-8 h-8 rounded-lg bg-accent-red/8 flex items-center justify-center shrink-0">
+                      <XCircle size={14} className="text-accent-red" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-xs font-semibold text-primary">{j.user?.name || "Colaborador"}</span>
+                        <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-accent-red/10 text-accent-red uppercase tracking-wider">
+                          <span className="w-1 h-1 rounded-full bg-accent-red" />
+                          Recusado
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-muted mt-0.5">{j.reason} · {fmtDate(j.startDate)} → {fmtDate(j.endDate)}</p>
+                      {j.rhResponse && <p className="text-[9px] text-accent-red/70 mt-0.5 italic">"{j.rhResponse}"</p>}
+                    </div>
+                    <span className="text-[10px] text-muted shrink-0">{fmtRel(j.createdAt)}</span>
+                  </div>
+                ))
               )}
             </div>
           )}
@@ -901,79 +1006,6 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                   </div>
                 )
               })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ═══ ANÁLISES TAB ═══ */}
-      {activeTab === "analises" && (
-        <div className="flex flex-col gap-4">
-          {pendingReviews.length > 0 && (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-amber/10">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-amber animate-pulse" />
-                <span className="text-[11px] font-medium text-accent-amber">{pendingReviews.length} pendente{pendingReviews.length !== 1 ? "s" : ""}</span>
-              </div>
-              <span className="text-[11px] text-muted">Registros aguardando aprovação</span>
-            </div>
-          )}
-
-          {loading ? (
-            <div className="flex flex-col">
-              {[1,2,3].map(i => <div key={i} className="h-16 bg-elevated/20 animate-pulse border-b border-default last:border-b-0 first:border-t border-default" />)}
-            </div>
-          ) : pendingReviews.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-300">
-              <div className="w-16 h-16 rounded-2xl bg-elevated/30 flex items-center justify-center mb-5">
-                <CheckCircle size={28} className="text-accent-green" />
-              </div>
-              <p className="text-base font-semibold text-primary">Nenhum registro pendente</p>
-              <p className="text-sm text-secondary mt-1.5 max-w-xs">
-                Todos os registros de jornada foram processados.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {pendingReviews.map(r => (
-                <div key={r.id} onClick={() => setSelReview(r)}
-                  className="flex items-center gap-4 p-4 rounded-xl border border-accent-amber/20 hover:border-accent-amber/30 transition-all duration-200 cursor-pointer group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-accent-amber/10 flex items-center justify-center shrink-0">
-                    <Clock size={15} className="text-accent-amber" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-sm font-semibold text-primary">{r.user?.name || "Colaborador"}</span>
-                      {r.user?.department && <span className="text-[10px] text-muted hidden sm:inline">{r.user.department}</span>}
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-accent-amber/10 text-accent-amber uppercase tracking-wider">Pendente</span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className="text-[11px] text-secondary">
-                        {r.date?.substring?.(0, 10) ? new Date(r.date.substring(0, 10)).toLocaleDateString("pt-BR") : r.date}
-                      </span>
-                      <span className="text-[9px] text-muted">·</span>
-                      <span className="text-[11px] text-muted">{r.clockIn} → {r.clockOut || "---"}</span>
-                      {r.totalMinutes != null && (
-                        <>
-                          <span className="text-[9px] text-muted">·</span>
-                          <span className="text-[11px] text-muted">{fmtMins(r.totalMinutes)}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-2 shrink-0">
-                    <button onClick={(e) => { e.stopPropagation(); handleReviewApprove(r.id) }} disabled={reviewLoading}
-                      className="w-8 h-8 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green hover:bg-accent-green/20 transition-all duration-200 disabled:opacity-50"
-                      title="Aprovar"
-                    ><ThumbsUp size={13} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); setSelReview(r); setReviewNote("") }}
-                      className="w-8 h-8 rounded-lg bg-accent-red/10 flex items-center justify-center text-accent-red hover:bg-accent-red/20 transition-all duration-200"
-                      title="Recusar"
-                    ><ThumbsDown size={13} /></button>
-                  </div>
-                </div>
-              ))}
             </div>
           )}
         </div>
@@ -1155,10 +1187,12 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                   className={`px-3 py-1.5 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all duration-200 ${
                     permTab === "info" ? "bg-elevated text-primary" : "text-muted hover:text-primary"
                   }`}>Informações</button>
-                <button onClick={() => { setPermTab("permissoes"); handleLoadPerms(selMember.id) }}
-                  className={`px-3 py-1.5 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all duration-200 ${
-                    permTab === "permissoes" ? "bg-elevated text-primary" : "text-muted hover:text-primary"
-                  }`}>Permissões</button>
+                {["DEVELOPER", "SUPER_ADMIN"].includes(user?.role || "") && (
+                  <button onClick={() => { setPermTab("permissoes"); handleLoadPerms(selMember.id) }}
+                    className={`px-3 py-1.5 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all duration-200 ${
+                      permTab === "permissoes" ? "bg-elevated text-primary" : "text-muted hover:text-primary"
+                    }`}>Permissões</button>
+                )}
               </div>
             )}
 
@@ -1169,7 +1203,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { label: "Email", value: selMember.email },
-                      { label: "Cargo", value: ROLE_STYLES[selMember.role]?.label || selMember.role },
+                      { label: "Cargo", value: user?.id === selMember.id ? (ROLE_STYLES[selMember.role]?.label || selMember.role) : "Colaborador" },
                       { label: "Departamento", value: inferDepartment(selMember) },
                       { label: "Função", value: selMember.position || "---" },
                       { label: "Contrato", value: CONTRACT_LABEL[selMember.contractType ?? ""] || selMember.contractType || "---" },
@@ -1225,7 +1259,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                     </div>
                   )}
                 </>
-              ) : (
+              ) : ["DEVELOPER", "SUPER_ADMIN"].includes(user?.role || "") ? (
                 /* ═══ PERMISSIONS TAB ═══ */
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -1261,7 +1295,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                     })}
                   </div>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -1316,6 +1350,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                   <input name="name" defaultValue={selMember.name} required
                     className="w-full h-9 px-3 rounded-lg bg-input border border-default/30 text-xs text-primary placeholder:text-muted focus:outline-none focus:border-[var(--accent-ring)] transition-all duration-200" />
                 </div>
+                {["DEVELOPER", "SUPER_ADMIN"].includes(user?.role || "") ? (
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-semibold uppercase tracking-wider text-secondary">Cargo</label>
                   <select name="role" defaultValue={selMember.role}
@@ -1325,6 +1360,9 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                     ))}
                   </select>
                 </div>
+                ) : (
+                  <input type="hidden" name="role" value={selMember.role} />
+                )}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-semibold uppercase tracking-wider text-secondary">Contrato</label>
                   <select name="contractType" defaultValue={selMember.contractType || "CLT"}

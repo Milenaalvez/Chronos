@@ -15,7 +15,7 @@ export async function listRecords(userId: string, startDate?: string, endDate?: 
     orderBy: { date: 'desc' },
   })
   const today = new Date()
-  const todayStr = today.toISOString().split('T')[0]
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   for (const r of records) {
     if (!r.clockOut && r.clockIn) {
       const recordDate = r.date instanceof Date ? r.date.toISOString().split('T')[0] : String(r.date).substring(0, 10)
@@ -155,7 +155,8 @@ export async function upsertRecord(userId: string, data: {
     // Notify user about successful registration
     const recordDate = new Date(data.date)
     const hoje = new Date()
-    const isToday = recordDate.toISOString().split('T')[0] === hoje.toISOString().split('T')[0]
+    const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`
+    const isToday = data.date === hojeStr
     const dateLabel = recordDate.toLocaleDateString('pt-BR')
 
     prisma.activityLog.create({

@@ -17,7 +17,7 @@ export async function list(req: AuthRequest, res: Response, next: NextFunction) 
 
 export async function create(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { pointType, timeValue, latitude, longitude, locationAccuracy, locationAddress, locationCity, locationState, deviceInfo, photoData, hasPhoto, password, faceVerified } = req.body
+    const { pointType, timeValue, date, latitude, longitude, locationAccuracy, locationAddress, locationCity, locationState, deviceInfo, photoData, hasPhoto, password, faceVerified } = req.body
     if (!pointType || !timeValue) {
       res.status(400).json({ error: 'pointType e timeValue são obrigatórios' })
       return
@@ -29,6 +29,7 @@ export async function create(req: AuthRequest, res: Response, next: NextFunction
     const event = await createPointRecord(req.user!.userId, {
       pointType,
       timeValue,
+      date,
       latitude,
       longitude,
       locationAccuracy,

@@ -49,6 +49,7 @@ export async function listPointRecords(userId: string, companyId: string, date?:
 export async function createPointRecord(userId: string, data: {
   pointType: 'ENTRY' | 'BREAK_START' | 'BREAK_END' | 'EXIT'
   timeValue: string
+  date?: string
   latitude?: number | null
   longitude?: number | null
   locationAccuracy?: number | null
@@ -77,8 +78,8 @@ export async function createPointRecord(userId: string, data: {
     throw new AppError(401, 'Senha inválida')
   }
 
-  const now = new Date()
-  const dateStr = now.toISOString().split('T')[0]
+  const recordedAt = new Date()
+  const dateStr = data.date || recordedAt.toISOString().split('T')[0]
   const date = new Date(dateStr)
 
   const event = await prisma.pointEvent.create({
@@ -87,7 +88,7 @@ export async function createPointRecord(userId: string, data: {
       date,
       pointType: data.pointType,
       timeValue: data.timeValue,
-      recordedAt: now,
+      recordedAt,
       latitude: data.latitude ?? null,
       longitude: data.longitude ?? null,
       locationAccuracy: data.locationAccuracy ?? null,

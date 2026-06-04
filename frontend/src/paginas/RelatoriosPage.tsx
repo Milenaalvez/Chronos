@@ -3,10 +3,13 @@ import {
   FileText, Download, Loader2, X, ChevronRight, Search,
   Clock, TrendingUp, Users, UserX, Calendar,
   Lock, Unlock, ShieldCheck, AlertTriangle, Eye,
-  BarChart3, Building2, UserCheck, SlidersHorizontal,
+  BarChart3, Building2, UserCheck, SlidersHorizontal, Activity,
 } from "lucide-react"
 import { reports as apiReports, reference as apiRef } from "../services/api"
 import { PageHeader } from "../componentes/PageHeader"
+import { JustificativasPage } from "./JustificativasPage"
+import { EmAnalisePage } from "./EmAnalisePage"
+import { AuditoriaPage } from "./AuditoriaPage"
 import * as XLSX from "xlsx"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -98,7 +101,17 @@ interface RelatoriosPageProps {
   } | null
 }
 
+const TABS = [
+  { key: "consolidado", label: "Consolidado", icon: BarChart3 },
+  { key: "justificativas", label: "Justificativas", icon: FileText },
+  { key: "em-analise", label: "Em Análise", icon: ShieldCheck },
+  { key: "auditoria", label: "Auditoria", icon: Activity },
+] as const
+
+type RelTabKey = (typeof TABS)[number]["key"]
+
 export function RelatoriosPage({ user }: RelatoriosPageProps) {
+  const [tab, setTab] = useState<RelTabKey>("consolidado")
   const [selectedMonth, setSelectedMonth] = useState(defaultMonth)
   const [departmentId, setDepartmentId] = useState("")
   const [positionId, setPositionId] = useState("")
@@ -271,10 +284,41 @@ export function RelatoriosPage({ user }: RelatoriosPageProps) {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Relatórios Corporativos"
-        subtitle="Acompanhamento geral da empresa e fechamento de competência."
+        title="Relatórios"
+        subtitle="Acompanhamento geral da empresa, justificativas, análise e auditoria."
       />
 
+      {/* Tab bar */}
+      <div className="flex items-center gap-1 border-b border-default/30 overflow-x-auto flex-wrap">
+        {TABS.map((t) => {
+          const Icon = t.icon
+          const isActive = tab === t.key
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all duration-200 ${
+                isActive
+                  ? "border-[var(--accent-primary)] text-primary"
+                  : "border-transparent text-muted hover:text-secondary hover:border-default/30"
+              }`}
+            >
+              <Icon size={13} strokeWidth={2} />
+              {t.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {tab !== "consolidado" && (
+        <>
+          {tab === "justificativas" && <JustificativasPage />}
+          {tab === "em-analise" && <EmAnalisePage />}
+          {tab === "auditoria" && <AuditoriaPage />}
+        </>
+      )}
+
+      {tab === "consolidado" && (<>
       {/* Filter bar */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative">
@@ -720,6 +764,7 @@ export function RelatoriosPage({ user }: RelatoriosPageProps) {
           </div>
         </div>
       )}
+    </>)}
     </div>
   )
 }

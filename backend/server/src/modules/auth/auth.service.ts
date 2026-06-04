@@ -274,11 +274,16 @@ export async function loginWithSupabase(accessToken: string) {
   let user = await prisma.user.findUnique({ where: { email: emailLower } })
   if (!user) {
     let company = await prisma.company.findUnique({ where: { slug: 'default' } })
+    let isNewCompany = false
     if (!company) {
       company = await prisma.company.create({
         data: { name: 'Default Company', slug: 'default' },
       })
+      isNewCompany = true
     }
+
+    const userCount = await prisma.user.count({ where: { companyId: company.id } })
+    const role = userCount === 0 || isNewCompany ? 'DEVELOPER' : 'EMPLOYEE'
 
     const registrationNumber = await generateRegistrationNumber()
 
@@ -291,6 +296,7 @@ export async function loginWithSupabase(accessToken: string) {
         registrationNumber,
         emailVerified: authUser.email_confirmed_at ? true : false,
         companyId: company.id,
+        role: role as any,
       },
     })
   } else {
