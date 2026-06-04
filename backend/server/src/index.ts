@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import nodemailer from 'nodemailer'
+import dns from 'dns'
 import { prisma } from './database/prisma.js'
 import { env } from './config/env.js'
 
@@ -64,10 +65,20 @@ app.get('/api/diagnostics/smtp', async (_req, res) => {
     return res.json(result)
   }
 
+  // Resolve IPv4
+  let ip = env.smtpHost
+  try {
+    const addrs = await dns.promises.resolve4(env.smtpHost)
+    if (addrs.length > 0) ip = addrs[0]
+    result.resolvedIp = ip
+  } catch {
+    result.ipv4Error = 'Falha ao resolver IPv4'
+  }
+
   for (const port of [587, 465]) {
     const test: any = { port, secure: port === 465 }
     const transport = nodemailer.createTransport({
-      host: env.smtpHost,
+      host: ip,
       port,
       secure: port === 465,
       auth: { user: env.smtpUser, pass: env.smtpPass },
