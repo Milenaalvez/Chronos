@@ -122,6 +122,8 @@ export function FeriasPage() {
     const start = new Date(newStart + "T12:00:00")
     const end = new Date(newEnd + "T12:00:00")
     const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1)
+    const todayLocal = new Date()
+    const todayLocalStr = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, "0")}-${String(todayLocal.getDate()).padStart(2, "0")}`
     const record: FeriasRecord = {
       id: `f${Date.now()}`,
       collaboratorId: newCollaboratorId,
@@ -129,7 +131,7 @@ export function FeriasPage() {
       startDate: newStart,
       endDate: newEnd,
       days,
-      requestedAt: new Date().toISOString().split("T")[0],
+      requestedAt: todayLocalStr,
       status: "pendente",
       notes: newNotes || undefined,
     }
@@ -196,7 +198,7 @@ export function FeriasPage() {
       end: (() => {
         const d = new Date(r.endDate + "T12:00:00")
         d.setDate(d.getDate() + 1)
-        return d.toISOString().split("T")[0]
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
       })(),
       backgroundColor: r.status === "em_andamento" ? "var(--accent-primary)" : "#10b981",
       borderColor: "transparent",

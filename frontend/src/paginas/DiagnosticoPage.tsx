@@ -40,7 +40,7 @@ export function DiagnosticoPage({ allRecords, records: _records, justificacoes }
     const y = now.getFullYear()
     const m = now.getMonth()
     const daysInMonth = new Date(y, m + 1, 0).getDate()
-    const todayStr = now.toISOString().split("T")[0]
+    const todayStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(y, m, d)
       if (date.getDay() === 0 || date.getDay() === 6) continue

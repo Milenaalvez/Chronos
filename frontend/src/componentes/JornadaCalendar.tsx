@@ -29,7 +29,8 @@ export function JornadaCalendar({ records, onEdit }: JornadaCalendarProps) {
 
   const days = useMemo(() => {
     const raw = getCurrentMonthDays()
-    const today = new Date().toISOString().split("T")[0]
+    const d = new Date()
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
     return raw.map((d) => {
       if (d.dayOfWeek === 0 || d.dayOfWeek === 6) {
         return { ...d, status: "weekend" as DayStatus, hours: 0, label: "Fim de semana", editable: false }

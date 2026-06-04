@@ -60,7 +60,7 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
     let list = [...allRecords]
 
     const now = new Date()
-    const today = now.toISOString().split("T")[0]
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`
     if (periodo === "hoje") {
       list = list.filter((r) => r.dataISO === today)
     } else if (periodo === "semana") {

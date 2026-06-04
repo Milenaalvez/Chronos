@@ -116,29 +116,29 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
       isWeekend, isFuture, isJustified, isMissing, isComplete, isOngoing,
       record: rec,
       statusText: isWeekend ? "Fim de semana" : isFuture ? "Futuro" : isJustified
-        ? justificacoes[selectedISO]?.status === "aprovado" ? "Falta justificada"
-          : justificacoes[selectedISO]?.status === "recusado" ? "Justificativa recusada"
+        ? justificacoes[selectedISO]?.status === "aprovado" ? "Abonado"
+          : justificacoes[selectedISO]?.status === "recusado" ? "Justificado"
           : "Em análise"
-        : isMissing ? "Ausente"
+        : isMissing ? "Pendente"
         : isOngoing ? "Em andamento"
-        : "Completo",
+        : "OK",
       statusColor: isWeekend || isFuture ? "text-blue-400" : isJustified
-        ? justificacoes[selectedISO]?.status === "aprovado" ? "text-green-400"
-          : justificacoes[selectedISO]?.status === "recusado" ? "text-red-400"
+        ? justificacoes[selectedISO]?.status === "aprovado" ? "text-orange-400"
+          : justificacoes[selectedISO]?.status === "recusado" ? "text-purple-400"
           : "text-yellow-400"
         : isMissing ? "text-red-400"
         : isOngoing ? "text-blue-400"
         : "text-green-400",
       badgeBg: isWeekend || isFuture ? "bg-blue-500/8" : isJustified
-        ? justificacoes[selectedISO]?.status === "aprovado" ? "bg-green-500/8"
-          : justificacoes[selectedISO]?.status === "recusado" ? "bg-red-500/8"
+        ? justificacoes[selectedISO]?.status === "aprovado" ? "bg-orange-500/8"
+          : justificacoes[selectedISO]?.status === "recusado" ? "bg-purple-500/8"
           : "bg-yellow-500/8"
         : isMissing ? "bg-red-500/8"
         : isOngoing ? "bg-blue-500/8"
         : "bg-green-500/8",
       badgeText: isWeekend || isFuture ? "text-blue-400" : isJustified
-        ? justificacoes[selectedISO]?.status === "aprovado" ? "text-green-400"
-          : justificacoes[selectedISO]?.status === "recusado" ? "text-red-400"
+        ? justificacoes[selectedISO]?.status === "aprovado" ? "text-orange-400"
+          : justificacoes[selectedISO]?.status === "recusado" ? "text-purple-400"
           : "text-yellow-400"
         : isMissing ? "text-red-400"
         : isOngoing ? "text-blue-400"
@@ -192,7 +192,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
     { label: "Horas Extras", value: formatMinutes(monthStats.extraMins), color: "text-purple-400", bg: "bg-purple-500/8", icon: TrendingUp },
     { label: "Dias Trabalhados", value: `${monthStats.workedDays}`, color: "text-green-400", bg: "bg-green-500/8", icon: CalendarCheck },
     { label: "Faltas", value: `${absences.faltasCount}`, color: absences.faltasCount > 0 ? "text-red-400" : "text-green-400", bg: absences.faltasCount > 0 ? "bg-red-500/8" : "bg-green-500/8", icon: AlertTriangle },
-    { label: "Abonos", value: `${abonosCount}`, color: "text-emerald-400", bg: "bg-emerald-500/8", icon: ShieldCheck },
+    { label: "Abonos", value: `${abonosCount}`, color: "text-orange-400", bg: "bg-orange-500/8", icon: ShieldCheck },
   ], [monthStats, saldoMins, absences, abonosCount])
 
   function handleEventClick(arg: EventClickArg) {
@@ -348,6 +348,42 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
         })}
       </div>
     )
+  }
+
+  function handleDayCellDidMount(arg: { el: HTMLElement; date: Date; dateStr: string }) {
+    const iso = arg.dateStr
+    const d = arg.date
+    const dayOfWeek = d.getDay()
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+    const isFuture = iso > today
+    if (isWeekend || isFuture) return
+
+    const just = justificacoes[iso]
+    const rec = allRecords.find((r) => r.dataISO === iso)
+    const isMissing = !rec || rec.tipo === "Pendente"
+
+    let color = ""
+    if (just) {
+      if (just.status === "aprovado") color = "#F97316"
+      else if (just.status === "em_analise") color = "#EAB308"
+      else if (just.status === "recusado") color = "#A855F7"
+    } else if (isMissing) {
+      color = "#EF4444"
+    } else {
+      color = "#22C55E"
+    }
+
+    if (color) {
+      const marker = document.createElement("div")
+      marker.className = "absolute top-[2px] left-[2px] right-[2px] h-[3px] rounded-t-[3px] z-10 pointer-events-none"
+      marker.style.backgroundColor = color
+      const frame = arg.el.querySelector(".fc-daygrid-day-frame")
+      if (frame) {
+        const existing = (frame as HTMLElement).style.position
+        if (!existing || existing === "static") (frame as HTMLElement).style.position = "relative"
+        frame.appendChild(marker)
+      }
+    }
   }
 
   const viewLabels: Record<string, string> = {
@@ -620,6 +656,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
             eventClick={handleEventClick}
             dateClick={handleDateClick}
             datesSet={handleDatesSet}
+            dayCellDidMount={handleDayCellDidMount}
             height="auto"
             contentHeight="auto"
             aspectRatio={1.35}
@@ -660,6 +697,21 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
               },
             }}
           />
+        </div>
+
+        <div className="flex items-center gap-4 flex-wrap mt-2">
+          {[
+            { color: "bg-red-500", label: "Pendente" },
+            { color: "bg-orange-500", label: "Abonado" },
+            { color: "bg-green-500", label: "OK" },
+            { color: "bg-yellow-500", label: "Em análise" },
+            { color: "bg-purple-500", label: "Justificado" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-1.5">
+              <div className={`w-2.5 h-2.5 rounded-sm ${item.color}`} />
+              <span className="text-[10px] font-medium text-muted">{item.label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -735,15 +787,20 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
               </div>
             )}
 
-            {dayDetail.isJustified && dayDetail.justificacao && (
-              <div className="bg-yellow-500/8 rounded-lg p-3">
-                <span className="text-[10px] font-semibold text-yellow-400">Justificativa</span>
-                <p className="text-[11px] text-secondary mt-1">{dayDetail.justificacao.observacao || justificacoes[selectedISO]?.motivo}</p>
-                <span className="text-[9px] text-muted block mt-1">
-                  {dayDetail.justificacao.status === "aprovado" ? "Aprovado" : dayDetail.justificacao.status === "recusado" ? "Recusado" : "Em análise"}
-                </span>
-              </div>
-            )}
+            {dayDetail.isJustified && dayDetail.justificacao && (() => {
+              const s = dayDetail.justificacao.status
+              const isAprovado = s === "aprovado"
+              const isRecusado = s === "recusado"
+              return (
+                <div className={`${isAprovado ? "bg-orange-500/8" : isRecusado ? "bg-purple-500/8" : "bg-yellow-500/8"} rounded-lg p-3`}>
+                  <span className={`text-[10px] font-semibold ${isAprovado ? "text-orange-400" : isRecusado ? "text-purple-400" : "text-yellow-400"}`}>Justificativa</span>
+                  <p className="text-[11px] text-secondary mt-1">{dayDetail.justificacao.observacao || justificacoes[selectedISO]?.motivo}</p>
+                  <span className={`text-[9px] ${isAprovado ? "text-orange-400" : isRecusado ? "text-purple-400" : "text-yellow-400"} block mt-1`}>
+                    {isAprovado ? "Aprovado" : isRecusado ? "Recusado" : "Em análise"}
+                  </span>
+                </div>
+              )
+            })()}
 
             {dayDetail.isMissing && (
               <div className="bg-red-500/8 rounded-lg p-3">
@@ -756,7 +813,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
                 onClick={() => handleQuickEdit(dayDetail.iso)}
                 className="w-full h-9 rounded-lg bg-blue-500/10 text-[11px] font-semibold text-blue-400 hover:bg-blue-500/20 transition-all"
               >
-                {dayDetail.isMissing || dayDetail.isJustified ? "Justificar falta" : "Editar registro"}
+                {dayDetail.isJustified ? "Editar justificativa" : dayDetail.isMissing ? "Justificar falta" : "Editar registro"}
               </button>
             )}
 

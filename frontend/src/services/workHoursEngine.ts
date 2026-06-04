@@ -36,7 +36,7 @@ const STD_DAY_MINS = STD_DAY_HOURS * 60
  */
 export function formatSaldoDisplay(netSaldo: number): string {
   if (netSaldo === 0) return "00h00m"
-  return netSaldo > 0 ? `+${formatMinutes(netSaldo)}` : formatMinutes(netSaldo)
+  return netSaldo > 0 ? formatMinutes(netSaldo) : formatMinutes(netSaldo)
 }
 
 /**
