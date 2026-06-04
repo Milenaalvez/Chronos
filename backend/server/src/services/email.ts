@@ -1,67 +1,27 @@
-import nodemailer from 'nodemailer'
-import dns from 'dns'
 import { env } from '../config/env.js'
 
-const hasSmtp = !!(env.smtpHost && env.smtpUser && env.smtpPass)
-
-let transporter: nodemailer.Transporter | null = null
-let transporterReady: Promise<void>
-
-if (hasSmtp) {
-  transporterReady = (async () => {
-    let host = env.smtpHost
-    try {
-      const addresses = await dns.promises.resolve4(env.smtpHost)
-      if (addresses.length > 0) {
-        host = addresses[0]
-        console.log(`[Email] ${env.smtpHost} resolvido para IPv4: ${host}`)
-      }
-    } catch (err: any) {
-      console.warn(`[Email] Não foi possível resolver IPv4 para ${env.smtpHost}: ${err.message}`)
-    }
-
-    for (const port of [env.smtpPort, env.smtpPort === 587 ? 465 : 587]) {
-      try {
-        const t = nodemailer.createTransport({
-          host,
-          port,
-          secure: port === 465,
-          auth: { user: env.smtpUser, pass: env.smtpPass },
-          connectionTimeout: 10000,
-          greetingTimeout: 10000,
-          socketTimeout: 10000,
-        })
-        await t.verify()
-        transporter = t
-        console.log(`[Email] Conexão SMTP OK (${host}:${port})`)
-        return
-      } catch (err: any) {
-        console.warn(`[Email] Tentativa SMTP ${host}:${port} falhou: ${err.message}`)
-      }
-    }
-    console.error('[Email] Todas as tentativas SMTP falharam — emails serão logados no console')
-  })()
-} else {
-  transporterReady = Promise.resolve()
-}
-
-function logFallback(to: string, subject: string, html: string) {
-  console.warn(`[Email] FALLBACK (console) -> TO: ${to} | SUBJECT: ${subject}`)
-  console.warn(`[Email] HTML:\n${html.replace(/<[^>]+>/g, '').slice(0, 500)}...`)
-}
+const EDGE_FUNCTION_URL = `${env.supabaseUrl}/functions/v1/send-email`
 
 async function send(to: string, subject: string, html: string) {
-  await transporterReady
-  if (transporter) {
-    try {
-      const info = await transporter.sendMail({ from: env.smtpFrom, to, subject, html })
-      console.log(`[Email] Enviado para ${to}: ${info.messageId}`)
-      return
-    } catch (err: any) {
-      console.error(`[Email] ERRO ao enviar para ${to}:`, err.message)
+  try {
+    const res = await fetch(EDGE_FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ to, subject, html }),
+      signal: AbortSignal.timeout(20000),
+    })
+    const data = await res.json()
+    if (data.ok) {
+      console.log(`[Email] Enviado para ${to}: ${data.messageId}`)
+    } else {
+      console.error(`[Email] Edge Function rejeitou: ${data.error}`)
     }
+  } catch (err: any) {
+    console.error(`[Email] ERRO ao enviar para ${to}:`, err.message)
   }
-  logFallback(to, subject, html)
 }
 
 function bannerTop() {
