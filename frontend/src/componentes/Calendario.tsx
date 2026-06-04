@@ -226,6 +226,42 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
     }
   }
 
+  function handleDayCellDidMount(arg: { el: HTMLElement; date: Date }) {
+    const d = arg.date
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+    const dayOfWeek = d.getDay()
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+    const isFuture = iso > today
+    if (isWeekend || isFuture) return
+
+    const just = justificacoes[iso]
+    const rec = allRecords.find((r) => r.dataISO === iso)
+    const isMissing = !rec || rec.tipo === "Pendente"
+
+    let color = ""
+    if (just) {
+      if (just.status === "aprovado") color = "#F97316"
+      else if (just.status === "em_analise") color = "#EAB308"
+      else if (just.status === "recusado") color = "#A855F7"
+    } else if (isMissing) {
+      color = "#EF4444"
+    } else {
+      color = "#22C55E"
+    }
+
+    if (color) {
+      const marker = document.createElement("div")
+      marker.className = "absolute top-[2px] left-[2px] right-[2px] h-[3px] rounded-t-[3px] z-10 pointer-events-none"
+      marker.style.backgroundColor = color
+      const frame = arg.el.querySelector(".fc-daygrid-day-frame")
+      if (frame) {
+        const existing = (frame as HTMLElement).style.position
+        if (!existing || existing === "static") (frame as HTMLElement).style.position = "relative"
+        frame.appendChild(marker)
+      }
+    }
+  }
+
   function handleQuickEdit(iso: string) {
     const rec = getRecord(iso)
     if ((!rec || rec.tipo === "Pendente") && iso <= today) {
@@ -625,7 +661,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
                   <h3 className="text-sm font-bold text-primary tracking-tight">{dayDetail.label}</h3>
                 </div>
               </div>
-              <button onClick={() => { setSelectedISO(null); setEditMode(false); setEditForm(null) }} className="w-6 h-6 rounded flex items-center justify-center text-muted hover:text-primary hover:bg-elevated/50 transition-all">
+              <button onClick={() => { setSelectedISO(null) }} className="w-6 h-6 rounded flex items-center justify-center text-muted hover:text-primary hover:bg-elevated/50 transition-all">
                 <X size={12} />
               </button>
             </div>
@@ -663,26 +699,12 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
               </div>
             )}
 
-            {dayDetail.record && dayDetail.record.tipo !== "Pendente" && !dayDetail.isJustified && !editMode && (
+            {dayDetail.record && dayDetail.record.tipo !== "Pendente" && !dayDetail.isJustified && (
               <div>
                 <span className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-2 block">Linha do tempo</span>
                 <div className="relative">
                   <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-elevated/50" />
                   <DayEvents record={dayDetail.record} />
-                </div>
-              </div>
-            )}
-
-            {dayDetail.record && dayDetail.record.tipo !== "Pendente" && !dayDetail.isJustified && editMode && editForm && (
-              <div>
-                <span className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-2 block">Editar horários</span>
-                <div className="relative">
-                  <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-elevated/50" />
-                  <EditableDayEvents
-                    record={dayDetail.record}
-                    form={editForm}
-                    onChange={(field, value) => setEditForm(prev => prev ? { ...prev, [field]: value } : prev)}
-                  />
                 </div>
               </div>
             )}

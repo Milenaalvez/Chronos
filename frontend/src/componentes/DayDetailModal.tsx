@@ -42,20 +42,21 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
   const [saving, setSaving] = useState(false)
 
   if (!open || !record) return null
+  const rec = record
 
-  const bancoDiaMins = computeDayBalanceMins(record)
+  const bancoDiaMins = computeDayBalanceMins(rec)
   const bancoDia = bancoDiaMins / 60
-  const isMissing = record.tipo === "Pendente"
-  const isWeekend = record.dataISO ? (new Date(record.dataISO + "T12:00:00").getDay() === 0 || new Date(record.dataISO + "T12:00:00").getDay() === 6) : false
+  const isMissing = rec.tipo === "Pendente"
+  const isWeekend = rec.dataISO ? (new Date(rec.dataISO + "T12:00:00").getDay() === 0 || new Date(rec.dataISO + "T12:00:00").getDay() === 6) : false
 
   function startEditing() {
     const now = new Date()
     const nowStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
     setEditForm({
-      entrada: record.entrada !== "---" ? record.entrada : nowStr,
-      saidaIntervalo: record.saidaIntervalo !== "---" ? record.saidaIntervalo : "",
-      retornoIntervalo: record.retornoIntervalo !== "---" ? record.retornoIntervalo : "",
-      saida: record.saida !== "---" ? record.saida : "",
+      entrada: rec.entrada !== "---" ? rec.entrada : nowStr,
+      saidaIntervalo: rec.saidaIntervalo !== "---" ? rec.saidaIntervalo : "",
+      retornoIntervalo: rec.retornoIntervalo !== "---" ? rec.retornoIntervalo : "",
+      saida: rec.saida !== "---" ? rec.saida : "",
     })
     setEditing(true)
   }
@@ -69,7 +70,7 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
     if (!editForm || !onSave) return
     setSaving(true)
     onSave({
-      data: record.dataISO,
+      data: rec.dataISO,
       entrada: editForm.entrada,
       saidaIntervalo: editForm.saidaIntervalo,
       retornoIntervalo: editForm.retornoIntervalo,
