@@ -1,6 +1,6 @@
 import { env } from '../config/env.js'
 
-const EDGE_FUNCTION_URL = `${env.supabaseUrl}/functions/v1/send-email`
+const EDGE_FUNCTION_URL = `${env.supabaseUrl}/functions/v1/resend-email`
 
 async function send(to: string, subject: string, html: string) {
   try {
