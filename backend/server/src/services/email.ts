@@ -10,7 +10,14 @@ async function send(to: string, subject: string, html: string) {
         'Authorization': `Bearer ${env.supabaseAnonKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ to, subject, html }),
+      body: JSON.stringify({
+        to, subject, html,
+        smtpHost: env.smtpHost,
+        smtpPort: env.smtpPort,
+        smtpUser: env.smtpUser,
+        smtpPass: env.smtpPass,
+        smtpFrom: env.smtpFrom,
+      }),
       signal: AbortSignal.timeout(20000),
     })
     const data = await res.json()
