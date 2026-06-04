@@ -350,9 +350,9 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
     )
   }
 
-  function handleDayCellDidMount(arg: { el: HTMLElement; date: Date; dateStr: string }) {
-    const iso = arg.dateStr
+  function handleDayCellDidMount(arg: { el: HTMLElement; date: Date }) {
     const d = arg.date
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
     const dayOfWeek = d.getDay()
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
     const isFuture = iso > today
