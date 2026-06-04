@@ -481,6 +481,7 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
         onClose={() => { setDetailOpen(false); setDetailRecord(null) }}
         record={detailRecord}
         onEdit={(iso) => { setDetailOpen(false); setDetailRecord(null); onEdit(iso) }}
+        onSave={handleSaveRecord}
         activityLogs={detailRecord ? buildActivityLogs(detailRecord) : undefined}
       />
 

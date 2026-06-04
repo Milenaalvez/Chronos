@@ -1,5 +1,6 @@
-import { X, Pencil, Clock, History } from "lucide-react"
-import type { TimeRecord } from "../types"
+import { useState } from "react"
+import { X, Pencil, Clock, History, LogIn, Coffee, Undo2, LogOut, CheckCircle2, Loader2 } from "lucide-react"
+import type { TimeRecord, FormData } from "../types"
 import { formatMinutes } from "../types"
 import { computeDayBalanceMins } from "../services/workHoursEngine"
 
@@ -15,6 +16,7 @@ interface DayDetailModalProps {
   onClose: () => void
   record: TimeRecord | null
   onEdit: (dataISO: string) => void
+  onSave?: (data: FormData) => void
   activityLogs?: ActivityLog[]
 }
 
@@ -34,13 +36,60 @@ const ACTION_CONFIG: Record<ActivityLog["action"], { icon: any; color: string; l
   justified: { icon: History, color: "text-[#5B9B7A]", label: "Justificado" },
 }
 
-export function DayDetailModal({ open, onClose, record, onEdit, activityLogs }: DayDetailModalProps) {
+export function DayDetailModal({ open, onClose, record, onEdit, onSave, activityLogs }: DayDetailModalProps) {
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState<{ entrada: string; saidaIntervalo: string; retornoIntervalo: string; saida: string } | null>(null)
+  const [saving, setSaving] = useState(false)
+
   if (!open || !record) return null
 
   const bancoDiaMins = computeDayBalanceMins(record)
   const bancoDia = bancoDiaMins / 60
   const isMissing = record.tipo === "Pendente"
   const isWeekend = record.dataISO ? (new Date(record.dataISO + "T12:00:00").getDay() === 0 || new Date(record.dataISO + "T12:00:00").getDay() === 6) : false
+
+  function startEditing() {
+    const now = new Date()
+    const nowStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+    setEditForm({
+      entrada: record.entrada !== "---" ? record.entrada : nowStr,
+      saidaIntervalo: record.saidaIntervalo !== "---" ? record.saidaIntervalo : "",
+      retornoIntervalo: record.retornoIntervalo !== "---" ? record.retornoIntervalo : "",
+      saida: record.saida !== "---" ? record.saida : "",
+    })
+    setEditing(true)
+  }
+
+  function cancelEditing() {
+    setEditing(false)
+    setEditForm(null)
+  }
+
+  async function handleSave() {
+    if (!editForm || !onSave) return
+    setSaving(true)
+    onSave({
+      data: record.dataISO,
+      entrada: editForm.entrada,
+      saidaIntervalo: editForm.saidaIntervalo,
+      retornoIntervalo: editForm.retornoIntervalo,
+      saida: editForm.saida,
+    })
+    setSaving(false)
+    setEditing(false)
+    setEditForm(null)
+  }
+
+  function handleFieldChange(field: string, value: string) {
+    setEditForm((prev) => prev ? { ...prev, [field]: value } : prev)
+  }
+
+  const fields: { icon: any; label: string; key: string; color: string }[] = [
+    { icon: LogIn, label: "Entrada", key: "entrada", color: "text-green-400" },
+    { icon: Coffee, label: "Intervalo", key: "saidaIntervalo", color: "text-yellow-400" },
+    { icon: Undo2, label: "Retorno", key: "retornoIntervalo", color: "text-blue-400" },
+    { icon: LogOut, label: "Saída", key: "saida", color: "text-red-400" },
+  ]
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -81,23 +130,65 @@ export function DayDetailModal({ open, onClose, record, onEdit, activityLogs }: 
           <div className="px-4 py-3 rounded-lg bg-elevated/50">
             <p className="text-sm text-muted leading-relaxed">Fim de semana — não há registro de jornada.</p>
           </div>
+        ) : editing && editForm ? (
+          <div className="flex flex-col gap-3">
+            <div className="space-y-2">
+              {fields.map((f) => {
+                const val = editForm[f.key as keyof typeof editForm]
+                const locked = f.key === "entrada"
+                return (
+                  <div key={f.key} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg ${locked ? "bg-elevated/40" : "bg-blue-500/5 border border-blue-500/20"}`}>
+                    <div className={`w-7 h-7 rounded flex items-center justify-center ${f.color.replace("text-", "bg-")}/10`}>
+                      <f.icon size={12} className={f.color} />
+                    </div>
+                    <span className="text-xs font-semibold text-secondary flex-1">{f.label}</span>
+                    {locked ? (
+                      <span className="text-sm font-mono font-bold text-primary">{val}</span>
+                    ) : (
+                      <input
+                        type="time"
+                        value={val || ""}
+                        onChange={(e) => handleFieldChange(f.key, e.target.value)}
+                        className="w-28 h-9 px-2 rounded-lg bg-surface border border-blue-500/30 text-sm font-mono font-bold text-primary outline-none focus:border-blue-400 transition-all"
+                      />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="flex items-center gap-2 mt-1">
+              <button
+                onClick={cancelEditing}
+                className="flex-1 h-10 rounded-lg bg-surface border border-default/40 text-xs font-semibold text-secondary hover:text-primary transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1 h-10 rounded-lg bg-blue-500 text-xs font-semibold text-white hover:bg-blue-600 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {saving ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                {saving ? "Salvando..." : "Salvar"}
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="flex flex-col gap-3">
             <div className="rounded-lg bg-elevated/50 divide-y divide-default/20">
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <div className="flex items-center gap-2.5">
-                  <Clock size={13} className="text-[var(--accent-hover)] shrink-0" />
-                  <span className="text-sm text-secondary">Entrada</span>
-                </div>
-                <span className="text-sm font-semibold text-primary font-mono">{record.entrada}</span>
-              </div>
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <div className="flex items-center gap-2.5">
-                  <Clock size={13} className="text-[#C96B6B] shrink-0" />
-                  <span className="text-sm text-secondary">Saída</span>
-                </div>
-                <span className="text-sm font-semibold text-primary font-mono">{record.saida}</span>
-              </div>
+              {fields.map((f, i) => {
+                const val = record[f.key as keyof TimeRecord] as string
+                return (
+                  <div key={i} className="flex items-center justify-between px-4 py-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <f.icon size={13} className={`${f.color} shrink-0`} />
+                      <span className="text-sm text-secondary">{f.label}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-primary font-mono">{val}</span>
+                  </div>
+                )
+              })}
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
@@ -113,13 +204,24 @@ export function DayDetailModal({ open, onClose, record, onEdit, activityLogs }: 
               </div>
             </div>
 
-            <button
-              onClick={() => { onClose(); onEdit(record.dataISO) }}
-              className="flex items-center justify-center gap-2 h-11 w-full rounded-lg bg-surface border border-default/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
-            >
-              <Pencil size={14} strokeWidth={2} />
-              Editar Registro
-            </button>
+            <div className="flex gap-2">
+              {onSave && (
+                <button
+                  onClick={startEditing}
+                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-surface border border-default/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
+                >
+                  <Pencil size={14} strokeWidth={2} />
+                  Editar
+                </button>
+              )}
+              <button
+                onClick={() => { onClose(); onEdit(record.dataISO) }}
+                className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200"
+              >
+                <Clock size={14} strokeWidth={2} />
+                Registrar Ponto
+              </button>
+            </div>
 
             {activityLogs && activityLogs.length > 0 && (
               <div className="flex flex-col gap-2.5 pt-1">

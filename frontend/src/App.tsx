@@ -490,8 +490,14 @@ export default function App() {
 
   useEffect(() => {
     if (!authenticated || !getToken()) return
-    if (!user) apiAuth.me().then((u) => setUser(u)).catch(() => {})
-    refreshRecords()
+    if (!user) {
+      apiAuth.me().then((u) => {
+        setUser(u)
+        refreshRecords()
+      }).catch(() => {})
+    } else {
+      refreshRecords()
+    }
     apiJust.list().then((data) => {
       const justMap: Record<string, Justificacao> = {}
       if (Array.isArray(data)) {
