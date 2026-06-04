@@ -93,12 +93,15 @@ export function computeSaldo(records: TimeRecord[], justificacoes: Record<string
       if (r.entrada !== "---") {
         const mins = Math.round(r.totalHours * 60)
         totalWorkedMins += mins
+        const saldo = mins - STD_DAY_MINS
+        if (saldo > 0) positiveMins += saldo
+        else if (saldo < 0) negativeMins += Math.abs(saldo)
         const idx = dayIndex.size
         dayIndex.set(r.dataISO, idx)
         dailyList.push({
           iso: r.dataISO,
           label: r.dataISO.slice(8, 10) + "/" + r.dataISO.slice(5, 7),
-          saldo: 0,
+          saldo,
         })
         continue
       }
@@ -188,7 +191,7 @@ export interface SimpleMonthStats {
 export function computeMonthStats(records: TimeRecord[]): SimpleMonthStats {
   const totalMins = records.reduce((s, r) => s + r.totalHours * 60, 0)
   const extraMins = records.reduce((s, r) => s + Math.max((r.totalHours - STD_DAY_HOURS) * 60, 0), 0)
-  const workedDays = new Set(records.filter((r) => r.tipo !== "Pendente").map((r) => r.dataISO)).size
+  const workedDays = new Set(records.filter((r) => !(r.tipo === "Pendente" && r.entrada === "---")).map((r) => r.dataISO)).size
   const normalHours = records
     .filter((r) => r.tipo === "Normal" || r.tipo === "Compensação")
     .reduce((s, r) => s + r.totalHours, 0)
