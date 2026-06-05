@@ -130,7 +130,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
               name="data"
               type="date"
               defaultValue={editDate ?? todayISO()}
-              className="w-full h-10 px-3 rounded-lg bg-elevated/50 text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated/80 transition-all duration-200"
+              className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated transition-all duration-200"
             />
           </div>
 
@@ -140,7 +140,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
               name="entrada"
               type="time"
               defaultValue={nowISO()}
-              className="w-full h-10 px-3 rounded-lg bg-elevated/50 text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated/80 transition-all duration-200"
+              className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated transition-all duration-200"
             />
           </div>
 
@@ -153,7 +153,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                     name="saidaIntervalo"
                     type="time"
                     defaultValue="12:00"
-                    className="w-full h-10 px-3 rounded-lg bg-elevated/50 text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated/80 transition-all duration-200"
+                    className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated transition-all duration-200"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -162,7 +162,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                     name="retornoIntervalo"
                     type="time"
                     defaultValue="13:00"
-                    className="w-full h-10 px-3 rounded-lg bg-elevated/50 text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated/80 transition-all duration-200"
+                    className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated transition-all duration-200"
                   />
                 </div>
               </div>
@@ -173,7 +173,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                   name="saida"
                   type="time"
                   defaultValue="17:00"
-                    className="w-full h-10 px-3 rounded-lg bg-elevated/50 text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated/80 transition-all duration-200"
+                    className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary placeholder-[#64748B] outline-none focus:bg-elevated transition-all duration-200"
                   />
                 </div>
               </>
@@ -189,7 +189,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
             <button
               type="button"
               onClick={onClose}
-            className="flex-1 h-11 rounded-lg bg-elevated/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated/80 transition-all duration-200"
+            className="flex-1 h-11 rounded-lg bg-elevated text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
           >
             Cancelar
           </button>

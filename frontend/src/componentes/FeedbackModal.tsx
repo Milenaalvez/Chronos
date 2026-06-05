@@ -58,7 +58,7 @@ export function FeedbackModal({
         </div>
 
         {details && details.length > 0 && (
-          <div className="mt-6 rounded-lg bg-elevated/50 p-4 flex flex-col gap-2">
+          <div className="mt-6 rounded-lg bg-elevated p-4 flex flex-col gap-2">
             {details.map((d, i) => (
               <div key={i} className="flex items-center justify-between">
                 <span className="text-[11px] text-muted">{d.label}</span>
@@ -84,7 +84,7 @@ export function FeedbackModal({
           {secondaryButton && (
             <button
               onClick={secondaryButton.onClick}
-              className="flex-1 h-11 rounded-lg bg-elevated/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated/80 transition-all duration-200"
+              className="flex-1 h-11 rounded-lg bg-elevated text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
             >
               {secondaryButton.text}
             </button>
