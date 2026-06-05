@@ -46,7 +46,7 @@ export function FeedbackModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-md mx-4 bg-surface border border-default/40 rounded-xl p-6 animate-in fade-in zoom-in duration-200"
+        className="relative w-full max-w-md mx-4 bg-surface shadow-modal rounded-xl p-6 animate-in fade-in zoom-in duration-200"
       >
         <div className="flex flex-col items-center text-center">
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${type === "success" ? "bg-[#5B9B7A]/8" : type === "pending" ? "bg-[#C49A6B]/8" : "bg-[#C96B6B]/8"}`}>
@@ -84,7 +84,7 @@ export function FeedbackModal({
           {secondaryButton && (
             <button
               onClick={secondaryButton.onClick}
-              className="flex-1 h-11 rounded-lg bg-surface border border-default/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
+              className="flex-1 h-11 rounded-lg bg-elevated/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated/80 transition-all duration-200"
             >
               {secondaryButton.text}
             </button>

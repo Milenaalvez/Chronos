@@ -202,7 +202,7 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
                         type="time"
                         value={val || ""}
                         onChange={(e) => handleFieldChange(f.key, e.target.value)}
-                        className="w-28 h-9 px-2 rounded-lg bg-surface border border-blue-500/30 text-sm font-mono font-bold text-primary outline-none focus:border-blue-400 transition-all"
+                        className="w-28 h-9 px-2 rounded-lg bg-blue-500/8 text-sm font-mono font-bold text-primary outline-none focus:bg-blue-500/15 transition-all"
                       />
                     )}
                   </div>

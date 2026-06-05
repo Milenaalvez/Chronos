@@ -509,7 +509,7 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setDeleteConfirmISO(null)}
-                className="flex-1 h-11 rounded-lg bg-surface border border-default/20 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
+                className="flex-1 h-11 rounded-lg bg-elevated/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated/80 transition-all duration-200"
               >
                 Cancelar
               </button>
