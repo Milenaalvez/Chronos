@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { X, Pencil, Clock, History, LogIn, Coffee, Undo2, LogOut, CheckCircle2, Loader2 } from "lucide-react"
 import type { TimeRecord, FormData } from "../types"
-import { formatMinutes, toMinutes } from "../types"
+import { formatMinutes } from "../types"
 
 interface ActivityLog {
   action: "created" | "edited" | "exported" | "justified"
