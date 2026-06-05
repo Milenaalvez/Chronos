@@ -52,6 +52,7 @@ export interface FormData {
   saidaIntervalo?: string
   retornoIntervalo?: string
   saida?: string
+  motivo?: string
 }
 
 export interface PageAction {
