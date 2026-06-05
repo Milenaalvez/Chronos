@@ -488,7 +488,7 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
       {deleteConfirmISO && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmISO(null)} />
-          <div className="relative w-full max-w-sm mx-4 bg-surface border border-default/40 dark:border-white/6 rounded-xl p-5 animate-in fade-in zoom-in duration-200">
+          <div className="relative w-full max-w-sm mx-4 bg-surface border border-default/10 shadow-modal rounded-xl p-5 animate-in fade-in zoom-in duration-200">
             <button
               onClick={() => setDeleteConfirmISO(null)}
               className="absolute top-4 right-4 md:w-11 md:h-11 w-7 h-7 rounded-md flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all duration-200"
@@ -509,7 +509,7 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setDeleteConfirmISO(null)}
-                className="flex-1 h-11 rounded-lg bg-surface border border-default/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
+                className="flex-1 h-11 rounded-lg bg-surface border border-default/20 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
               >
                 Cancelar
               </button>

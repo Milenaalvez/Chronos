@@ -65,7 +65,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg mx-4 bg-surface border border-default/40 rounded-xl p-6 animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-lg mx-4 bg-surface border border-default/10 shadow-modal rounded-xl p-6 animate-in fade-in zoom-in duration-200">
         <button
           onClick={onClose}
           className="absolute top-5 right-5 w-10 h-10 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-white/[0.07] transition-all duration-200"
@@ -130,7 +130,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
               name="data"
               type="date"
               defaultValue={editDate ?? todayISO()}
-              className="w-full h-10 px-3 rounded-lg bg-surface border border-default/50 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
+              className="w-full h-10 px-3 rounded-lg bg-surface border border-default/20 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
             />
           </div>
 
@@ -140,7 +140,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
               name="entrada"
               type="time"
               defaultValue={nowISO()}
-              className="w-full h-10 px-3 rounded-lg bg-surface border border-default/50 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
+              className="w-full h-10 px-3 rounded-lg bg-surface border border-default/20 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
             />
           </div>
 
@@ -153,7 +153,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                     name="saidaIntervalo"
                     type="time"
                     defaultValue="12:00"
-                    className="w-full h-10 px-3 rounded-lg bg-surface border border-default/50 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
+                    className="w-full h-10 px-3 rounded-lg bg-surface border border-default/20 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -162,7 +162,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                     name="retornoIntervalo"
                     type="time"
                     defaultValue="13:00"
-                    className="w-full h-10 px-3 rounded-lg bg-surface border border-default/50 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
+                    className="w-full h-10 px-3 rounded-lg bg-surface border border-default/20 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
                   />
                 </div>
               </div>
@@ -173,13 +173,13 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                   name="saida"
                   type="time"
                   defaultValue="17:00"
-                  className="w-full h-10 px-3 rounded-lg bg-surface border border-default/50 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
-                />
-              </div>
-            </>
-          )}
+                    className="w-full h-10 px-3 rounded-lg bg-surface border border-default/20 text-sm text-primary placeholder-[#64748B] outline-none focus:border-[var(--accent-hover)] transition-all duration-200"
+                  />
+                </div>
+              </>
+            )}
 
-          {error && (
+            {error && (
             <div className="px-3 py-2 rounded-lg bg-[#C96B6B]/8">
               <p className="text-xs font-medium text-[#C96B6B]">{error}</p>
             </div>
@@ -189,7 +189,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
             <button
               type="button"
               onClick={onClose}
-            className="flex-1 h-11 rounded-lg bg-surface border border-default/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
+            className="flex-1 h-11 rounded-lg bg-surface border border-default/20 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
           >
             Cancelar
           </button>

@@ -1,8 +1,7 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { X, Pencil, Clock, History, LogIn, Coffee, Undo2, LogOut, CheckCircle2, Loader2 } from "lucide-react"
 import type { TimeRecord, FormData } from "../types"
-import { formatMinutes } from "../types"
-import { computeDayBalanceMins } from "../services/workHoursEngine"
+import { formatMinutes, toMinutes } from "../types"
 
 interface ActivityLog {
   action: "created" | "edited" | "exported" | "justified"
@@ -21,12 +20,44 @@ interface DayDetailModalProps {
 }
 
 const WEEKDAY_NAMES = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"]
+const STD_DAY_MINS = 480
 
 function formatDateBR(iso: string): string {
   const [y, m, d] = iso.split("-")
   const date = new Date(+y, +m - 1, +d)
   const weekday = WEEKDAY_NAMES[date.getDay()]
   return `${weekday}, ${d}/${m}/${y}`
+}
+
+function parseTime(t: string): number {
+  if (!t || t === "---") return -1
+  const [h, m] = t.split(":").map(Number)
+  if (isNaN(h) || isNaN(m)) return -1
+  return h * 60 + m
+}
+
+function computePreview(form: { entrada: string; saidaIntervalo: string; retornoIntervalo: string; saida: string }) {
+  const entrada = parseTime(form.entrada)
+  const si = parseTime(form.saidaIntervalo)
+  const ri = parseTime(form.retornoIntervalo)
+  const saida = parseTime(form.saida)
+  if (entrada < 0) return null
+
+  const hasLunch = si >= 0 && ri >= 0
+  let totalMins = 0
+  if (hasLunch) {
+    totalMins = (saida >= 0 ? saida : 0) - entrada - (ri - si)
+  } else if (saida >= 0) {
+    totalMins = saida - entrada
+  }
+
+  const saldo = saida >= 0 ? totalMins - STD_DAY_MINS : 0
+  return {
+    totalMins: Math.max(totalMins, 0),
+    saldoMins: saldo,
+    isPartial: saida < 0,
+    hasLunch,
+  }
 }
 
 const ACTION_CONFIG: Record<ActivityLog["action"], { icon: any; color: string; label: string }> = {
@@ -40,14 +71,20 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
   const [editing, setEditing] = useState(false)
   const [editForm, setEditForm] = useState<{ entrada: string; saidaIntervalo: string; retornoIntervalo: string; saida: string } | null>(null)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   if (!open || !record) return null
   const rec = record
 
-  const bancoDiaMins = computeDayBalanceMins(rec)
+  const bancoDiaMins = Math.round((rec.totalHours - 8) * 60)
   const bancoDia = bancoDiaMins / 60
   const isMissing = rec.tipo === "Pendente"
   const isWeekend = rec.dataISO ? (new Date(rec.dataISO + "T12:00:00").getDay() === 0 || new Date(rec.dataISO + "T12:00:00").getDay() === 6) : false
+
+  const preview = useMemo(() => {
+    if (!editForm) return null
+    return computePreview(editForm)
+  }, [editForm])
 
   function startEditing() {
     const now = new Date()
@@ -59,11 +96,13 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
       saida: rec.saida !== "---" ? rec.saida : "",
     })
     setEditing(true)
+    setSaved(false)
   }
 
   function cancelEditing() {
     setEditing(false)
     setEditForm(null)
+    setSaved(false)
   }
 
   async function handleSave() {
@@ -72,17 +111,30 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
     onSave({
       data: rec.dataISO,
       entrada: editForm.entrada,
-      saidaIntervalo: editForm.saidaIntervalo,
-      retornoIntervalo: editForm.retornoIntervalo,
-      saida: editForm.saida,
+      saidaIntervalo: editForm.saidaIntervalo || undefined,
+      retornoIntervalo: editForm.retornoIntervalo || undefined,
+      saida: editForm.saida || undefined,
     })
     setSaving(false)
+    setSaved(true)
     setEditing(false)
     setEditForm(null)
   }
 
   function handleFieldChange(field: string, value: string) {
-    setEditForm((prev) => prev ? { ...prev, [field]: value } : prev)
+    setEditForm((prev) => {
+      if (!prev) return prev
+      const next = { ...prev, [field]: value }
+      if (field === "saidaIntervalo" && value && !next.retornoIntervalo) {
+        const [h, m] = value.split(":").map(Number)
+        if (!isNaN(h) && !isNaN(m)) {
+          const ri = new Date()
+          ri.setHours(h + 1, m)
+          next.retornoIntervalo = `${String(ri.getHours()).padStart(2, "0")}:${String(ri.getMinutes()).padStart(2, "0")}`
+        }
+      }
+      return next
+    })
   }
 
   const fields: { icon: any; label: string; key: string; color: string }[] = [
@@ -95,7 +147,7 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md mx-4 bg-surface border border-default/40 rounded-xl p-5 animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-md mx-4 bg-surface border border-default/10 shadow-modal rounded-xl p-5 animate-in fade-in zoom-in duration-200">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-10 h-10 rounded-md flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all duration-200"
@@ -105,7 +157,7 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
 
         <div className="flex flex-col gap-1 mb-6">
           <h2 className="text-lg font-bold text-primary tracking-tight">
-            {formatDateBR(record.dataISO)}
+            {formatDateBR(rec.dataISO)}
           </h2>
           <span className={`text-xs font-medium ${isMissing ? "text-[#C96B6B]" : isWeekend ? "text-[var(--accent-hover)]" : "text-[#5B9B7A]"}`}>
             {isMissing ? "Não registrado" : isWeekend ? "Fim de semana" : "Registrado"}
@@ -120,7 +172,7 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
               </p>
             </div>
             <button
-              onClick={() => { onClose(); onEdit(record.dataISO) }}
+              onClick={() => { onClose(); onEdit(rec.dataISO) }}
               className="flex items-center justify-center gap-2 h-11 w-full rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200"
             >
               <Pencil size={14} strokeWidth={2} />
@@ -158,10 +210,29 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
               })}
             </div>
 
+            {preview && (
+              <div className="grid grid-cols-2 gap-2">
+                <div className={`rounded-lg px-3 py-2 ${preview.isPartial ? "bg-blue-500/8" : "bg-elevated/50"}`}>
+                  <span className="text-[10px] text-muted font-medium uppercase tracking-wider">Total</span>
+                  <span className="text-sm font-bold font-mono text-primary block mt-0.5">
+                    {preview.isPartial ? "---" : formatMinutes(preview.totalMins)}
+                  </span>
+                  {preview.isPartial && <span className="text-[9px] text-blue-400 font-medium">em andamento</span>}
+                </div>
+                <div className={`rounded-lg px-3 py-2 ${preview.isPartial ? "bg-blue-500/8" : preview.saldoMins >= 0 ? "bg-green-500/8" : "bg-red-500/8"}`}>
+                  <span className="text-[10px] text-muted font-medium uppercase tracking-wider">Banco</span>
+                  <span className={`text-sm font-bold font-mono block mt-0.5 ${preview.isPartial ? "text-blue-400" : preview.saldoMins >= 0 ? "text-green-400" : "text-red-400"}`}>
+                    {preview.isPartial ? "---" : `${preview.saldoMins >= 0 ? "+" : ""}${formatMinutes(Math.abs(preview.saldoMins))}`}
+                  </span>
+                  {preview.isPartial && <span className="text-[9px] text-blue-400 font-medium">finalize o dia</span>}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-2 mt-1">
               <button
                 onClick={cancelEditing}
-                className="flex-1 h-10 rounded-lg bg-surface border border-default/40 text-xs font-semibold text-secondary hover:text-primary transition-all"
+                className="flex-1 h-10 rounded-lg bg-surface border border-default/20 text-xs font-semibold text-secondary hover:text-primary transition-all"
               >
                 Cancelar
               </button>
@@ -175,11 +246,16 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
               </button>
             </div>
           </div>
+        ) : saved ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-6">
+            <CheckCircle2 size={32} className="text-green-400" />
+            <span className="text-sm font-semibold text-primary">Registro salvo!</span>
+          </div>
         ) : (
           <div className="flex flex-col gap-3">
             <div className="rounded-lg bg-elevated/50 divide-y divide-default/20">
               {fields.map((f, i) => {
-                const val = record[f.key as keyof TimeRecord] as string
+                const val = rec[f.key as keyof TimeRecord] as string
                 return (
                   <div key={i} className="flex items-center justify-between px-4 py-2.5">
                     <div className="flex items-center gap-2.5">
@@ -195,7 +271,7 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
             <div className="grid grid-cols-2 gap-2.5">
               <div className="flex flex-col gap-0.5 px-3 py-2.5 rounded-lg bg-elevated/50">
                 <span className="text-[11px] text-muted font-medium">Total de horas</span>
-                <span className="text-base font-bold text-primary font-mono">{record.total}</span>
+                <span className="text-base font-bold text-primary font-mono">{rec.total}</span>
               </div>
               <div className="flex flex-col gap-0.5 px-3 py-2.5 rounded-lg bg-elevated/50">
                 <span className="text-[11px] text-muted font-medium">Banco do dia</span>
@@ -209,14 +285,14 @@ export function DayDetailModal({ open, onClose, record, onEdit, onSave, activity
               {onSave && (
                 <button
                   onClick={startEditing}
-                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-surface border border-default/50 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
+                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-surface border border-default/20 text-sm font-medium text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
                 >
                   <Pencil size={14} strokeWidth={2} />
                   Editar
                 </button>
               )}
               <button
-                onClick={() => { onClose(); onEdit(record.dataISO) }}
+                onClick={() => { onClose(); onEdit(rec.dataISO) }}
                 className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200"
               >
                 <Clock size={14} strokeWidth={2} />
