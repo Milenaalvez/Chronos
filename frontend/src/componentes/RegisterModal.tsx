@@ -100,9 +100,9 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg mx-4 bg-surface shadow-modal rounded-xl p-6 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-2xl mx-4 bg-surface shadow-modal rounded-xl p-6 animate-in fade-in zoom-in duration-200">
         <button
           onClick={onClose}
           className="absolute top-5 right-5 w-10 h-10 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-white/[0.07] transition-all duration-200"
@@ -193,48 +193,20 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Entrada</label>
-            <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
-              <LogIn size={14} className="text-green-400 shrink-0" />
-              <input
-                name="entrada"
-                type="time"
-                defaultValue={nowISO()}
-                className="flex-1 bg-transparent text-sm text-primary outline-none"
-              />
-            </div>
-          </div>
-
-          {!quickMode && (
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Saída Intervalo</label>
-                  <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
-                    <Coffee size={14} className="text-yellow-400 shrink-0" />
-                    <input
-                      name="saidaIntervalo"
-                      type="time"
-                      defaultValue="12:00"
-                      className="flex-1 bg-transparent text-sm text-primary outline-none"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Retorno Intervalo</label>
-                  <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
-                    <Undo2 size={14} className="text-blue-400 shrink-0" />
-                    <input
-                      name="retornoIntervalo"
-                      type="time"
-                      defaultValue="13:00"
-                      className="flex-1 bg-transparent text-sm text-primary outline-none"
-                    />
-                  </div>
+          {isEditing ? (
+            <div className="grid grid-cols-2 gap-x-5 gap-y-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Entrada</label>
+                <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
+                  <LogIn size={14} className="text-green-400 shrink-0" />
+                  <input
+                    name="entrada"
+                    type="time"
+                    defaultValue={nowISO()}
+                    className="flex-1 bg-transparent text-sm text-primary outline-none"
+                  />
                 </div>
               </div>
-
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Saída</label>
                 <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
@@ -247,50 +219,133 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                   />
                 </div>
               </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Saída Intervalo</label>
+                <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
+                  <Coffee size={14} className="text-yellow-400 shrink-0" />
+                  <input
+                    name="saidaIntervalo"
+                    type="time"
+                    defaultValue="12:00"
+                    className="flex-1 bg-transparent text-sm text-primary outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Retorno Intervalo</label>
+                <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
+                  <Undo2 size={14} className="text-blue-400 shrink-0" />
+                  <input
+                    name="retornoIntervalo"
+                    type="time"
+                    defaultValue="13:00"
+                    className="flex-1 bg-transparent text-sm text-primary outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Entrada</label>
+                <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
+                  <LogIn size={14} className="text-green-400 shrink-0" />
+                  <input
+                    name="entrada"
+                    type="time"
+                    defaultValue={nowISO()}
+                    className="flex-1 bg-transparent text-sm text-primary outline-none"
+                  />
+                </div>
+              </div>
+
+              {!quickMode && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Saída Intervalo</label>
+                      <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
+                        <Coffee size={14} className="text-yellow-400 shrink-0" />
+                        <input
+                          name="saidaIntervalo"
+                          type="time"
+                          defaultValue="12:00"
+                          className="flex-1 bg-transparent text-sm text-primary outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Retorno Intervalo</label>
+                      <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
+                        <Undo2 size={14} className="text-blue-400 shrink-0" />
+                        <input
+                          name="retornoIntervalo"
+                          type="time"
+                          defaultValue="13:00"
+                          className="flex-1 bg-transparent text-sm text-primary outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Saída</label>
+                    <div className="flex items-center gap-2.5 px-3 h-10 rounded-lg bg-elevated border border-default/10">
+                      <LogOut size={14} className="text-red-400 shrink-0" />
+                      <input
+                        name="saida"
+                        type="time"
+                        defaultValue="17:00"
+                        className="flex-1 bg-transparent text-sm text-primary outline-none"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
 
           {isEditing && (
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Motivo da solicitação</label>
-                <span className={`text-[10px] font-medium ${charCount >= 20 ? "text-[#5B9B7A]" : charCount > 0 ? "text-[#C49A6B]" : "text-muted"}`}>
-                  {charCount}/500
-                </span>
+            <div className="grid grid-cols-[1fr_240px] gap-5">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Motivo da solicitação</label>
+                  <span className={`text-[10px] font-medium ${charCount >= 20 ? "text-[#5B9B7A]" : charCount > 0 ? "text-[#C49A6B]" : "text-muted"}`}>
+                    {charCount}/500
+                  </span>
+                </div>
+                <textarea
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value)}
+                  placeholder="Descreva detalhadamente o motivo da correção."
+                  rows={4}
+                  maxLength={500}
+                  className="w-full px-3 py-2.5 rounded-lg bg-elevated border border-default/10 text-sm text-primary placeholder-muted outline-none focus:border-default/30 transition-all duration-200 resize-none"
+                />
+                {charCount > 0 && charCount < 20 && (
+                  <p className="text-[10px] text-[#C49A6B] font-medium">Mínimo de 20 caracteres</p>
+                )}
               </div>
-              <textarea
-                value={motivo}
-                onChange={(e) => setMotivo(e.target.value)}
-                placeholder="Descreva detalhadamente o motivo da correção."
-                rows={3}
-                maxLength={500}
-                className="w-full px-3 py-2.5 rounded-lg bg-elevated border border-default/10 text-sm text-primary placeholder-muted outline-none focus:border-default/30 transition-all duration-200 resize-none"
-              />
-              {charCount > 0 && charCount < 20 && (
-                <p className="text-[10px] text-[#C49A6B] font-medium">Mínimo de 20 caracteres</p>
-              )}
-            </div>
-          )}
 
-          {isEditing && (
-            <div className="rounded-lg bg-elevated border border-default/10 p-3 flex flex-col gap-2">
-              <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">Resumo da Solicitação</span>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-secondary">Data</span>
-                  <span className="text-[11px] font-semibold text-primary">{editDate ? formatDataBR(editDate) : ""}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-secondary">Horários alterados</span>
-                  <span className="text-[11px] font-semibold text-primary">4</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-secondary">Status após envio</span>
-                  <span className="text-[11px] font-semibold text-[#C49A6B]">Aguardando análise</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-secondary">Responsável pela aprovação</span>
-                  <span className="text-[11px] font-semibold text-primary">RH / Gestor</span>
+              <div className="rounded-lg bg-elevated border border-default/10 p-3 flex flex-col gap-2">
+                <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">Resumo da Solicitação</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-secondary">Data</span>
+                    <span className="text-[11px] font-semibold text-primary">{editDate ? formatDataBR(editDate) : ""}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-secondary">Horários alterados</span>
+                    <span className="text-[11px] font-semibold text-primary">4</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-secondary">Status após envio</span>
+                    <span className="text-[11px] font-semibold text-[#C49A6B]">Aguardando análise</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-secondary">Responsável pela aprovação</span>
+                    <span className="text-[11px] font-semibold text-primary">RH / Gestor</span>
+                  </div>
                 </div>
               </div>
             </div>
