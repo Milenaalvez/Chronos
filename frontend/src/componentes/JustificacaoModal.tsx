@@ -74,7 +74,7 @@ export function JustificacaoModal({ open, onClose, onSave, defaultDate }: Justif
                 type="date"
                 value={dataInicio}
                 onChange={(e) => setDataInicio(e.target.value)}
-                className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary outline-none focus:bg-elevated/80 transition-all duration-200"
+                className="w-full h-10 px-3 rounded-lg bg-elevated border border-default/10 text-sm text-primary outline-none focus:border-default/30 transition-all duration-200"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -83,7 +83,7 @@ export function JustificacaoModal({ open, onClose, onSave, defaultDate }: Justif
                 type="date"
                 value={dataFim}
                 onChange={(e) => setDataFim(e.target.value)}
-                className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary outline-none focus:bg-elevated/80 transition-all duration-200"
+                className="w-full h-10 px-3 rounded-lg bg-elevated border border-default/10 text-sm text-primary outline-none focus:border-default/30 transition-all duration-200"
               />
             </div>
           </div>
@@ -93,7 +93,7 @@ export function JustificacaoModal({ open, onClose, onSave, defaultDate }: Justif
             <select
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
-              className="w-full h-10 px-3 rounded-lg bg-elevated text-sm text-primary outline-none focus:bg-elevated/80 transition-all duration-200 appearance-none"
+              className="w-full h-10 px-3 rounded-lg bg-elevated border border-default/10 text-sm text-primary outline-none focus:border-default/30 transition-all duration-200 appearance-none"
             >
               <option value="" disabled>Selecione um motivo</option>
               {JUSTIFICATIVAS.map((j) => (
@@ -107,7 +107,7 @@ export function JustificacaoModal({ open, onClose, onSave, defaultDate }: Justif
               <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Anexar documento</label>
               <button
                 onClick={() => fileRef.current?.click()}
-                className="flex items-center gap-3 w-full h-10 px-3 rounded-lg bg-elevated text-sm text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
+                className="flex items-center gap-3 w-full h-10 px-3 rounded-lg bg-elevated border border-default/10 text-sm text-secondary hover:text-primary hover:bg-elevated transition-all duration-200"
               >
                 <Paperclip size={14} strokeWidth={2} />
                 <span>{anexoNome || "Selecionar arquivo (PDF, imagem)"}</span>

@@ -189,7 +189,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
           }}
         >
           {isEditing ? (
-            <div className="grid grid-cols-[1fr_360px] gap-6">
+            <div className="grid grid-cols-2 gap-6">
               {/* ─── LEFT COLUMN: Data + Horários ─── */}
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
@@ -255,8 +255,8 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
               </div>
 
               {/* ─── RIGHT COLUMN: Motivo + Resumo + Prazo ─── */}
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5 flex-1">
+              <div className="flex flex-col gap-4 min-h-0">
+                <div className="flex flex-col gap-1.5 flex-1 min-h-0">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Motivo da solicitação</label>
                     <span className={`text-[10px] font-medium ${charCount >= 20 ? "text-[#5B9B7A]" : charCount > 0 ? "text-[#C49A6B]" : "text-muted"}`}>
@@ -267,9 +267,8 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                     value={motivo}
                     onChange={(e) => setMotivo(e.target.value)}
                     placeholder="Descreva detalhadamente o motivo da correção."
-                    rows={5}
                     maxLength={500}
-                    className="w-full h-full min-h-[100px] px-3 py-2.5 rounded-lg bg-elevated border border-default/10 text-sm text-primary placeholder-muted outline-none focus:border-default/30 transition-all duration-200 resize-none"
+                    className="w-full flex-1 px-3 py-2.5 rounded-lg bg-elevated border border-default/10 text-sm text-primary placeholder-muted outline-none focus:border-default/30 transition-all duration-200 resize-none min-h-[120px]"
                   />
                   {charCount > 0 && charCount < 20 && (
                     <p className="text-[10px] text-[#C49A6B] font-medium">Mínimo de 20 caracteres</p>
