@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react"
-import { X, Clock, AlertCircle, Send, LogIn, Coffee, Undo2, LogOut } from "lucide-react"
+import { X, Clock, AlertCircle, Send, LogIn, Coffee, Undo2, LogOut, Calendar, ShieldCheck } from "lucide-react"
 import type { FormData } from "../types"
 import { toMinutes } from "../types"
 
@@ -189,6 +189,7 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
           }}
         >
           {isEditing ? (
+            <>
             <div className="grid grid-cols-2 gap-6">
               {/* ─── LEFT COLUMN: Data + Horários ─── */}
               <div className="flex flex-col gap-4">
@@ -254,8 +255,8 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                 </div>
               </div>
 
-              {/* ─── RIGHT COLUMN: Motivo + Resumo + Prazo ─── */}
-              <div className="flex flex-col gap-4 min-h-0">
+              {/* ─── RIGHT COLUMN: Motivo ─── */}
+              <div className="flex flex-col min-h-0">
                 <div className="flex flex-col gap-1.5 flex-1 min-h-0">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Motivo da solicitação</label>
@@ -274,35 +275,52 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
                     <p className="text-[10px] text-[#C49A6B] font-medium">Mínimo de 20 caracteres</p>
                   )}
                 </div>
+              </div>
+            </div>
 
-                <div className="grid grid-cols-2 gap-3 rounded-lg bg-elevated border border-default/10 p-3">
+            {/* ─── BOTTOM SECTION: Resumo + Prazo ─── */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="rounded-lg bg-elevated border border-default/10 p-4">
+                <h4 className="text-[11px] font-bold text-secondary uppercase tracking-wider mb-3">Resumo da Solicitação</h4>
+                <div className="grid grid-cols-2 gap-y-3 gap-x-4">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[9px] text-muted uppercase tracking-wider font-semibold">Data</span>
                     <span className="text-xs font-semibold text-primary">{editDate ? formatDateBR(editDate) : ""}</span>
                   </div>
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex flex-col gap-0.5 items-end">
                     <span className="text-[9px] text-muted uppercase tracking-wider font-semibold">Horários Alterados</span>
                     <span className="text-xs font-semibold text-primary">4</span>
                   </div>
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[9px] text-muted uppercase tracking-wider font-semibold">Status</span>
-                    <span className="text-xs font-semibold text-[#C49A6B]">Aguardando Análise</span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#C49A6B]/10 text-[11px] font-semibold text-[#C49A6B] w-fit">
+                      <span className="w-1 h-1 rounded-full bg-[#C49A6B]" />
+                      Aguardando Análise
+                    </span>
                   </div>
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex flex-col gap-0.5 items-end">
                     <span className="text-[9px] text-muted uppercase tracking-wider font-semibold">Aprovador</span>
                     <span className="text-xs font-semibold text-primary">RH / Gestor</span>
                   </div>
                 </div>
-
-                <div className="rounded-lg bg-elevated border border-default/10 p-3 flex items-center justify-between">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[9px] text-muted uppercase tracking-wider font-semibold">Prazo Limite</span>
-                    <span className="text-xs font-semibold text-primary">{deadlineDate}</span>
+              </div>
+              <div className="rounded-lg bg-elevated border border-[#C49A6B]/20 p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#C49A6B]/10 flex items-center justify-center">
+                    <Calendar size={16} className="text-[#C49A6B]" />
                   </div>
-                  <span className="text-xs font-semibold font-mono text-[#C49A6B]">23:59</span>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-muted uppercase tracking-wider font-semibold">Prazo para Alterações</span>
+                    <span className="text-sm font-bold text-primary">{deadlineDate}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-[9px] text-muted uppercase tracking-wider font-semibold">Horário Limite</span>
+                  <span className="text-sm font-bold font-mono text-[#C49A6B]">23:59</span>
                 </div>
               </div>
             </div>
+            </>
           ) : (
             <>
               <div className="flex flex-col gap-1.5">
@@ -391,15 +409,17 @@ export function RegisterModal({ open, onClose, onSave, editDate }: RegisterModal
               </button>
               <button
                 type="submit"
-                className="flex-1 h-11 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200"
+                className="flex-1 h-11 rounded-lg bg-[var(--accent-primary)] text-sm font-semibold text-white hover:bg-[var(--accent-hover)] transition-all duration-200 flex items-center justify-center gap-2"
                 disabled={isEditing && charCount < 20}
               >
+                <Send size={14} className="shrink-0" />
                 {quickMode ? "Registrar Entrada" : isEditing ? "Enviar para Análise" : "Salvar Registro"}
               </button>
             </div>
             {isEditing && (
-              <p className="text-[10px] text-muted text-center">
-                As alterações não serão aplicadas automaticamente. Toda solicitação será analisada pelo responsável.
+              <p className="text-[10px] text-muted text-center flex items-center justify-center gap-1.5">
+                <ShieldCheck size={12} className="text-muted shrink-0" />
+                Suas alterações não serão aplicadas automaticamente. Elas serão analisadas e aprovadas pelo responsável.
               </p>
             )}
           </div>
