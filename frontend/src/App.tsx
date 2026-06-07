@@ -194,7 +194,7 @@ function generateMissingRecords(existing: TimeRecord[], hireDate?: string): Time
 export default function App() {
   const [authenticated, setAuthenticated] = useState(false)
   const [restoring, setRestoring] = useState(true)
-  const [user, setUser] = useState<{ id: string; name: string; email: string; role: string; position?: string | null; avatar?: string | null; companyId?: string; hireDate?: string; permissions?: string[]; emailVerified?: boolean; themeMode?: string; themeAccent?: string; cpf?: string | null; phone?: string | null; department?: string | null; registrationNumber?: string | null; employeeCode?: string | null; contractType?: string | null; weeklyHours?: number } | null>(null)
+  const [user, setUser] = useState<{ id: string; name: string; email: string; role: string; position?: string | null; avatar?: string | null; companyId?: string; hireDate?: string; permissions?: string[]; emailVerified?: boolean; themeMode?: string; themeAccent?: string; cpf?: string | null; phone?: string | null; department?: string | null; registrationNumber?: string | null; employeeCode?: string | null; contractType?: string | null; weeklyHours?: number; workSchedule?: string } | null>(null)
   const [page, setPage] = useState("dashboard")
   const [modalOpen, setModalOpen] = useState(false)
   const [editDate, setEditDate] = useState<string | undefined>(undefined)

@@ -437,6 +437,7 @@ export const pointRecords = {
     hasPhoto?: boolean
     password?: string
     faceVerified?: boolean | null
+    outsideSchedule?: boolean
   }) =>
     request<any>('/point-records', {
       method: 'POST',

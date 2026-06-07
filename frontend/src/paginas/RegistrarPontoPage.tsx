@@ -162,8 +162,37 @@ interface RegistrarPontoPageProps {
     department?: string | null
     contractType?: string | null
     weeklyHours?: number
+    workSchedule?: string
   }
   onPointCreated?: () => void
+}
+
+const WEEKDAY_NAMES_SHORT: Record<number, string> = {
+  0: "Domingo", 1: "Segunda", 2: "Terça", 3: "Quarta",
+  4: "Quinta", 5: "Sexta", 6: "Sábado",
+}
+
+function isWorkday(iso: string, workSchedule?: string): boolean {
+  const d = new Date(iso + "T12:00:00")
+  if (isNaN(d.getTime())) return true
+  const day = d.getDay()
+
+  if (!workSchedule) return day >= 1 && day <= 5
+  if (workSchedule === "Seg-Dom") return true
+  if (workSchedule === "Seg-Sab") return day >= 1 && day <= 6
+  if (workSchedule === "Seg-Sex" || workSchedule === "Seg-Sexta") return day >= 1 && day <= 5
+
+  const dayMap: Record<string, number> = {
+    "Dom": 0, "Domingo": 0,
+    "Seg": 1, "Segunda": 1,
+    "Ter": 2, "Terça": 2, "Terca": 2,
+    "Qua": 3, "Quarta": 3,
+    "Qui": 4, "Quinta": 4,
+    "Sex": 5, "Sexta": 5,
+    "Sab": 6, "Sábado": 6, "Sabado": 6,
+  }
+  const parts = workSchedule.split(",").map(s => s.trim())
+  return parts.some(p => dayMap[p] === day)
 }
 
 export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageProps) {
@@ -184,6 +213,11 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
   // Face verification state
   const [faceRegistered, setFaceRegistered] = useState<boolean | null>(null)
   const [faceDescriptors, setFaceDescriptors] = useState<number[][] | null>(null)
+
+  // Schedule warning state
+  const [scheduleWarningOpen, setScheduleWarningOpen] = useState(false)
+  const [pendingScheduleType, setPendingScheduleType] = useState<PointType | null>(null)
+  const [outsideSchedule, setOutsideSchedule] = useState(false)
 
   // Live location tracking
   const [liveCoords, setLiveCoords] = useState<{ latitude: number; longitude: number; accuracy: number } | null>(null)
@@ -375,6 +409,7 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
         hasPhoto,
         password,
         faceVerified,
+        outsideSchedule: outsideSchedule || undefined,
       })
 
       console.log('[Ponto] Ponto salvo com sucesso')
@@ -393,16 +428,38 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
   }, [selectedType, location, faceRegistered, faceDescriptors, fetchEvents, onPointCreated])
 
   const openModal = useCallback((type: PointType) => {
+    if (!outsideSchedule && !isWorkday(todayISO(), user?.workSchedule)) {
+      setPendingScheduleType(type)
+      setScheduleWarningOpen(true)
+      return
+    }
     setSelectedType(type)
     setError(null)
     setSuccessMsg(null)
     setLocationModalOpen(false)
     setModalOpen(true)
-  }, [])
+  }, [user?.workSchedule, outsideSchedule])
 
   const closeModal = useCallback(() => {
     setModalOpen(false)
     setSelectedType(null)
+  }, [])
+
+  const handleScheduleConfirm = useCallback(() => {
+    setScheduleWarningOpen(false)
+    setOutsideSchedule(true)
+    if (pendingScheduleType) {
+      setSelectedType(pendingScheduleType)
+      setError(null)
+      setSuccessMsg(null)
+      setLocationModalOpen(false)
+      setModalOpen(true)
+    }
+  }, [pendingScheduleType])
+
+  const handleScheduleCancel = useCallback(() => {
+    setScheduleWarningOpen(false)
+    setPendingScheduleType(null)
   }, [])
 
   const eventStatusIcon = (type: PointType) => {
@@ -899,6 +956,47 @@ export function RegistrarPontoPage({ user, onPointCreated }: RegistrarPontoPageP
           onConfirm={handleModalConfirm}
           onCancel={closeModal}
         />
+      )}
+
+      {/* ─── SCHEDULE WARNING MODAL ─── */}
+      {scheduleWarningOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-md bg-surface rounded-2xl border border-default overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex flex-col gap-6 p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                  <AlertTriangle size={24} className="text-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-base font-bold text-primary">Aviso de escala</h2>
+                  <p className="text-sm text-secondary mt-2 leading-relaxed">
+                    Hoje (<strong className="text-primary">{WEEKDAY_NAMES_SHORT[new Date().getDay()]}</strong>) não está na sua escala de trabalho (<strong className="text-primary">{user?.workSchedule || "Seg-Sex"}</strong>).
+                  </p>
+                  <p className="text-sm text-secondary mt-2 leading-relaxed">
+                    Sua presença não será contabilizada como jornada normal. O registro será enviado para análise do gestor.
+                  </p>
+                  <p className="text-xs text-amber-400 mt-3 font-medium">
+                    Deseja continuar mesmo assim?
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 justify-end pt-2 border-t border-default/50">
+                <button
+                  onClick={handleScheduleCancel}
+                  className="px-5 h-10 rounded-lg text-xs font-semibold text-secondary hover:text-primary bg-elevated/50 hover:bg-elevated transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleScheduleConfirm}
+                  className="px-5 h-10 rounded-lg text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-all"
+                >
+                  Continuar mesmo assim
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ─── LOCATION MODAL ─── */}
