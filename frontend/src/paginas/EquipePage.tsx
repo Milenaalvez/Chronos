@@ -1615,9 +1615,9 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
               </p>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-accent-red/8 mb-5">
-              <AlertTriangle size={14} className="text-accent-red shrink-0" strokeWidth={2} />
-              <span className="text-[11px] text-accent-red font-medium">Esta ação não pode ser desfeita.</span>
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-500/10 mb-5">
+              <AlertTriangle size={14} className="text-amber-400 shrink-0" strokeWidth={2} />
+              <span className="text-[11px] text-amber-400 font-medium">Esta ação não pode ser desfeita.</span>
             </div>
 
             <div className="flex items-center gap-2.5">
@@ -1628,7 +1628,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                 Cancelar
               </button>
               <button
-                onClick={handleDeleteConfirm}
+                onClick={() => handleDeleteConfirm()}
                 className="flex-1 h-11 rounded-lg bg-accent-red text-sm font-semibold text-white hover:bg-accent-red/80 transition-all duration-200"
               >
                 Excluir

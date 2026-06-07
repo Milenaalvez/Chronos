@@ -501,9 +501,9 @@ export function RegistrosPage({ allRecords, justificacoes, onEdit, onSave, onJus
               <p className="text-sm text-secondary">Tem certeza que deseja excluir o registro do dia <strong className="text-primary">{deleteConfirmISO ? formatDataBR(deleteConfirmISO) : ""}</strong>?</p>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[#C96B6B]/8 mb-5">
-              <AlertTriangle size={14} className="text-[#C96B6B] shrink-0" strokeWidth={2} />
-              <span className="text-[11px] text-[#C96B6B] font-medium">Esta ação não pode ser desfeita.</span>
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-500/10 mb-5">
+              <AlertTriangle size={14} className="text-amber-400 shrink-0" strokeWidth={2} />
+              <span className="text-[11px] text-amber-400 font-medium">Esta ação não pode ser desfeita.</span>
             </div>
 
             <div className="flex items-center gap-2.5">
