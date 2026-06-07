@@ -180,6 +180,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("todas")
   const [statusFilter, setStatusFilter] = useState("todos")
+  const [showInactive, setShowInactive] = useState(false)
   const [sortOrder, setSortOrder] = useState<"az" | "za">("az")
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -304,9 +305,10 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
     }
     if (roleFilter !== "todas") list = list.filter(m => m.role === roleFilter)
     if (statusFilter !== "todos") list = list.filter(m => statusOf(m) === statusFilter)
+    if (!showInactive) list = list.filter(m => m.isActive)
     list.sort((a, b) => sortOrder === "az" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
     return list
-  }, [membersWithLocalStats, search, roleFilter, statusFilter, sortOrder])
+  }, [membersWithLocalStats, search, roleFilter, statusFilter, sortOrder, showInactive])
 
   const pendingJusts = useMemo(() => justifications.filter(j => j.status === "PENDING"), [justifications])
   const roles = useMemo(() => ["todas", ...new Set(membersWithLocalStats.map(m => m.role))], [membersWithLocalStats])
@@ -627,6 +629,16 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
               <option value="az" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">A → Z</option>
               <option value="za" className="bg-white dark:bg-[#1e293b] text-gray-900 dark:text-gray-100">Z → A</option>
             </select>
+            <button
+              onClick={() => setShowInactive(!showInactive)}
+              className={`h-9 px-3 rounded-lg border text-[11px] font-semibold transition-all duration-200 ${
+                showInactive
+                  ? "border-accent-red/30 bg-accent-red/8 text-accent-red"
+                  : "border-default/20 bg-input text-muted hover:text-primary"
+              }`}
+            >
+              {showInactive ? "Ocultar inativos" : "Mostrar inativos"}
+            </button>
             <span className="text-[11px] text-muted whitespace-nowrap">{filtered.length} de {members.length}</span>
           </div>
 
