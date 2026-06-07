@@ -1,31 +1,34 @@
+import nodemailer from 'nodemailer'
 import { env } from '../config/env.js'
 
-const EDGE_FUNCTION_URL = `${env.supabaseUrl}/functions/v1/resend-email`
+let transporter: nodemailer.Transporter | null = null
+
+function getTransporter(): nodemailer.Transporter | null {
+  if (transporter) return transporter
+  if (!env.smtpHost || !env.smtpUser || !env.smtpPass) {
+    console.warn('[Email] SMTP não configurado — e-mails não serão enviados')
+    return null
+  }
+  transporter = nodemailer.createTransport({
+    host: env.smtpHost,
+    port: env.smtpPort,
+    secure: env.smtpPort === 465,
+    auth: { user: env.smtpUser, pass: env.smtpPass },
+  })
+  return transporter
+}
 
 async function send(to: string, subject: string, html: string) {
+  const t = getTransporter()
+  if (!t) return
   try {
-    const res = await fetch(EDGE_FUNCTION_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.supabaseAnonKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to, subject, html,
-        smtpHost: env.smtpHost,
-        smtpPort: env.smtpPort,
-        smtpUser: env.smtpUser,
-        smtpPass: env.smtpPass,
-        smtpFrom: env.smtpFrom,
-      }),
-      signal: AbortSignal.timeout(20000),
+    const info = await t.sendMail({
+      from: env.smtpFrom || 'noreply@chronos.app',
+      to,
+      subject,
+      html,
     })
-    const data = await res.json()
-    if (data.ok) {
-      console.log(`[Email] Enviado para ${to}: ${data.messageId}`)
-    } else {
-      console.error(`[Email] Edge Function rejeitou: ${data.error}`)
-    }
+    console.log(`[Email] Enviado para ${to}: ${info.messageId}`)
   } catch (err: any) {
     console.error(`[Email] ERRO ao enviar para ${to}:`, err.message)
   }
@@ -202,9 +205,12 @@ const STATUS_COLORS: Record<string, string> = {
   ENCERRADO: '#6B7280',
 }
 
-export async function sendTicketUpdateEmail(to: string, requesterName: string, protocol: string, title: string, status: string, message?: string) {
+export async function sendTicketUpdateEmail(to: string, requesterName: string, protocol: string, title: string, status: string, message?: string, ticketId?: string) {
   const statusLabel = STATUS_LABELS[status] || status
   const statusColor = STATUS_COLORS[status] || '#6B7280'
+  const ticketLink = ticketId
+    ? `${env.appUrl}/solicitacoes/${ticketId}`
+    : `${env.appUrl}/solicitacoes`
   await send(to, `[${protocol}] Solicitação atualizada - Chronos`, `
     <div style="font-family:Arial,Helvetica,sans-serif;background:#f8fafc;padding:20px;">
       <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;">
@@ -228,9 +234,9 @@ export async function sendTicketUpdateEmail(to: string, requesterName: string, p
             </div>
           ` : ''}
           <p style="margin:24px 0 8px;color:#64748B;">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/solicitacoes"
+            <a href="${ticketLink}"
                style="color:#3B82F6;font-weight:600;text-decoration:underline;">
-              Acessar Central de Solicitações →
+              Acessar esta solicitação →
             </a>
           </p>
           ${bannerBottom()}

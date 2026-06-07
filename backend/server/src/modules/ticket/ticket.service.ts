@@ -115,7 +115,7 @@ export async function createTicket(
 ) {
   const assignedTo = await findAssignee(companyId, data.category)
 
-  let ticket
+  let ticket: any
   let protocol
   for (let attempt = 0; attempt < 3; attempt++) {
     protocol = await generateProtocol(companyId)
@@ -167,7 +167,7 @@ export async function createTicket(
   }
 
   return prisma.ticket.findUnique({
-    where: { id: ticket.id },
+    where: { id: ticket!.id },
     include: {
       user: { select: { id: true, name: true, avatar: true, email: true } },
       assignee: { select: { id: true, name: true, avatar: true, email: true } },
@@ -248,6 +248,12 @@ export async function updateTicketStatus(
   if (ticket.companyId !== companyId) return null
   if (!MANAGER_ROLES.includes(role)) return null
 
+  const resolver = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { name: true },
+  })
+  const resolverName = resolver?.name || 'Responsável'
+
   const updated = await prisma.ticket.update({
     where: { id: ticketId },
     data: { status: status as TicketStatus },
@@ -268,9 +274,13 @@ export async function updateTicketStatus(
     })
   }
 
+  const statusLabel: Record<string, string> = { ABERTO: 'Aberto', EM_ANALISE: 'Em Análise', AGUARDANDO_RESPOSTA: 'Aguardando Resposta', RESOLVIDO: 'Resolvido', ENCERRADO: 'Encerrado' }
+  const notifMsg = message
+    ? `${ticket.protocol} - ${statusLabel[status] || status} por ${resolverName}: "${message.slice(0, 80)}"`
+    : `${ticket.protocol} - ${statusLabel[status] || status} por ${resolverName}`
   notificationService.createNotification(ticket.userId, {
     title: 'Solicitação atualizada',
-    message: `${ticket.protocol} - Status: ${status}`,
+    message: notifMsg,
     type: 'INFO',
     link: `/solicitacoes/${ticketId}`,
   }).catch(() => {})
@@ -284,6 +294,7 @@ export async function updateTicketStatus(
       ticket.title,
       status,
       message,
+      ticketId,
     ).catch(() => {})
   }
 
