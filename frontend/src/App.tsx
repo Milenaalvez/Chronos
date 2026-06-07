@@ -249,15 +249,16 @@ export default function App() {
     if (!user) return
     apiRecords.list().then((data: any[]) => {
       const mapped = data.map(apiRecordToTimeRecord)
-      const mismatched = mapped.filter((r: TimeRecord) => r.userId && r.userId !== user.id)
-      if (mismatched.length > 0) {
-        console.group('⚠️ Records de outro usuário detectados')
+      const own = mapped.filter((r: TimeRecord) => r.userId === user.id)
+      const mismatched = mapped.length - own.length
+      if (mismatched > 0) {
+        console.group('⚠️ Backend retornou records de outro usuário')
         console.log('Usuário atual:', user.id, user.name)
-        console.log('Records com userId diferente:', mismatched.length)
-        console.log('Primeiro record:', mismatched[0])
+        console.log('Records do próprio:', own.length)
+        console.log('Records de outros:', mismatched)
         console.groupEnd()
       }
-      setRecords(mapped)
+      setRecords(own)
       setRecordsLoaded(true)
     }).catch(() => {})
   }, [user])
@@ -300,10 +301,9 @@ export default function App() {
 
   const hireDate = user?.hireDate
   const allRecords = useMemo(() => {
-    const filtered = records.filter((r) => !r.userId || r.userId === user?.id)
-    const missing = generateMissingRecords(filtered, hireDate)
-    return [...filtered, ...missing].filter((r) => r.dataISO >= (hireDate || '') && !deletedDates.has(r.dataISO))
-  }, [records, deletedDates, hireDate, user?.id])
+    const missing = generateMissingRecords(records, hireDate)
+    return [...records, ...missing].filter((r) => r.dataISO >= (hireDate || '') && !deletedDates.has(r.dataISO))
+  }, [records, deletedDates, hireDate])
 
   useEffect(() => {
     if (authenticated && allRecords.length > 0 && import.meta.env.DEV) {
@@ -345,7 +345,7 @@ export default function App() {
       ...(fd.saidaIntervalo && fd.saidaIntervalo !== "---" ? { breakStart: fd.saidaIntervalo } : {}),
       ...(fd.retornoIntervalo && fd.retornoIntervalo !== "---" ? { breakEnd: fd.retornoIntervalo } : {}),
     }).then(() => {
-      return apiRecords.list().then((data) => setRecords(data.map(apiRecordToTimeRecord)))
+      return apiRecords.list().then((data: any[]) => setRecords(data.map(apiRecordToTimeRecord).filter((r) => r.userId === user!.id)))
     }).then(() => {
     apiNotifs.refresh().catch(() => {})
     }).catch((err) => {
