@@ -51,9 +51,9 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
   const monthLabelClean = "No mês atual"
 
-  const weekDays = useMemo(() => computeWeekDays(allRecords), [allRecords])
+  const weekDays = useMemo(() => computeWeekDays(allRecords, justificacoes), [allRecords, justificacoes])
 
-  const weekEvolution = useMemo(() => computeWeekEvolution(allRecords), [allRecords])
+  const weekEvolution = useMemo(() => computeWeekEvolution(allRecords, justificacoes), [allRecords, justificacoes])
 
   const evolutionInsight = useMemo(() => {
     if (weekEvolution.length < 2) return undefined

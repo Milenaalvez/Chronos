@@ -115,12 +115,19 @@ export function computeFilteredTotals(records: TimeRecord[], justificacoes?: Rec
  * Weekly cumulative balance evolution (last 5 weeks).
  * Replaces DashboardPage's inline `computeWeeklyEvolution`.
  */
-export function computeWeekEvolution(records: TimeRecord[]): { label: string; value: number }[] {
+export function computeWeekEvolution(records: TimeRecord[], justificacoes?: Record<string, Justificacao>): { label: string; value: number }[] {
   const weekMap = new Map<string, number>()
   for (const r of records) {
-    if ((r.tipo === "Pendente" && r.entrada === "---") || !r.dataISO) continue
+    if (!r.dataISO) continue
+    if (r.tipo === "Pendente") {
+      if (r.entrada === "---") {
+        const j = justificacoes?.[r.dataISO]
+        if (!j || j.status !== "aprovado") continue
+      }
+    }
     const weekStart = getMondayOfWeek(r.dataISO)
-    weekMap.set(weekStart, (weekMap.get(weekStart) || 0) + (r.totalHours - STD_DAY_HOURS))
+    const effective = (r.tipo === "Pendente" && justificacoes?.[r.dataISO]?.status === "aprovado") ? STD_DAY_HOURS : r.totalHours
+    weekMap.set(weekStart, (weekMap.get(weekStart) || 0) + (effective - STD_DAY_HOURS))
   }
   const sorted = [...weekMap.keys()].sort()
   const last5 = sorted.slice(-5)
@@ -138,7 +145,7 @@ export function computeWeekEvolution(records: TimeRecord[]): { label: string; va
  * Daily hours for the current week (Mon-Fri).
  * Replaces DashboardPage's inline `computeWeekDays`.
  */
-export function computeWeekDays(records: TimeRecord[]): { day: string; hours: number }[] {
+export function computeWeekDays(records: TimeRecord[], justificacoes?: Record<string, Justificacao>): { day: string; hours: number }[] {
   const dayNames = ["Seg", "Ter", "Qua", "Qui", "Sex"]
   const now = new Date()
   const day = now.getDay()
@@ -148,13 +155,20 @@ export function computeWeekDays(records: TimeRecord[]): { day: string; hours: nu
 
   const hoursByDay = new Array(5).fill(0)
   for (const r of records) {
-    if ((r.tipo === "Pendente" && r.entrada === "---") || !r.dataISO) continue
+    if (!r.dataISO) continue
+    if (r.tipo === "Pendente") {
+      if (r.entrada === "---") {
+        const j = justificacoes?.[r.dataISO]
+        if (!j || j.status !== "aprovado") continue
+      }
+    }
     const d = new Date(r.dataISO + "T12:00:00")
     if (isNaN(d.getTime())) continue
     if (r.dataISO < start) continue
     const dayIdx = d.getDay() - 1
     if (dayIdx >= 0 && dayIdx < 5) {
-      hoursByDay[dayIdx] += r.totalHours
+      const effective = (r.tipo === "Pendente" && justificacoes?.[r.dataISO]?.status === "aprovado") ? STD_DAY_HOURS : r.totalHours
+      hoursByDay[dayIdx] += effective
     }
   }
   const todayDayIdx = now.getDay() - 1
