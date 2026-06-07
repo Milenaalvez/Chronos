@@ -1,5 +1,6 @@
 export interface TimeRecord {
   id: string
+  userId?: string
   data: string
   dataISO: string
   entrada: string

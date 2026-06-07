@@ -112,6 +112,7 @@ function apiRecordToTimeRecord(r: any): TimeRecord {
   else if (r.status === 'ABSENCE' || totalMins < 240) tipo = 'Afastamento'
   return {
     id: r.id || '',
+    userId: r.userId || '',
     data,
     dataISO: dateISO,
     entrada: r.clockIn || '---',
@@ -143,6 +144,7 @@ function buildRecord(fd: FormData): TimeRecord {
 
   return {
     id: genId(),
+    userId: undefined,
     data: formatDataBR(fd.data),
     dataISO: fd.data,
     entrada: fd.entrada,
@@ -245,8 +247,17 @@ export default function App() {
 
   const refreshRecords = useCallback(() => {
     if (!user) return
-    apiRecords.list().then((data) => {
-      setRecords(data.map(apiRecordToTimeRecord))
+    apiRecords.list().then((data: any[]) => {
+      const mapped = data.map(apiRecordToTimeRecord)
+      const mismatched = mapped.filter((r: TimeRecord) => r.userId && r.userId !== user.id)
+      if (mismatched.length > 0) {
+        console.group('⚠️ Records de outro usuário detectados')
+        console.log('Usuário atual:', user.id, user.name)
+        console.log('Records com userId diferente:', mismatched.length)
+        console.log('Primeiro record:', mismatched[0])
+        console.groupEnd()
+      }
+      setRecords(mapped)
       setRecordsLoaded(true)
     }).catch(() => {})
   }, [user])
@@ -289,9 +300,10 @@ export default function App() {
 
   const hireDate = user?.hireDate
   const allRecords = useMemo(() => {
-    const missing = generateMissingRecords(records, hireDate)
-    return [...records, ...missing].filter((r) => r.dataISO >= (hireDate || '') && !deletedDates.has(r.dataISO))
-  }, [records, deletedDates, hireDate])
+    const filtered = records.filter((r) => !r.userId || r.userId === user?.id)
+    const missing = generateMissingRecords(filtered, hireDate)
+    return [...filtered, ...missing].filter((r) => r.dataISO >= (hireDate || '') && !deletedDates.has(r.dataISO))
+  }, [records, deletedDates, hireDate, user?.id])
 
   useEffect(() => {
     if (authenticated && allRecords.length > 0 && import.meta.env.DEV) {
