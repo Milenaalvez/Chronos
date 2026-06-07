@@ -38,17 +38,18 @@ async function findAssignee(companyId: string, category: string): Promise<string
 
 async function generateProtocol(companyId: string): Promise<string> {
   const year = new Date().getFullYear()
-  const count = await prisma.ticket.count({
+  const prefix = `SOL-${year}-`
+  const last = await prisma.ticket.findFirst({
     where: {
       companyId,
-      createdAt: {
-        gte: new Date(`${year}-01-01T00:00:00Z`),
-        lt: new Date(`${year + 1}-01-01T00:00:00Z`),
-      },
+      protocol: { startsWith: prefix },
     },
+    orderBy: { protocol: 'desc' },
+    select: { protocol: true },
   })
-  const seq = String(count + 1).padStart(5, '0')
-  return `SOL-${year}-${seq}`
+  const lastSeq = last ? parseInt(last.protocol.split('-')[2] || '0', 10) : 0
+  const seq = String(lastSeq + 1).padStart(5, '0')
+  return `${prefix}${seq}`
 }
 
 async function uploadFile(file: Express.Multer.File, ticketId: string): Promise<{ fileUrl: string; fileName: string; mimeType: string; fileSize: number }> {
@@ -112,26 +113,36 @@ export async function createTicket(
   data: { title: string; description: string; category: string; subcategory?: string },
   file?: Express.Multer.File,
 ) {
-  const protocol = await generateProtocol(companyId)
   const assignedTo = await findAssignee(companyId, data.category)
 
-  const ticket = await prisma.ticket.create({
-    data: {
-      protocol,
-      title: data.title,
-      description: data.description,
-      category: data.category as TicketCategory,
-      subcategory: data.subcategory || '',
-      userId,
-      companyId,
-      assignedTo,
-    },
-  })
+  let ticket
+  let protocol
+  for (let attempt = 0; attempt < 3; attempt++) {
+    protocol = await generateProtocol(companyId)
+    try {
+      ticket = await prisma.ticket.create({
+        data: {
+          protocol,
+          title: data.title,
+          description: data.description,
+          category: data.category as TicketCategory,
+          subcategory: data.subcategory || '',
+          userId,
+          companyId,
+          assignedTo,
+        },
+      })
+      break
+    } catch (err: any) {
+      if (err.code === 'P2002' && attempt < 2) continue
+      throw err
+    }
+  }
 
   if (file) {
-    const fileData = await uploadFile(file, ticket.id)
+    const fileData = await uploadFile(file, ticket!.id)
     await prisma.ticketAttachment.create({
-      data: { ...fileData, ticketId: ticket.id },
+      data: { ...fileData, ticketId: ticket!.id },
     })
   }
 
@@ -141,7 +152,7 @@ export async function createTicket(
       action: 'TICKET_CREATE',
       description: `Solicitação ${protocol} criada`,
       entityType: 'Ticket',
-      entityId: ticket.id,
+      entityId: ticket!.id,
       metadata: { category: data.category },
     },
   }).catch(() => {})
@@ -149,9 +160,9 @@ export async function createTicket(
   if (assignedTo) {
     notificationService.createNotification(assignedTo, {
       title: 'Nova solicitação',
-      message: `${ticket.protocol} - ${ticket.title}`,
+      message: `${ticket!.protocol} - ${ticket!.title}`,
       type: 'INFO',
-      link: `/solicitacoes/${ticket.id}`,
+      link: `/solicitacoes/${ticket!.id}`,
     }).catch(() => {})
   }
 
