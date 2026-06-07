@@ -73,10 +73,10 @@ async function uploadFile(file: Express.Multer.File, ticketId: string): Promise<
 async function canManage(userId: string): Promise<boolean> {
   const u = await prisma.user.findUnique({
     where: { id: userId },
-    select: { role: true, extraPermissions: true, department: true },
+    select: { role: true, permissions: true, department: true },
   })
   if (!u) return false
-  const perms = getEffectivePermissions(u.role, u.extraPermissions, u.department)
+  const perms = getEffectivePermissions(u.role, u.permissions as string[] | null, u.department)
   return perms.includes('manage_tickets')
 }
 
