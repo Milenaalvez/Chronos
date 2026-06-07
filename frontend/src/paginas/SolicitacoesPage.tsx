@@ -111,6 +111,9 @@ export function SolicitacoesPage({ user }: { user?: { id: string; role: string; 
 
   const filteredTickets = useMemo(() => {
     let list = [...tickets]
+    if (!isManager) {
+      list = list.filter(t => t.userId === user?.id)
+    }
     if (filterStatus !== "ALL") {
       list = list.filter(t => t.status === filterStatus)
     }
@@ -128,7 +131,7 @@ export function SolicitacoesPage({ user }: { user?: { id: string; role: string; 
       if (orderA !== orderB) return orderA - orderB
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
-  }, [tickets, filterStatus, search])
+  }, [tickets, filterStatus, search, isManager, user?.id])
 
   const filteredStatuses = useMemo(() => {
     const counts: Record<string, number> = { ALL: tickets.length }

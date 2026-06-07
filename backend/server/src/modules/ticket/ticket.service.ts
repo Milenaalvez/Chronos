@@ -2,9 +2,9 @@ import { prisma } from '../../database/prisma.js'
 import { supabaseAdmin } from '../../database/supabase.js'
 import * as notificationService from '../notification/notification.service.js'
 import type { TicketStatus, TicketCategory } from '../../generated/prisma/enums.js'
+import { getEffectivePermissions } from '../../utils/permissions.js'
 
 const BUCKET = 'tickets'
-const MANAGER_ROLES = ['ADMIN', 'DEVELOPER', 'SUPER_ADMIN', 'RH']
 
 async function ensureBucket() {
   const { data: buckets } = await supabaseAdmin.storage.listBuckets()
@@ -70,8 +70,18 @@ async function uploadFile(file: Express.Multer.File, ticketId: string): Promise<
   }
 }
 
+async function canManage(userId: string): Promise<boolean> {
+  const u = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true, extraPermissions: true, department: true },
+  })
+  if (!u) return false
+  const perms = getEffectivePermissions(u.role, u.extraPermissions, u.department)
+  return perms.includes('manage_tickets')
+}
+
 export async function listTickets(userId: string, role: string, companyId: string) {
-  const isManager = MANAGER_ROLES.includes(role)
+  const isManager = await canManage(userId)
   const where: any = { companyId }
   if (!isManager) where.userId = userId
   return prisma.ticket.findMany({
@@ -102,7 +112,7 @@ export async function getTicketById(id: string, userId: string, role: string, co
   })
   if (!ticket) return null
   if (ticket.companyId !== companyId) return null
-  const isManager = MANAGER_ROLES.includes(role)
+  const isManager = await canManage(userId)
   if (!isManager && ticket.userId !== userId) return null
   return ticket
 }
@@ -187,7 +197,7 @@ export async function addTicketMessage(
   const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } })
   if (!ticket) return null
   if (ticket.companyId !== companyId) return null
-  const isManager = MANAGER_ROLES.includes(role)
+  const isManager = await canManage(userId)
   if (!isManager && ticket.userId !== userId) return null
 
   const msg = await prisma.ticketMessage.create({
@@ -246,7 +256,7 @@ export async function updateTicketStatus(
   })
   if (!ticket) return null
   if (ticket.companyId !== companyId) return null
-  if (!MANAGER_ROLES.includes(role)) return null
+  if (!(await canManage(userId))) return null
 
   const resolver = await prisma.user.findUnique({
     where: { id: userId },
