@@ -39,16 +39,19 @@ async function findAssignee(companyId: string, category: string): Promise<string
 async function generateProtocol(companyId: string): Promise<string> {
   const year = new Date().getFullYear()
   const prefix = `SOL-${year}-`
-  const last = await prisma.ticket.findFirst({
+  const all = await prisma.ticket.findMany({
     where: {
       companyId,
       protocol: { startsWith: prefix },
     },
-    orderBy: { protocol: 'desc' },
     select: { protocol: true },
   })
-  const lastSeq = last ? parseInt(last.protocol.split('-')[2] || '0', 10) : 0
-  const seq = String(lastSeq + 1).padStart(5, '0')
+  let maxSeq = 0
+  for (const t of all) {
+    const n = parseInt(t.protocol.split('-')[2] || '0', 10)
+    if (n > maxSeq) maxSeq = n
+  }
+  const seq = String(maxSeq + 1).padStart(5, '0')
   return `${prefix}${seq}`
 }
 
@@ -127,7 +130,7 @@ export async function createTicket(
 
   let ticket: any
   let protocol
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
     protocol = await generateProtocol(companyId)
     try {
       ticket = await prisma.ticket.create({
@@ -144,7 +147,10 @@ export async function createTicket(
       })
       break
     } catch (err: any) {
-      if (err.code === 'P2002' && attempt < 2) continue
+      if (err.code === 'P2002' && attempt < 4) {
+        await new Promise(r => setTimeout(r, 50))
+        continue
+      }
       throw err
     }
   }
