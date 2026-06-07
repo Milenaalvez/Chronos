@@ -249,15 +249,20 @@ export default function App() {
     if (!user) return
     apiRecords.list().then((data: any[]) => {
       const mapped = data.map(apiRecordToTimeRecord)
-      const own = mapped.filter((r: TimeRecord) => r.userId === user.id)
-      const mismatched = mapped.length - own.length
-      if (mismatched > 0) {
-        console.group('⚠️ Backend retornou records de outro usuário')
-        console.log('Usuário atual:', user.id, user.name)
-        console.log('Records do próprio:', own.length)
-        console.log('Records de outros:', mismatched)
-        console.groupEnd()
+      console.group('🔍 refreshRecords')
+      console.log('user.id:', user.id, 'user.name:', user.name)
+      console.log('total records da API:', mapped.length)
+      if (mapped.length > 0) {
+        console.log('primeiro record:', mapped[0])
+        console.log('primeiro record userId:', JSON.stringify(mapped[0].userId))
       }
+      const own = mapped.filter((r: TimeRecord) => r.userId === user.id)
+      console.log('após filtrar userId === user.id:', own.length)
+      if (own.length !== mapped.length) {
+        console.log('🚨 Records FILTRADOS:', mapped.length - own.length)
+        console.log('userId do primeiro filtrado:', JSON.stringify(mapped.find((r) => r.userId !== user.id)?.userId))
+      }
+      console.groupEnd()
       setRecords(own)
       setRecordsLoaded(true)
     }).catch(() => {})
