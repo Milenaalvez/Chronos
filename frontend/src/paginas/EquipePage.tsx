@@ -282,7 +282,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
     if (!user?.id || !allRecords.length || !members.length) return members
     const monthBounds = getMonthBounds()
     const monthRecs = filterMonthRecords(allRecords, monthBounds)
-    const stats = computeFilteredTotals(monthRecs)
+    const stats = computeFilteredTotals(monthRecs, justificacoes)
     const saldo = computeSaldo(monthRecs, justificacoes)
     return members.map((m) =>
       m.id === user.id

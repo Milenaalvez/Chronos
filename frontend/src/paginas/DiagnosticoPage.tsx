@@ -30,8 +30,8 @@ export function DiagnosticoPage({ allRecords, records: _records, justificacoes }
   const saldoAll = useMemo(() => computeSaldo(allRecords, justificacoes), [allRecords, justificacoes])
   const saldoMonth = useMemo(() => computeSaldo(monthRecords, justificacoes), [monthRecords, justificacoes])
 
-  const statsStrict = useMemo(() => computeMonthStats(monthRecordsStrict), [monthRecordsStrict])
-  const totalsMonth = useMemo(() => computeFilteredTotals(monthRecords), [monthRecords])
+  const statsStrict = useMemo(() => computeMonthStats(monthRecordsStrict, justificacoes), [monthRecordsStrict, justificacoes])
+  const totalsMonth = useMemo(() => computeFilteredTotals(monthRecords, justificacoes), [monthRecords, justificacoes])
   const projected = useMemo(() => computeProjectedSaldo(saldoMonth.dailySaldo, saldoMonth.netSaldo), [saldoMonth])
 
   const monthWeekdayISOs = useMemo(() => {
@@ -54,7 +54,7 @@ export function DiagnosticoPage({ allRecords, records: _records, justificacoes }
 
   const totalMinsEngine = computeTotalMins(monthRecords)
   const extraMinsEngine = computeExtraMins(monthRecords)
-  const workedDaysEngine = computeWorkedDays(monthRecords)
+  const workedDaysEngine = computeWorkedDays(monthRecords, justificacoes)
 
   return (
     <div className="flex flex-col gap-6 py-4">

@@ -382,7 +382,7 @@ export function PerfilPage({ memberId, user, onBack, onNavigate, embedded, onAva
     if (!allRecords.length) return null
     const monthBounds = getMonthBounds()
     const monthRecs = filterMonthRecords(allRecords, monthBounds)
-    return computeFilteredTotals(monthRecs)
+    return computeFilteredTotals(monthRecs, justificacoes)
   }, [allRecords])
 
   const localSaldo = useMemo(() => {

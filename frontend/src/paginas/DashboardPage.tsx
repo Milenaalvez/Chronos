@@ -30,9 +30,10 @@ interface DashboardPageProps {
   onEdit: (dataISO: string) => void
   onNavigate?: (page: string) => void
   user?: { name: string; position?: string | null; hireDate?: string }
+  recordsLoaded?: boolean
 }
 
-export function DashboardPage({ records: _records, allRecords, justificacoes = {}, onEdit, onNavigate, user }: DashboardPageProps) {
+export function DashboardPage({ records: _records, allRecords, justificacoes = {}, onEdit, onNavigate, user, recordsLoaded }: DashboardPageProps) {
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => {
     return sessionStorage.getItem("chronos-welcome-dismissed") === "true"
   })
@@ -70,13 +71,13 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
 
   const monthRecords = useMemo(() => filterMonthRecords(allRecords, monthBounds), [allRecords, monthBounds])
 
-  const monthStats = useMemo(() => computeMonthStats(monthRecords), [monthRecords])
+  const monthStats = useMemo(() => computeMonthStats(monthRecords, justificacoes), [monthRecords, justificacoes])
 
   const saldoData = useMemo(() => computeSaldo(monthRecords, justificacoes), [monthRecords, justificacoes])
 
   const saldoDisplay = formatSaldoDisplay(saldoData.netSaldo)
 
-  const filteredTotals = useMemo(() => computeFilteredTotals(monthRecords), [monthRecords])
+  const filteredTotals = useMemo(() => computeFilteredTotals(monthRecords, justificacoes), [monthRecords, justificacoes])
 
   const { totalMins, extraMins, workedDays } = filteredTotals
   const normalHours = (totalMins - extraMins) / 60
@@ -86,6 +87,20 @@ export function DashboardPage({ records: _records, allRecords, justificacoes = {
   const negativoHours = Math.max(0, baselineMins - normalMins) / 60
 
   const workedDaysLabel = monthStats.workedDays === 1 ? "dia trabalhado" : "dias trabalhados"
+
+  if (!recordsLoaded && allRecords.length === 0) {
+    return (
+      <div className="flex flex-col gap-8 animate-pulse">
+        <div className="flex flex-col gap-2">
+          <div className="h-7 w-48 bg-elevated/30 rounded-lg" />
+          <div className="h-4 w-36 bg-elevated/20 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1,2,3,4].map(i => <div key={i} className="h-24 bg-elevated/20 rounded-xl" />)}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-8">

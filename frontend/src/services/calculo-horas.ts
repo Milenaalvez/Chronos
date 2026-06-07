@@ -103,16 +103,20 @@ export function computeSaldo(records: TimeRecord[], justificacoes: Record<string
         continue
       }
       const j = justificacoes[r.dataISO]
-      if (j) {
-        if (j.status === "aprovado") {
-          totalAbsences++
-          justifiedAbsences++
-        } else if (j.status === "recusado") {
-          totalAbsences++
-          negativeMins += STD_DAY_MINS
-        } else {
-          totalAbsences++
-        }
+      if (j && j.status === "aprovado") {
+        totalWorkedMins += STD_DAY_MINS
+        const idx = dayIndex.size
+        dayIndex.set(r.dataISO, idx)
+        dailyList.push({
+          iso: r.dataISO,
+          label: r.dataISO.slice(8, 10) + "/" + r.dataISO.slice(5, 7),
+          saldo: 0,
+        })
+      } else if (j && j.status === "recusado") {
+        totalAbsences++
+        negativeMins += STD_DAY_MINS
+      } else if (j) {
+        totalAbsences++
       } else {
         totalAbsences++
         negativeMins += STD_DAY_MINS
@@ -185,10 +189,24 @@ export interface SimpleMonthStats {
   totalNormalExtraMins: number
 }
 
-export function computeMonthStats(records: TimeRecord[]): SimpleMonthStats {
-  const totalMins = records.reduce((s, r) => s + r.totalHours * 60, 0)
-  const extraMins = records.reduce((s, r) => s + Math.max((r.totalHours - STD_DAY_HOURS) * 60, 0), 0)
-  const workedDays = new Set(records.filter((r) => !(r.tipo === "Pendente" && r.entrada === "---")).map((r) => r.dataISO)).size
+export function computeMonthStats(records: TimeRecord[], justificacoes?: Record<string, Justificacao>): SimpleMonthStats {
+  let totalMins = records.reduce((s, r) => s + r.totalHours * 60, 0)
+  let extraMins = records.reduce((s, r) => s + Math.max((r.totalHours - STD_DAY_HOURS) * 60, 0), 0)
+  const workedDaysSet = new Set(records.filter((r) => !(r.tipo === "Pendente" && r.entrada === "---")).map((r) => r.dataISO))
+
+  if (justificacoes) {
+    for (const r of records) {
+      if (r.tipo === "Pendente" && r.entrada === "---") {
+        const j = justificacoes[r.dataISO]
+        if (j && j.status === "aprovado") {
+          totalMins += STD_DAY_MINS
+          workedDaysSet.add(r.dataISO)
+        }
+      }
+    }
+  }
+
+  const workedDays = workedDaysSet.size
   const normalHours = records
     .filter((r) => r.tipo === "Normal" || r.tipo === "Compensação")
     .reduce((s, r) => s + r.totalHours, 0)

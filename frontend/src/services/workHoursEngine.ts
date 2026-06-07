@@ -58,8 +58,19 @@ export function computeExtraMins(records: TimeRecord[]): number {
 /**
  * Count unique worked days (non-Pendente) from a list of records.
  */
-export function computeWorkedDays(records: TimeRecord[]): number {
-  return new Set(records.filter((r) => r.tipo !== "Pendente").map((r) => r.dataISO)).size
+export function computeWorkedDays(records: TimeRecord[], justificacoes?: Record<string, Justificacao>): number {
+  const daySet = new Set(records.filter((r) => r.tipo !== "Pendente").map((r) => r.dataISO))
+  if (justificacoes) {
+    for (const r of records) {
+      if (r.tipo === "Pendente" && r.entrada === "---") {
+        const j = justificacoes[r.dataISO]
+        if (j && j.status === "aprovado") {
+          daySet.add(r.dataISO)
+        }
+      }
+    }
+  }
+  return daySet.size
 }
 
 /**
@@ -74,7 +85,7 @@ export function computeDayBalanceMins(record: TimeRecord): number {
  * Compute filtered totals for any record set.
  * Returns { totalMins, extraMins, workedDays } in a single pass.
  */
-export function computeFilteredTotals(records: TimeRecord[]): {
+export function computeFilteredTotals(records: TimeRecord[], justificacoes?: Record<string, Justificacao>): {
   totalMins: number
   extraMins: number
   workedDays: number
@@ -86,7 +97,15 @@ export function computeFilteredTotals(records: TimeRecord[]): {
     const mins = r.totalHours * 60
     totalMins += mins
     extraMins += Math.max(mins - STD_DAY_MINS, 0)
-    if (r.tipo !== "Pendente") daySet.add(r.dataISO)
+    if (r.tipo !== "Pendente") {
+      daySet.add(r.dataISO)
+    } else if (r.entrada === "---" && justificacoes) {
+      const j = justificacoes[r.dataISO]
+      if (j && j.status === "aprovado") {
+        totalMins += STD_DAY_MINS
+        daySet.add(r.dataISO)
+      }
+    }
   }
   return { totalMins, extraMins, workedDays: daySet.size }
 }

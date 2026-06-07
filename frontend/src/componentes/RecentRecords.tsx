@@ -37,7 +37,7 @@ export function RecentRecords({ records, onEdit, onNavigate }: RecentRecordsProp
         </span>
         <span className="w-7" />
       </div>
-      <div className="flex flex-col overflow-x-auto">
+      <div className="flex flex-col">
         <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-3 px-0 pb-2 text-[10px] font-medium text-muted uppercase tracking-wider">
           <span>Data</span>
           <span className="w-14 text-center">Entrada</span>

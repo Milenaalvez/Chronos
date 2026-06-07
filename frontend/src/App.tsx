@@ -199,6 +199,7 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editDate, setEditDate] = useState<string | undefined>(undefined)
   const [records, setRecords] = useState<TimeRecord[]>(initialRecords)
+  const [recordsLoaded, setRecordsLoaded] = useState(false)
   const [justificacoes, setJustificacoes] = useState<Record<string, Justificacao>>({})
   const [, setWorkflowNotifs] = useState<WorkflowNotification[]>([])
   const [pageAction, setPageAction] = useState<PageAction | null>(null)
@@ -243,7 +244,10 @@ export default function App() {
 
   const refreshRecords = useCallback(() => {
     if (!user) return
-    apiRecords.list().then((data) => setRecords(data.map(apiRecordToTimeRecord))).catch(() => {})
+    apiRecords.list().then((data) => {
+      setRecords(data.map(apiRecordToTimeRecord))
+      setRecordsLoaded(true)
+    }).catch(() => {})
   }, [user])
 
   useEffect(() => {
@@ -438,6 +442,7 @@ export default function App() {
     setUser(userData || null)
     if (newRefreshToken) setRefreshToken(newRefreshToken, remMe)
     setRecords([])
+    setRecordsLoaded(false)
     setJustificacoes({})
     apiNotifs.refresh().catch(() => {})
     apiNotifs.unreadCount().then((r) => setNotificationCount(r.count)).catch(() => {})
@@ -628,6 +633,7 @@ export default function App() {
             onEdit={handleEdit}
             onNavigate={setPage}
             user={user ?? undefined}
+            recordsLoaded={recordsLoaded}
           />
         )
       case "banco":
@@ -714,6 +720,7 @@ export default function App() {
             onEdit={handleEdit}
             onNavigate={setPage}
             user={user ?? undefined}
+            recordsLoaded={recordsLoaded}
           />
         )
     }

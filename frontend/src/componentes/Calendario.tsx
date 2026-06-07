@@ -158,7 +158,7 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
   }, [])
 
   const monthRecords = useMemo(() => filterMonthRecordsStrict(allRecords, monthBounds), [allRecords, monthBounds])
-  const monthStats = useMemo(() => computeMonthStats(monthRecords), [monthRecords])
+  const monthStats = useMemo(() => computeMonthStats(monthRecords, justificacoes), [monthRecords, justificacoes])
 
   const daysInMonth = useMemo(() => {
     const now = new Date()
