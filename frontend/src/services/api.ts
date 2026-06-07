@@ -103,7 +103,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         }
         if (res.status !== 401) {
           const text = await res.text()
-          if (!text) throw new Error(`Resposta vazia (${res.status}) para ${path}`)
+          if (!text) {
+            if (res.ok) return null as T
+            throw new Error(`Resposta vazia (${res.status}) para ${path}`)
+          }
           let data: any
           try { data = JSON.parse(text) } catch { throw new Error(`Resposta inválida (${res.status})`) }
           if (!res.ok) throw new Error(data.error || 'Erro na requisição')
@@ -126,6 +129,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   const text = await res.text()
   if (!text) {
+    if (res.ok) return null as T
     throw new Error(`Resposta vazia (${res.status}) para ${path}`)
   }
   let data: any

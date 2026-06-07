@@ -361,12 +361,14 @@ export default function App() {
     setModalOpen(true)
   }, [])
 
-  const handleDelete = useCallback((dataISO: string) => {
+  const handleDelete = useCallback(async (dataISO: string) => {
     const record = records.find((r) => r.dataISO === dataISO)
     if (record) {
-      apiRecords.delete(record.id).catch(() => {
-        setRecords((prev) => [...prev, record])
-      })
+      try {
+        await apiRecords.delete(record.id)
+      } catch {
+        return
+      }
     }
     setRecords((prev) => prev.filter((r) => r.dataISO !== dataISO))
     setDeletedDates((prev) => new Set(prev).add(dataISO))
