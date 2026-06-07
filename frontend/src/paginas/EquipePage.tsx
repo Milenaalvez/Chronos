@@ -191,6 +191,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
   const [justLoading, setJustLoading] = useState(false)
   const [reviewLoading, setReviewLoading] = useState(false)
   const [reviewNote, setReviewNote] = useState("")
+  const [deleteTarget, setDeleteTarget] = useState<EnrichedMember | null>(null)
   const [rejectText, setRejectText] = useState("")
   const [permTab, setPermTab] = useState<"info" | "permissoes">("info")
   const [memberPerms, setMemberPerms] = useState<string[]>([])
@@ -459,6 +460,16 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
     doc.save(`perfil-${m.name.toLowerCase().replace(/\s+/g, "-")}.pdf`)
   }, [])
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return
+    setOpenMenuId(null)
+    try {
+      await apiTeam.delete(deleteTarget.id)
+      setDeleteTarget(null)
+      await fetchData()
+    } catch {}
+  }, [deleteTarget, fetchData])
+
   const handleAction = useCallback(async (action: string, member: EnrichedMember) => {
     setOpenMenuId(null)
     try {
@@ -471,7 +482,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
           alert(`Senha temporária: ${r.tempPassword}`)
           break
         case "delete":
-          if (confirm(`Excluir permanentemente ${member.name}?`)) await apiTeam.delete(member.id)
+          setDeleteTarget(member)
           break
       }
       await fetchData()
@@ -1576,6 +1587,48 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                   Recusar
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── DELETE CONFIRMATION MODAL ─── */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative w-full max-w-sm mx-4 bg-surface border border-default/10 shadow-modal rounded-xl p-5 animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setDeleteTarget(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-elevated/50 transition-all duration-200"
+            >
+              <X size={16} strokeWidth={2} />
+            </button>
+
+            <div className="flex flex-col gap-1 mb-5">
+              <h2 className="text-lg font-bold text-primary tracking-tight">Excluir colaborador</h2>
+              <p className="text-sm text-secondary">
+                Tem certeza que deseja excluir permanentemente <strong className="text-primary">{deleteTarget.name}</strong>?
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-accent-red/8 mb-5">
+              <AlertTriangle size={14} className="text-accent-red shrink-0" strokeWidth={2} />
+              <span className="text-[11px] text-accent-red font-medium">Esta ação não pode ser desfeita.</span>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 h-11 rounded-lg bg-elevated text-sm font-medium text-secondary hover:text-primary transition-all duration-200"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="flex-1 h-11 rounded-lg bg-accent-red text-sm font-semibold text-white hover:bg-accent-red/80 transition-all duration-200"
+              >
+                Excluir
+              </button>
             </div>
           </div>
         </div>

@@ -362,9 +362,15 @@ export default function App() {
   }, [])
 
   const handleDelete = useCallback((dataISO: string) => {
+    const record = records.find((r) => r.dataISO === dataISO)
+    if (record) {
+      apiRecords.delete(record.id).catch(() => {
+        setRecords((prev) => [...prev, record])
+      })
+    }
     setRecords((prev) => prev.filter((r) => r.dataISO !== dataISO))
     setDeletedDates((prev) => new Set(prev).add(dataISO))
-  }, [])
+  }, [records])
 
   const handleJustificar = useCallback((data: Justificacao) => {
     setJustificacoes((prev) => {
