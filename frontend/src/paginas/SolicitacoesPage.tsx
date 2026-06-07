@@ -472,7 +472,7 @@ export function SolicitacoesPage({ user }: { user?: { id: string; role: string; 
         <NovaSolicitacaoModal
           onClose={() => setNovaOpen(false)}
           onCreated={(ticket) => {
-            setTickets(prev => [ticket, ...prev])
+            setTickets(prev => prev.some(t => t.id === ticket.id) ? prev : [ticket, ...prev])
             setSelectedId(ticket.id)
             setNovaOpen(false)
           }}
@@ -491,6 +491,7 @@ function NovaSolicitacaoModal({ onClose, onCreated }: { onClose: () => void; onC
   const [file, setFile] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const submittingRef = useRef(false)
 
   const categories: { key: TicketCategory; icon: string; label: string }[] = [
     { key: "SUPORTE_TECNICO", icon: "🛠", label: "Suporte Técnico" },
@@ -503,6 +504,8 @@ function NovaSolicitacaoModal({ onClose, onCreated }: { onClose: () => void; onC
 
   async function handleSubmit() {
     if (!title.trim() || !description.trim() || !category) return
+    if (submittingRef.current) return
+    submittingRef.current = true
     setSaving(true)
     setError(null)
     try {
@@ -515,6 +518,7 @@ function NovaSolicitacaoModal({ onClose, onCreated }: { onClose: () => void; onC
       setError(err.message)
     } finally {
       setSaving(false)
+      submittingRef.current = false
     }
   }
 

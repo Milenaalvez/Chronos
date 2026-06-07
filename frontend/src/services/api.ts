@@ -225,7 +225,7 @@ export const auth = {
 }
 
 export const timeRecords = {
-  list: (params?: { startDate?: string; endDate?: string }) => {
+  list: (params?: { startDate?: string; endDate?: string; userId?: string }) => {
     const qs = params
       ? '?' + new URLSearchParams(params as any).toString()
       : ''

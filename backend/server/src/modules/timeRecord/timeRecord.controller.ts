@@ -4,8 +4,14 @@ import * as service from './timeRecord.service.js'
 
 export async function list(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { startDate, endDate } = req.query as any
-    const records = await service.listRecords(req.user!.userId, startDate, endDate)
+    const { startDate, endDate, userId } = req.query as any
+    const targetUserId = userId || req.user!.userId
+    const isManager = ['ADMIN', 'RH', 'DEVELOPER', 'SUPER_ADMIN'].includes(req.user!.role)
+    if (userId && !isManager) {
+      res.status(403).json({ error: 'Sem permissão para ver registros de outros usuários' })
+      return
+    }
+    const records = await service.listRecords(targetUserId, startDate, endDate)
     res.json(records)
   } catch (err) { next(err) }
 }
