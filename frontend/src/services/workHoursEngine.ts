@@ -36,7 +36,7 @@ const STD_DAY_MINS = STD_DAY_HOURS * 60
  */
 export function formatSaldoDisplay(netSaldo: number): string {
   if (netSaldo === 0) return "00h00m"
-  return netSaldo > 0 ? formatMinutes(netSaldo) : formatMinutes(netSaldo)
+  return formatMinutes(netSaldo)
 }
 
 /**
@@ -59,7 +59,7 @@ export function computeExtraMins(records: TimeRecord[]): number {
  * Count unique worked days (non-Pendente) from a list of records.
  */
 export function computeWorkedDays(records: TimeRecord[], justificacoes?: Record<string, Justificacao>): number {
-  const daySet = new Set(records.filter((r) => r.tipo !== "Pendente").map((r) => r.dataISO))
+  const daySet = new Set(records.filter((r) => !(r.tipo === "Pendente" && r.entrada === "---")).map((r) => r.dataISO))
   if (justificacoes) {
     for (const r of records) {
       if (r.tipo === "Pendente" && r.entrada === "---") {
@@ -97,9 +97,9 @@ export function computeFilteredTotals(records: TimeRecord[], justificacoes?: Rec
     const mins = r.totalHours * 60
     totalMins += mins
     extraMins += Math.max(mins - STD_DAY_MINS, 0)
-    if (r.tipo !== "Pendente") {
+    if (r.tipo !== "Pendente" || r.entrada !== "---") {
       daySet.add(r.dataISO)
-    } else if (r.entrada === "---" && justificacoes) {
+    } else if (justificacoes) {
       const j = justificacoes[r.dataISO]
       if (j && j.status === "aprovado") {
         totalMins += STD_DAY_MINS
@@ -117,7 +117,7 @@ export function computeFilteredTotals(records: TimeRecord[], justificacoes?: Rec
 export function computeWeekEvolution(records: TimeRecord[]): { label: string; value: number }[] {
   const weekMap = new Map<string, number>()
   for (const r of records) {
-    if (r.tipo === "Pendente" || !r.dataISO) continue
+    if ((r.tipo === "Pendente" && r.entrada === "---") || !r.dataISO) continue
     const weekStart = getMondayOfWeek(r.dataISO)
     weekMap.set(weekStart, (weekMap.get(weekStart) || 0) + (r.totalHours - STD_DAY_HOURS))
   }
@@ -147,7 +147,7 @@ export function computeWeekDays(records: TimeRecord[]): { day: string; hours: nu
 
   const hoursByDay = new Array(5).fill(0)
   for (const r of records) {
-    if (r.tipo === "Pendente" || !r.dataISO) continue
+    if ((r.tipo === "Pendente" && r.entrada === "---") || !r.dataISO) continue
     const d = new Date(r.dataISO + "T12:00:00")
     if (isNaN(d.getTime())) continue
     if (r.dataISO < start) continue
@@ -203,7 +203,7 @@ export function computeAbsences(
   const faltaISOs = weekdayISOs.filter((iso) => {
     const j = justificacoes[iso]
     if (j && j.status === "aprovado") return false
-    const rec = allRecords.find((r) => r.dataISO === iso && r.tipo !== "Pendente")
+    const rec = allRecords.find((r) => r.dataISO === iso && (r.tipo !== "Pendente" || r.entrada !== "---"))
     return !rec
   })
   return {
@@ -211,7 +211,7 @@ export function computeAbsences(
     faltasCount: faltaISOs.length,
     justificadasCount: faltaISOs.filter((iso) => {
       const j = justificacoes[iso]
-      return j && (j.status === "aprovado" || j.status === "em_analise")
+      return j && j.status === "em_analise"
     }).length,
     naoJustificadasCount: faltaISOs.filter((iso) => {
       const j = justificacoes[iso]

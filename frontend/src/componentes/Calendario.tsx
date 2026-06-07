@@ -17,7 +17,7 @@ import { PageHeader } from "./PageHeader"
 import { JustificacaoModal } from "./JustificacaoModal"
 import { DayDetailModal } from "./DayDetailModal"
 import type { FormData } from "../types"
-import { computeSaldo, computeMonthStats, filterMonthRecordsStrict, filterMonthRecords, computeDayBalanceMins, computeAbsences } from "../services/workHoursEngine"
+import { computeSaldo, computeMonthStats, filterMonthRecordsStrict, filterMonthRecords, computeDayBalanceMins, computeAbsences, currentMonthISO } from "../services/workHoursEngine"
 
 interface CalendarioProps {
   records: TimeRecord[]
@@ -179,7 +179,10 @@ export function Calendario({ records: _records, allRecords, onEdit: _onEdit, onS
   }, [daysInMonth])
 
   const absences = useMemo(() => computeAbsences(allRecords, monthWeekdayISOs, justificacoes), [allRecords, monthWeekdayISOs, justificacoes])
-  const abonosCount = useMemo(() => Object.values(justificacoes).filter(j => j.status === "aprovado").length, [justificacoes])
+  const currentMonth = currentMonthISO()
+  const abonosCount = useMemo(() =>
+    Object.entries(justificacoes).filter(([iso, j]) => j.status === "aprovado" && iso.startsWith(currentMonth)).length,
+  [justificacoes, currentMonth])
 
   const saldoMonthRecords = useMemo(() => filterMonthRecords(allRecords, monthBounds), [allRecords, monthBounds])
   const saldoData = useMemo(() => computeSaldo(saldoMonthRecords, justificacoes), [saldoMonthRecords, justificacoes])

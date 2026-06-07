@@ -63,7 +63,7 @@ export function filterMonthRecords(records: TimeRecord[], bounds?: { start: stri
 }
 
 export function filterMonthRecordsStrict(records: TimeRecord[], bounds?: { start: string; end: string }) {
-  return filterMonthRecords(records, bounds).filter((r) => r.tipo !== "Pendente")
+  return filterMonthRecords(records, bounds).filter((r) => !(r.tipo === "Pendente" && r.entrada === "---"))
 }
 
 export interface SaldoResult {
@@ -93,12 +93,19 @@ export function computeSaldo(records: TimeRecord[], justificacoes: Record<string
       if (r.entrada !== "---") {
         const mins = Math.round(r.totalHours * 60)
         totalWorkedMins += mins
+        const saldo = mins - STD_DAY_MINS
+        if (saldo > 0) {
+          positiveMins += saldo
+          extraMins += saldo
+        } else if (saldo < 0) {
+          negativeMins += Math.abs(saldo)
+        }
         const idx = dayIndex.size
         dayIndex.set(r.dataISO, idx)
         dailyList.push({
           iso: r.dataISO,
           label: r.dataISO.slice(8, 10) + "/" + r.dataISO.slice(5, 7),
-          saldo: 0,
+          saldo,
         })
         continue
       }
@@ -115,18 +122,39 @@ export function computeSaldo(records: TimeRecord[], justificacoes: Record<string
       } else if (j && j.status === "recusado") {
         totalAbsences++
         negativeMins += STD_DAY_MINS
+        const idx = dayIndex.size
+        dayIndex.set(r.dataISO, idx)
+        dailyList.push({
+          iso: r.dataISO,
+          label: r.dataISO.slice(8, 10) + "/" + r.dataISO.slice(5, 7),
+          saldo: -STD_DAY_MINS,
+        })
       } else if (j) {
         totalAbsences++
+        const idx = dayIndex.size
+        dayIndex.set(r.dataISO, idx)
+        dailyList.push({
+          iso: r.dataISO,
+          label: r.dataISO.slice(8, 10) + "/" + r.dataISO.slice(5, 7),
+          saldo: 0,
+        })
       } else {
         totalAbsences++
         negativeMins += STD_DAY_MINS
+        const idx = dayIndex.size
+        dayIndex.set(r.dataISO, idx)
+        dailyList.push({
+          iso: r.dataISO,
+          label: r.dataISO.slice(8, 10) + "/" + r.dataISO.slice(5, 7),
+          saldo: -STD_DAY_MINS,
+        })
       }
       continue
     }
 
     const j = justificacoes[r.dataISO]
     if (j && j.status === "aprovado") {
-      justifiedAbsences++
+      if (r.tipo === "Afastamento") justifiedAbsences++
       const mins = Math.round(r.totalHours * 60)
       totalWorkedMins += mins
       const idx = dayIndex.size
@@ -211,7 +239,7 @@ export function computeMonthStats(records: TimeRecord[], justificacoes?: Record<
     .filter((r) => r.tipo === "Normal" || r.tipo === "Compensação")
     .reduce((s, r) => s + r.totalHours, 0)
   const totalNormalExtraMins = records
-    .filter((r) => r.tipo !== "Pendente" && r.tipo !== "Afastamento")
+    .filter((r) => r.tipo !== "Pendente" && r.tipo !== "Afastamento" && r.tipo !== "Negativo")
     .reduce((s, r) => s + r.totalHours * 60, 0)
   return { totalMins, extraMins, workedDays, normalHours, totalNormalExtraMins }
 }
