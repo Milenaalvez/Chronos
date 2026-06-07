@@ -62,7 +62,7 @@ export function computeWorkedDays(records: TimeRecord[], justificacoes?: Record<
   const daySet = new Set(records.filter((r) => !(r.tipo === "Pendente" && r.entrada === "---")).map((r) => r.dataISO))
   if (justificacoes) {
     for (const r of records) {
-      if (r.tipo === "Pendente" && r.entrada === "---") {
+      if (r.tipo === "Pendente") {
         const j = justificacoes[r.dataISO]
         if (j && j.status === "aprovado") {
           daySet.add(r.dataISO)
@@ -99,7 +99,8 @@ export function computeFilteredTotals(records: TimeRecord[], justificacoes?: Rec
     extraMins += Math.max(mins - STD_DAY_MINS, 0)
     if (r.tipo !== "Pendente" || r.entrada !== "---") {
       daySet.add(r.dataISO)
-    } else if (justificacoes) {
+    }
+    if (r.tipo === "Pendente" && justificacoes) {
       const j = justificacoes[r.dataISO]
       if (j && j.status === "aprovado") {
         totalMins += STD_DAY_MINS
