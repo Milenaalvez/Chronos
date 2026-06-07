@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import {
   LifeBuoy, Send, Paperclip, X, Search, Plus,
-  Clock, User, Building2, ChevronDown, Loader2,
+  ChevronDown, Loader2,
 } from "lucide-react"
 import { tickets as apiTickets } from "../services/api"
 import { StatusBadge } from "../componentes/StatusBadge"
 import { PageHeader } from "../componentes/PageHeader"
 import { canAccess } from "../utils/permissions"
 import type {
-  Ticket, TicketStatus, TicketCategory, TicketMessage as TicketMessageType,
+  Ticket, TicketStatus, TicketCategory,
 } from "../types"
 import {
   TICKET_STATUS_LABELS, TICKET_CATEGORY_LABELS, TICKET_SUBCATEGORIES,
@@ -470,7 +470,6 @@ export function SolicitacoesPage({ user }: { user?: { id: string; role: string; 
       {/* Nova Solicitação Modal */}
       {novaOpen && (
         <NovaSolicitacaoModal
-          userId={user?.id || ""}
           onClose={() => setNovaOpen(false)}
           onCreated={(ticket) => {
             setTickets(prev => [ticket, ...prev])
@@ -483,7 +482,7 @@ export function SolicitacoesPage({ user }: { user?: { id: string; role: string; 
   )
 }
 
-function NovaSolicitacaoModal({ userId, onClose, onCreated }: { userId: string; onClose: () => void; onCreated: (ticket: Ticket) => void }) {
+function NovaSolicitacaoModal({ onClose, onCreated }: { onClose: () => void; onCreated: (ticket: Ticket) => void }) {
   const [step, setStep] = useState(0)
   const [category, setCategory] = useState<TicketCategory | null>(null)
   const [subcategory, setSubcategory] = useState("")

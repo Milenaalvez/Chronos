@@ -123,14 +123,9 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   RH: [
     "access_team", "manage_members", "approve_justifications",
     "edit_time_records", "approve_time_records", "reset_passwords",
-    "view_logs", "export_reports", "access_profiles",
-  ],
-  DEVELOPER: ALL_PERMISSIONS.map((p) => p.key),
-  RH: [
-    "access_team", "manage_members", "approve_justifications",
-    "edit_time_records", "approve_time_records", "reset_passwords",
     "view_logs", "export_reports", "access_profiles", "manage_tickets",
   ],
+  DEVELOPER: ALL_PERMISSIONS.map((p) => p.key),
   EMPLOYEE: ["access_team", "access_profiles"],
 }
 
