@@ -29,6 +29,7 @@ import { reportRouter } from './modules/reports/reports.routes.js'
 import { companyRouter } from './modules/company/company.routes.js'
 import { branchRouter } from './modules/branch/branch.routes.js'
 import { companyConfigRouter } from './modules/companyConfig/companyConfig.routes.js'
+import { ticketRouter } from './modules/ticket/ticket.routes.js'
 import { startScheduler } from './utils/scheduler.js'
 
 const app = express()
@@ -114,6 +115,7 @@ app.use('/api/reports', reportRouter)
 app.use('/api/companies', companyRouter)
 app.use('/api/branches', branchRouter)
 app.use('/api/company-config', companyConfigRouter)
+app.use('/api/tickets', ticketRouter)
 
 app.use(errorHandler)
 

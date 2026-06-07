@@ -81,6 +81,29 @@ export const PointType = {
 export type PointType = (typeof PointType)[keyof typeof PointType]
 
 
+export const TicketStatus = {
+  ABERTO: 'ABERTO',
+  EM_ANALISE: 'EM_ANALISE',
+  AGUARDANDO_RESPOSTA: 'AGUARDANDO_RESPOSTA',
+  RESOLVIDO: 'RESOLVIDO',
+  ENCERRADO: 'ENCERRADO'
+} as const
+
+export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]
+
+
+export const TicketCategory = {
+  SUPORTE_TECNICO: 'SUPORTE_TECNICO',
+  JORNADA_E_PONTO: 'JORNADA_E_PONTO',
+  RH_E_BENEFICIOS: 'RH_E_BENEFICIOS',
+  ACESSO_E_PERMISSOES: 'ACESSO_E_PERMISSOES',
+  SUGESTOES_E_MELHORIAS: 'SUGESTOES_E_MELHORIAS',
+  OUTROS: 'OUTROS'
+} as const
+
+export type TicketCategory = (typeof TicketCategory)[keyof typeof TicketCategory]
+
+
 export const IntegrationProvider = {
   GOOGLE_CALENDAR: 'GOOGLE_CALENDAR',
   SLACK: 'SLACK',

@@ -138,3 +138,79 @@ export interface FaceRegistrationData {
 export interface PointEventWithFace extends PointEvent {
   faceVerified: boolean | null
 }
+
+export type TicketStatus = 'ABERTO' | 'EM_ANALISE' | 'AGUARDANDO_RESPOSTA' | 'RESOLVIDO' | 'ENCERRADO'
+export type TicketCategory = 'SUPORTE_TECNICO' | 'JORNADA_E_PONTO' | 'RH_E_BENEFICIOS' | 'ACESSO_E_PERMISSOES' | 'SUGESTOES_E_MELHORIAS' | 'OUTROS'
+
+export interface TicketUser {
+  id: string
+  name: string
+  avatar?: string | null
+  email?: string
+  role?: string
+}
+
+export interface TicketAttachment {
+  id: string
+  fileUrl: string
+  fileName: string
+  mimeType: string
+  fileSize: number
+  createdAt: string
+}
+
+export interface TicketMessage {
+  id: string
+  ticketId: string
+  userId: string
+  message: string
+  createdAt: string
+  user: TicketUser
+}
+
+export interface Ticket {
+  id: string
+  protocol: string
+  title: string
+  description: string
+  category: TicketCategory
+  subcategory: string
+  status: TicketStatus
+  priority: string
+  assignedTo: string | null
+  userId: string
+  companyId: string
+  createdAt: string
+  updatedAt: string
+  user: TicketUser
+  assignee: TicketUser | null
+  messages: TicketMessage[]
+  attachments: TicketAttachment[]
+  _count?: { messages: number; attachments: number }
+}
+
+export const TICKET_CATEGORY_LABELS: Record<TicketCategory, string> = {
+  SUPORTE_TECNICO: 'Suporte Técnico',
+  JORNADA_E_PONTO: 'Jornada e Ponto',
+  RH_E_BENEFICIOS: 'RH e Benefícios',
+  ACESSO_E_PERMISSOES: 'Acesso e Permissões',
+  SUGESTOES_E_MELHORIAS: 'Sugestões e Melhorias',
+  OUTROS: 'Outros',
+}
+
+export const TICKET_STATUS_LABELS: Record<TicketStatus, string> = {
+  ABERTO: 'Aberto',
+  EM_ANALISE: 'Em Análise',
+  AGUARDANDO_RESPOSTA: 'Aguardando Resposta',
+  RESOLVIDO: 'Resolvido',
+  ENCERRADO: 'Encerrado',
+}
+
+export const TICKET_SUBCATEGORIES: Record<TicketCategory, string[]> = {
+  SUPORTE_TECNICO: ['Erro no sistema', 'Dúvida de uso', 'Problema de hardware', 'Melhoria no sistema', 'Outro'],
+  JORNADA_E_PONTO: ['Erro no registro', 'Banco de horas', 'Ajuste de jornada', 'Horas extras', 'Outro'],
+  RH_E_BENEFICIOS: ['Férias', 'Documentos', 'Benefícios', 'Afastamento', 'Admissão/Desligamento', 'Outro'],
+  ACESSO_E_PERMISSOES: ['Acesso ao sistema', 'Permissão de página', 'Reset de senha', 'Novo usuário', 'Outro'],
+  SUGESTOES_E_MELHORIAS: ['Nova funcionalidade', 'Melhoria existente', 'Processo interno', 'Outro'],
+  OUTROS: ['Outro'],
+}

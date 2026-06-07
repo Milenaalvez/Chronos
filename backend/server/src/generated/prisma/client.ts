@@ -112,6 +112,21 @@ export type TermAcceptance = Prisma.TermAcceptanceModel
  */
 export type FaceRegistration = Prisma.FaceRegistrationModel
 /**
+ * Model Ticket
+ * 
+ */
+export type Ticket = Prisma.TicketModel
+/**
+ * Model TicketMessage
+ * 
+ */
+export type TicketMessage = Prisma.TicketMessageModel
+/**
+ * Model TicketAttachment
+ * 
+ */
+export type TicketAttachment = Prisma.TicketAttachmentModel
+/**
  * Model MonthClosing
  * 
  */

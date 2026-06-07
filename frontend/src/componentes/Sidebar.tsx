@@ -18,6 +18,7 @@ import {
   Sun,
   Moon,
   LogOut,
+  LifeBuoy,
 } from "lucide-react"
 import { ChronosBrand } from "./ChronosBrand"
 import { useTheme } from "../contexts/ThemeContext"
@@ -57,6 +58,7 @@ const SECTION_KEYS: Record<string, string> = {
   "Gestão": "gestao",
   "RH": "rh",
   "Sistema": "sistema",
+  "Suporte": "suporte",
 }
 
 function loadSectionState(): Record<string, boolean> {
@@ -64,7 +66,7 @@ function loadSectionState(): Record<string, boolean> {
     const raw = localStorage.getItem("sidebar-sections")
     if (raw) return JSON.parse(raw)
   } catch {}
-  return { ponto: false, gestao: false, rh: true, sistema: false }
+  return { ponto: false, gestao: false, rh: true, sistema: false, suporte: true }
 }
 
 function saveSectionState(state: Record<string, boolean>) {
@@ -142,6 +144,12 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
       items: [
         { label: "Notificações", icon: Bell, page: "notificacoes", badge: notificationCount },
         { label: "Configurações", icon: Settings, page: "configuracoes" },
+      ],
+    },
+    {
+      label: "Suporte",
+      items: [
+        { label: "Solicitações", icon: LifeBuoy, page: "solicitacoes" },
       ],
     },
     {

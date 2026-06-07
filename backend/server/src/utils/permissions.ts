@@ -12,12 +12,13 @@ export type Permission =
   | 'edit_registries'
   | 'manage_permissions'
   | 'manage_company'
+  | 'manage_tickets'
 
 const ALL_PERMISSIONS: Permission[] = [
   'access_team', 'manage_members', 'approve_justifications',
   'edit_time_records', 'approve_time_records', 'reset_passwords',
   'view_logs', 'export_reports', 'access_profiles',
-  'switch_accounts', 'edit_registries', 'manage_permissions', 'manage_company',
+  'switch_accounts', 'edit_registries', 'manage_permissions', 'manage_company', 'manage_tickets',
 ]
 
 export const ROLE_PERMISSIONS: Record<string, Permission[]> = {

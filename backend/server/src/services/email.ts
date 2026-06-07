@@ -186,6 +186,60 @@ export async function sendVacationStatusEmail(to: string, collaboratorName: stri
   `)
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  ABERTO: 'Aberto',
+  EM_ANALISE: 'Em Análise',
+  AGUARDANDO_RESPOSTA: 'Aguardando Resposta',
+  RESOLVIDO: 'Resolvido',
+  ENCERRADO: 'Encerrado',
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  ABERTO: '#3B82F6',
+  EM_ANALISE: '#F59E0B',
+  AGUARDANDO_RESPOSTA: '#F97316',
+  RESOLVIDO: '#10B981',
+  ENCERRADO: '#6B7280',
+}
+
+export async function sendTicketUpdateEmail(to: string, requesterName: string, protocol: string, title: string, status: string, message?: string) {
+  const statusLabel = STATUS_LABELS[status] || status
+  const statusColor = STATUS_COLORS[status] || '#6B7280'
+  await send(to, `[${protocol}] Solicitação atualizada - Chronos`, `
+    <div style="font-family:Arial,Helvetica,sans-serif;background:#f8fafc;padding:20px;">
+      <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;">
+        ${bannerTop()}
+        <div style="padding:32px;">
+          <h2 style="color:#071A3D;">Atualização na sua solicitação</h2>
+          <p>Olá <strong>${requesterName}</strong>,</p>
+          <p>Sua solicitação foi atualizada.</p>
+          <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:20px 0;">
+            <p style="margin:4px 0;font-size:13px;color:#64748B;">Protocolo</p>
+            <p style="margin:4px 0;font-size:18px;font-weight:bold;color:#071A3D;letter-spacing:2px;">${protocol}</p>
+            <p style="margin:12px 0 4px;font-size:13px;color:#64748B;">Título</p>
+            <p style="margin:4px 0;font-weight:600;color:#071A3D;">${title}</p>
+            <p style="margin:12px 0 4px;font-size:13px;color:#64748B;">Status</p>
+            <p style="margin:4px 0;font-weight:700;color:${statusColor};">${statusLabel}</p>
+          </div>
+          ${message ? `
+            <div style="background:#FFFBEB;border-left:4px solid ${statusColor};border-radius:6px;padding:16px;margin:20px 0;">
+              <p style="margin:0 0 4px;font-size:12px;color:#64748B;font-weight:600;">Mensagem do responsável</p>
+              <p style="margin:0;color:#1E293B;font-size:14px;">${message}</p>
+            </div>
+          ` : ''}
+          <p style="margin:24px 0 8px;color:#64748B;">
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/solicitacoes"
+               style="color:#3B82F6;font-weight:600;text-decoration:underline;">
+              Acessar Central de Solicitações →
+            </a>
+          </p>
+          ${bannerBottom()}
+        </div>
+      </div>
+    </div>
+  `)
+}
+
 export async function sendSecurityNotification(to: string, name: string) {
   await send(to, 'Senha alterada - Chronos', `
     <div style="font-family:Arial,Helvetica,sans-serif;background:#f8fafc;padding:20px;">

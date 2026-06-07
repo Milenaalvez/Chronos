@@ -60,6 +60,7 @@ const PAGE_ACCESS: Record<string, Role[]> = {
   sistema: ["DEVELOPER"],
   debug: ["DEVELOPER"],
   "feature-flags": ["DEVELOPER"],
+  solicitacoes: ["EMPLOYEE", "RH", "ADMIN", "DEVELOPER", "SUPER_ADMIN"],
 }
 
 export interface MenuItemDef {
@@ -113,6 +114,7 @@ export const ALL_PERMISSIONS = [
   { key: "edit_registries", label: "Editar registros", group: "Registros" },
   { key: "manage_permissions", label: "Gerenciar permissões", group: "Administração" },
   { key: "manage_company", label: "Gerenciar empresa", group: "Administração" },
+  { key: "manage_tickets", label: "Gerenciar solicitações", group: "Administração" },
 ] as const
 
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
@@ -124,6 +126,11 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     "view_logs", "export_reports", "access_profiles",
   ],
   DEVELOPER: ALL_PERMISSIONS.map((p) => p.key),
+  RH: [
+    "access_team", "manage_members", "approve_justifications",
+    "edit_time_records", "approve_time_records", "reset_passwords",
+    "view_logs", "export_reports", "access_profiles", "manage_tickets",
+  ],
   EMPLOYEE: ["access_team", "access_profiles"],
 }
 

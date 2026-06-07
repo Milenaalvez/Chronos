@@ -58,6 +58,23 @@ enum PointType {
   EXIT
 }
 
+enum TicketStatus {
+  ABERTO
+  EM_ANALISE
+  AGUARDANDO_RESPOSTA
+  RESOLVIDO
+  ENCERRADO
+}
+
+enum TicketCategory {
+  SUPORTE_TECNICO
+  JORNADA_E_PONTO
+  RH_E_BENEFICIOS
+  ACESSO_E_PERMISSOES
+  SUGESTOES_E_MELHORIAS
+  OUTROS
+}
+
 enum IntegrationProvider {
   GOOGLE_CALENDAR
   SLACK
@@ -88,6 +105,7 @@ model Company {
   departments Department[]
   positions   Position[]
   config      CompanyConfig?
+  tickets     Ticket[]
 
   @@map("companies")
 }
@@ -220,6 +238,9 @@ model User {
   integrations        Integration[]
   termAcceptance      TermAcceptance?
   faceRegistration    FaceRegistration?
+  tickets             Ticket[]
+  assignedTickets     Ticket[]             @relation("TicketAssignee")
+  ticketMessages      TicketMessage[]
 
   @@index([companyId])
   @@index([branchId])
@@ -423,6 +444,63 @@ model FaceRegistration {
 
   @@unique([userId])
   @@map("face_registrations")
+}
+
+model Ticket {
+  id            String         @id @default(cuid())
+  protocol      String         @unique
+  title         String
+  description   String
+  category      TicketCategory
+  subcategory   String
+  status        TicketStatus   @default(ABERTO)
+  priority      String         @default("media")
+  assignedTo    String?
+  userId        String
+  companyId     String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user        User              @relation(fields: [userId], references: [id])
+  company     Company           @relation(fields: [companyId], references: [id])
+  assignee    User?             @relation("TicketAssignee", fields: [assignedTo], references: [id])
+  messages    TicketMessage[]
+  attachments TicketAttachment[]
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([status])
+  @@index([assignedTo])
+  @@map("tickets")
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([ticketId])
+  @@map("ticket_messages")
+}
+
+model TicketAttachment {
+  id        String   @id @default(cuid())
+  ticketId  String
+  fileUrl   String
+  fileName  String
+  mimeType  String
+  fileSize  Int
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("ticket_attachments")
 }
 
 model MonthClosing {

@@ -47,6 +47,7 @@ import { EmAnalisePage } from "./paginas/EmAnalisePage"
 import { AuditoriaPage } from "./paginas/AuditoriaPage"
 import { MeusRegistrosPage } from "./paginas/MeusRegistrosPage"
 import { FeriasPage } from "./paginas/FeriasPage"
+import { SolicitacoesPage } from "./paginas/SolicitacoesPage"
 import { AdminEmpresaPage } from "./paginas/AdminEmpresaPage"
 import { SuperAdminPage } from "./paginas/SuperAdminPage"
 import type { TimeRecord, FormData, Justificacao, WorkflowNotification, PageAction } from "./types"
@@ -715,6 +716,8 @@ export default function App() {
             justificacoes={justificacoes}
           />
         )
+      case "solicitacoes":
+        return <SolicitacoesPage user={user} />
       case "admin-empresa":
         return <AdminEmpresaPage user={user} />
       case "super-admin":

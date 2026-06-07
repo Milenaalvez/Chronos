@@ -65,6 +65,9 @@ export const ModelName = {
   Integration: 'Integration',
   TermAcceptance: 'TermAcceptance',
   FaceRegistration: 'FaceRegistration',
+  Ticket: 'Ticket',
+  TicketMessage: 'TicketMessage',
+  TicketAttachment: 'TicketAttachment',
   MonthClosing: 'MonthClosing',
   CompanyConfig: 'CompanyConfig'
 } as const
@@ -348,6 +351,49 @@ export const FaceRegistrationScalarFieldEnum = {
 } as const
 
 export type FaceRegistrationScalarFieldEnum = (typeof FaceRegistrationScalarFieldEnum)[keyof typeof FaceRegistrationScalarFieldEnum]
+
+
+export const TicketScalarFieldEnum = {
+  id: 'id',
+  protocol: 'protocol',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  subcategory: 'subcategory',
+  status: 'status',
+  priority: 'priority',
+  assignedTo: 'assignedTo',
+  userId: 'userId',
+  companyId: 'companyId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
+
+
+export const TicketMessageScalarFieldEnum = {
+  id: 'id',
+  ticketId: 'ticketId',
+  userId: 'userId',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type TicketMessageScalarFieldEnum = (typeof TicketMessageScalarFieldEnum)[keyof typeof TicketMessageScalarFieldEnum]
+
+
+export const TicketAttachmentScalarFieldEnum = {
+  id: 'id',
+  ticketId: 'ticketId',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  fileSize: 'fileSize',
+  createdAt: 'createdAt'
+} as const
+
+export type TicketAttachmentScalarFieldEnum = (typeof TicketAttachmentScalarFieldEnum)[keyof typeof TicketAttachmentScalarFieldEnum]
 
 
 export const MonthClosingScalarFieldEnum = {

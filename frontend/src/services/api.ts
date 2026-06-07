@@ -608,6 +608,35 @@ export const branches = {
     }),
 }
 
+export const tickets = {
+  list: () => request<any[]>('/tickets'),
+
+  getById: (id: string) => request<any>(`/tickets/${id}`),
+
+  create: (data: { title: string; description: string; category: string; subcategory?: string }, file?: File) => {
+    const form = new FormData()
+    form.append('title', data.title)
+    form.append('description', data.description)
+    form.append('category', data.category)
+    if (data.subcategory) form.append('subcategory', data.subcategory)
+    if (file) form.append('file', file)
+    return request<any>('/tickets', { method: 'POST', body: form })
+  },
+
+  addMessage: (ticketId: string, message: string, file?: File) => {
+    const form = new FormData()
+    form.append('message', message)
+    if (file) form.append('file', file)
+    return request<any>(`/tickets/${ticketId}/messages`, { method: 'POST', body: form })
+  },
+
+  updateStatus: (ticketId: string, status: string, message?: string) =>
+    request<any>(`/tickets/${ticketId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, message }),
+    }),
+}
+
 export const companyConfig = {
   get: (companyId?: string) =>
     request<any>(`/company-config${companyId ? `/${companyId}` : ''}`),
