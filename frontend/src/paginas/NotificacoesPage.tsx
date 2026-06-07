@@ -206,8 +206,8 @@ export function NotificacoesPage() {
       />
 
       {/* Filters */}
-      <div className="flex items-center justify-between">
-        <div className="flex rounded-md bg-elevated/50 p-0.5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex rounded-md bg-elevated/50 p-0.5 overflow-x-auto">
           {FILTERS.map((f) => (
             <button
               key={f.key}

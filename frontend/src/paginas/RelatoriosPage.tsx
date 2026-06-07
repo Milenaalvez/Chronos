@@ -366,7 +366,7 @@ export function RelatoriosPage({ user }: RelatoriosPageProps) {
       </div>
 
       {/* Metric cards — always visible */}
-      <div className="flex items-stretch overflow-hidden rounded-xl bg-app border border-default">
+      <div className="flex flex-wrap items-stretch overflow-hidden rounded-xl bg-app border border-default">
         {[
           { label: "Horas Trabalhadas", value: data ? fmtMins(data.indicadores.horasTrabalhadas) : "---", sub: "Total do período", icon: Clock, color: "text-accent-purple/80", bg: "bg-accent-purple/5" },
           { label: "Horas Extras", value: data ? fmtMins(data.indicadores.horasExtras) : "---", sub: "Acima da jornada", icon: TrendingUp, color: "text-accent-amber/80", bg: "bg-accent-amber/5" },
@@ -377,7 +377,7 @@ export function RelatoriosPage({ user }: RelatoriosPageProps) {
         ].map((c, i) => {
           const Icon = c.icon
           return (
-            <div key={c.label} className={`flex-1 flex flex-col gap-2 p-5 ${i < 5 ? "border-r border-default" : ""} ${c.bg}`}>
+            <div key={c.label} className={`w-1/2 lg:w-1/3 xl:w-1/6 flex flex-col gap-2 p-5 ${i < 5 ? "border-r border-default" : ""} ${c.bg}`}>
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center`}>
                   <Icon size={15} className={c.color} />

@@ -731,11 +731,11 @@ export default function App() {
           <button onClick={() => setImpersonatingRole(null)} className="ml-2 underline hover:no-underline">Sair</button>
         </div>
       )}
-      <main className={`${sidebarCollapsed ? "lg:ml-[68px]" : "lg:ml-72"} ${impersonatingRole ? "pt-8" : ""} h-screen px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 overflow-y-auto`}>
+      <main className={`${sidebarCollapsed ? "lg:ml-[68px]" : "lg:ml-72"} ${impersonatingRole ? "pt-8" : ""} h-screen px-3 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-8 overflow-y-auto`}>
         {/* Mobile hamburger */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-4 left-4 z-10 w-11 h-11 rounded-lg bg-surface border border-default/10 flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all duration-200 lg:hidden"
+          className={`fixed ${impersonatingRole ? "top-10" : "top-3 sm:top-4"} left-3 sm:left-4 z-10 w-11 h-11 rounded-lg bg-surface border border-default/10 flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-all duration-200 lg:hidden`}
         >
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
             <path d="M2 4h12M2 8h12M2 12h12" />

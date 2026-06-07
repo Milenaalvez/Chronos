@@ -540,7 +540,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
 
       {/* Metric cards */}
       {metrics && (
-        <div className="flex items-stretch">
+        <div className="flex flex-wrap items-stretch">
           {(() => {
             const cards = [
               { key: "total" as const, label: "Total de Colaboradores", icon: Users, value: metrics.total, color: "text-accent-purple/80", bg: "bg-accent-purple/5", trend: null as null | { dir: 'up' | 'down'; val: number } },
@@ -551,7 +551,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
             return cards.map(c => {
               const Icon = c.icon
               return (
-                <div key={c.key} className={`flex-1 flex flex-col gap-2 p-5 border-r border-default last:border-r-0 ${c.bg}`}>
+                <div key={c.key} className={`w-1/2 lg:w-1/4 flex flex-col gap-2 p-5 border-r border-default last:border-r-0 ${c.bg}`}>
                   <div className="flex items-center gap-2">
                     <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center`}>
                       <Icon size={14} className={c.color} />
@@ -598,7 +598,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
       {activeTab === "equipe" && (
         <div className="flex flex-col gap-4">
           {/* Search + filters */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 max-w-sm">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" strokeWidth={2} />
               <input value={search} onChange={e => setSearch(e.target.value)}
@@ -1062,8 +1062,8 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
               </div>
             ) : (
               <form onSubmit={(e) => { e.preventDefault(); handleCreateMember() }} className="p-5 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5 col-span-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
                     <label className="text-[10px] font-semibold uppercase tracking-wider text-secondary">Nome *</label>
                     <input required value={newMemberData.name} onChange={e => setNewMemberData(p => ({ ...p, name: e.target.value }))}
                       className="w-full h-9 px-3 rounded-lg bg-input border border-default/30 text-xs text-primary placeholder:text-muted focus:outline-none focus:border-[var(--accent-ring)] transition-all duration-200" />
@@ -1344,8 +1344,8 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
                 setSelMember(null)
               } catch (err: any) { alert(err?.message || "Erro ao atualizar") }
             }} className="p-5 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5 col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
                   <label className="text-[10px] font-semibold uppercase tracking-wider text-secondary">Nome</label>
                   <input name="name" defaultValue={selMember.name} required
                     className="w-full h-9 px-3 rounded-lg bg-input border border-default/30 text-xs text-primary placeholder:text-muted focus:outline-none focus:border-[var(--accent-ring)] transition-all duration-200" />

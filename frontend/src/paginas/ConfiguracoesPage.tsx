@@ -411,7 +411,7 @@ export function ConfiguracoesPage({ userId, user, onAvatarUpdate }: { userId?: s
                   <p className="text-xs text-muted">Seus dados de perfil são privados e não são compartilhados.</p>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                 <div className="flex flex-col gap-1.5">
                   <label className={labelClass}>Nome completo</label>
                   <input value={nome} onChange={(e) => setNome(e.target.value)} className={inputClass} />

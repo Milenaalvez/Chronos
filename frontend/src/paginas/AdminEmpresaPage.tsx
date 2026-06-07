@@ -157,7 +157,7 @@ export function AdminEmpresaPage({ user }: { user?: { companyId?: string; role?:
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 p-1 bg-elevated rounded-xl w-fit">
+      <div className="flex gap-1 mb-6 p-1 bg-elevated rounded-xl w-fit flex-wrap">
         {[
           { key: "empresa" as const, label: "Empresa", icon: Building2 },
           { key: "filiais" as const, label: "Filiais", icon: MapPin },

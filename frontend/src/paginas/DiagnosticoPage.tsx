@@ -64,7 +64,7 @@ export function DiagnosticoPage({ allRecords, records: _records, justificacoes }
         <span className="text-[10px] text-muted font-mono">workHoursEngine.ts</span>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="rounded-lg border border-default/20 p-4 flex flex-col gap-2">
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Registros</span>
           <div className="text-xs font-mono text-secondary space-y-1">
@@ -99,7 +99,7 @@ export function DiagnosticoPage({ allRecords, records: _records, justificacoes }
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-lg border border-default/20 p-4 flex flex-col gap-2">
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Engine Functions</span>
           <div className="text-xs font-mono text-secondary space-y-1">

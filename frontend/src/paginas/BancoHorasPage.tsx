@@ -137,7 +137,7 @@ export function BancoHorasPage({ allRecords, justificacoes }: BancoHorasPageProp
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-0">
         <div className="flex flex-col gap-1 p-5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-medium text-muted uppercase tracking-wider">Saldo Atual</span>
@@ -232,7 +232,7 @@ export function BancoHorasPage({ allRecords, justificacoes }: BancoHorasPageProp
               <span className="text-[11px] text-secondary">{monthLabel(selectedMonth)}</span>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="flex flex-col gap-0.5">
               <span className="text-[10px] font-medium text-muted uppercase tracking-wider">Horas Trabalhadas</span>
               <span className="text-lg font-bold text-primary tracking-tight">
@@ -258,7 +258,7 @@ export function BancoHorasPage({ allRecords, justificacoes }: BancoHorasPageProp
               </span>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 pt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-4">
             <div className="flex flex-col gap-0.5">
               <span className="text-[10px] font-medium text-muted uppercase tracking-wider">Faltas</span>
               <span className="text-lg font-bold text-[#C49A6B] tracking-tight">

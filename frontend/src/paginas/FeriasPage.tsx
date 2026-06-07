@@ -223,7 +223,7 @@ export function FeriasPage() {
       />
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 p-0.5 rounded-lg bg-elevated/20 w-fit">
+      <div className="flex items-center gap-1 p-0.5 rounded-lg bg-elevated/20 w-fit overflow-x-auto">
         <button onClick={() => setActiveTab("lista")}
           className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold transition-all ${
             activeTab === "lista" ? "bg-surface text-primary shadow-sm" : "text-muted hover:text-primary"
@@ -251,7 +251,7 @@ export function FeriasPage() {
       </div>
 
       {/* Metric cards */}
-      <div className="flex items-stretch">
+      <div className="flex flex-wrap items-stretch">
         {[
           { label: "Férias programadas", icon: CalendarCheck, value: programmed, color: "text-[var(--accent-primary)]" },
           { label: "Colaboradores em férias", icon: Users, value: active, color: "text-blue-400" },
@@ -260,7 +260,7 @@ export function FeriasPage() {
         ].map(c => {
           const Icon = c.icon
           return (
-            <div key={c.label} className="flex-1 flex flex-col gap-1.5 p-5 border-r border-default last:border-r-0">
+            <div key={c.label} className="w-1/2 lg:w-1/4 flex flex-col gap-1.5 p-5 border-r border-default last:border-r-0">
               <div className="flex items-center gap-2">
                 <Icon size={14} className={c.color} />
                 <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">{c.label}</span>
@@ -490,8 +490,8 @@ export function FeriasPage() {
                       <span className="text-[11px] text-amber-400 font-medium">{STATUS_CONFIG[r.status].label}</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-[11px]">
-                    <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-elevated/20 col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+                    <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-elevated/20 col-span-1 sm:col-span-2">
                       <span className="text-muted uppercase tracking-wider font-semibold">Período</span>
                       <span className="text-primary font-medium">{fmtDate(r.startDate)} — {fmtDate(r.endDate)}</span>
                     </div>
@@ -499,7 +499,7 @@ export function FeriasPage() {
                       <span className="text-muted uppercase tracking-wider font-semibold">Dias</span>
                       <span className="text-primary font-medium">{r.days}d</span>
                     </div>
-                    <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-elevated/20 col-span-3">
+                    <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-elevated/20 col-span-1 sm:col-span-3">
                       <span className="text-muted uppercase tracking-wider font-semibold">Solicitado em</span>
                       <span className="text-primary font-medium">{fmtDate(r.requestedAt)}</span>
                     </div>
@@ -557,7 +557,7 @@ export function FeriasPage() {
                   ))}
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-semibold uppercase tracking-wider text-secondary">Data início *</label>
                   <input required type="date" value={newStart} onChange={e => setNewStart(e.target.value)}

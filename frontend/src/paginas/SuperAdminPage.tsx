@@ -140,7 +140,7 @@ export function SuperAdminPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-primary">{company.name}</p>
-                  <div className="flex items-center gap-3 mt-0.5">
+                  <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                     <span className="text-[11px] text-muted font-mono">{company.slug}</span>
                     <span className="text-[11px] text-muted flex items-center gap-1"><Users size={10} />{company._count?.users || 0}</span>
                     <span className="text-[11px] text-muted flex items-center gap-1"><MapPin size={10} />{company._count?.branches || 0}</span>
