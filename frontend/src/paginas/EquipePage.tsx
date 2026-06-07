@@ -460,15 +460,19 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
     doc.save(`perfil-${m.name.toLowerCase().replace(/\s+/g, "-")}.pdf`)
   }, [])
 
-  const handleDeleteConfirm = useCallback(async () => {
+  async function handleDeleteConfirm() {
+    console.log("[delete] handleDeleteConfirm called, deleteTarget:", deleteTarget?.id)
     if (!deleteTarget) return
     setOpenMenuId(null)
     try {
-      await apiTeam.delete(deleteTarget.id)
+      const res = await apiTeam.delete(deleteTarget.id)
+      console.log("[delete] API response:", res)
       setDeleteTarget(null)
       await fetchData()
-    } catch {}
-  }, [deleteTarget, fetchData])
+    } catch (err) {
+      console.error("[delete] API error:", err)
+    }
+  }
 
   const handleAction = useCallback(async (action: string, member: EnrichedMember) => {
     setOpenMenuId(null)
@@ -483,7 +487,7 @@ export function EquipePage({ user, onViewProfile, allRecords = [], justificacoes
           break
         case "delete":
           setDeleteTarget(member)
-          break
+          return  // don't fetchData, modal will handle deletion
       }
       await fetchData()
     } catch {}
