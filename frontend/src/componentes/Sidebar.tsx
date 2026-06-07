@@ -57,8 +57,9 @@ const SECTION_KEYS: Record<string, string> = {
   "Registro de Ponto": "ponto",
   "Gestão": "gestao",
   "RH": "rh",
-  "Sistema": "sistema",
   "Suporte": "suporte",
+  "Administração": "admin",
+  "Sistema": "sistema",
 }
 
 function loadSectionState(): Record<string, boolean> {
@@ -66,7 +67,7 @@ function loadSectionState(): Record<string, boolean> {
     const raw = localStorage.getItem("sidebar-sections")
     if (raw) return JSON.parse(raw)
   } catch {}
-  return { ponto: false, gestao: false, rh: true, sistema: false, suporte: true }
+  return { ponto: false, gestao: false, rh: true, suporte: true, admin: false, sistema: false }
 }
 
 function saveSectionState(state: Record<string, boolean>) {
@@ -140,23 +141,23 @@ export function Sidebar({ activePage, onNavigate, onLogout, onSwitchAccount, use
       ],
     },
     {
-      label: "Sistema",
-      items: [
-        { label: "Notificações", icon: Bell, page: "notificacoes", badge: notificationCount },
-        { label: "Configurações", icon: Settings, page: "configuracoes" },
-      ],
-    },
-    {
       label: "Suporte",
       items: [
         { label: "Solicitações", icon: LifeBuoy, page: "solicitacoes" },
       ],
     },
     {
-      label: "Administrador",
+      label: "Administração",
       items: [
         { label: "Empresa", icon: Building2, page: "admin-empresa" },
         { label: "Super Admin", icon: ShieldCheck, page: "super-admin" },
+      ],
+    },
+    {
+      label: "Sistema",
+      items: [
+        { label: "Notificações", icon: Bell, page: "notificacoes", badge: notificationCount },
+        { label: "Configurações", icon: Settings, page: "configuracoes" },
       ],
     },
   ], [notificationCount])
